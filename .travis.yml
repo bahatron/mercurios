@@ -1,11 +1,35 @@
-sudo: false
+sudo: required
+
 dist: trusty
-services: docker
+
+services:
+    - docker
 
 language: node_js
 node_js: 12
 
-install: true
+before_install:
+    - sudo rm /usr/local/bin/docker-compose
+    - curl -L https://github.com/docker/compose/releases/download/1.24.0/docker-compose-`uname
+      -s`-`uname -m` > docker-compose
+    - chmod +x docker-compose
+    - sudo mv docker-compose /usr/local/bin
+
+# before_script:
+#     - my_script
 
 script:
     - npm run docker:build
+
+# after_script:
+#     - my_script
+
+notifications:
+    email:
+        recipients:
+            - simonpiscitelli@gmail.com
+        on_success: never # default: change
+        on_failure: change # default: always
+env:
+    global:
+        - MY_ENV_VAR=123
