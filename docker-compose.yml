@@ -1,0 +1,29 @@
+version: "3.7"
+
+services:
+    server:
+        build: .
+        image: mercurios_http
+        volumes:
+            - ./:/app
+        ports:
+            - 3000:3000
+            - 9220:9220
+        depends_on:
+            - mysql
+            - nats
+        command: npm run dev
+
+    mysql:
+        image: mysql:5
+        ports:
+            - 3306:3306
+        environment:
+            MYSQL_ROOT_PASSWORD: secret
+            MYSQL_DATABASE: mercurios
+
+    nats:
+        image: nats
+        ports:
+            - 4222:4222
+            - 8222:8222

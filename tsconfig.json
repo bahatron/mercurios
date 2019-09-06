@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "moduleResolution": "node",
+        "outDir": "dist",
+        // "preserveSymlinks": true,
+        "esModuleInterop": true,
+        "module": "commonjs",
+        "strict": true
+    },
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}

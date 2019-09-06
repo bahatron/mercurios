@@ -1,0 +1,22 @@
+{
+    "apps": [
+        {
+            "name": "server",
+            "script": "dist/bin/www.js",
+            "instances": "max",
+            "exec_mode": "cluster"
+        },
+        {
+            "name": "dev",
+            "script": "dist/bin/www.js",
+            "exec_mode": "cluster",
+            "instances": 2,
+            "watch": [
+                "dist"
+            ],
+            "env": {
+                "NODE_OPTIONS": "--inspect=0.0.0.0:9220"
+            }
+        }
+    ]
+}
