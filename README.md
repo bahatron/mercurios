@@ -7,15 +7,16 @@
 -   run `npm run docker:dev`
 -   done!
 
-# API
+## API
 
 ### POST /streams
 
-> Create stream
+Create stream
 
-_topic<string>_\*: stream's name, must be unique
-_schema(optional)<object>_: jsonschema Schema
-
+##### Params:
+    - topic*: stream name, must be unique
+    - schema?: [jsonschema](https://github.com/tdegrunt/jsonschema)
+##### Example:
 ```ts
 $axios.post<Stream>(`${API_URL}/streams`, {
     topic: "topic_name",
@@ -30,12 +31,13 @@ $axios.post<Stream>(`${API_URL}/streams`, {
 });
 ```
 
-### POST/stream/:topic
+### POST /stream/:topic
 
 > Publish event
 
-_data(optional)<object>_: event's payload
-
+##### Params:
+    - data?: event's payload
+##### Example:
 ```ts
 $axios.post<Event>(`${API_URL}/stream/my_topic`, {
     data: {
@@ -44,20 +46,22 @@ $axios.post<Event>(`${API_URL}/stream/my_topic`, {
 });
 ```
 
-### GET/stream/:topic/:seq
+### GET /stream/:topic/:seq
 
 > Get event
 
-_seq<number>\*_: event position on the stream
-
+##### Params:
+    - seq: event's sequence
+##### Example:
 ```ts
 $axios.get<Event>(`${API_URL}/stream/my_topic/2`);
 ```
 
-### GET/ping
+### GET /ping
 
 > Check HTTP status
-
+> 
+##### Example:
 ```ts
 $axios.get<"pong">(`${API_URL}/ping`);
 ```
