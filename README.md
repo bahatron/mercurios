@@ -13,8 +13,8 @@
 
 > Create stream
 
--   topic<string>\*: stream's name, must be unique
--   schema(optional)<object>: jsonschema Schema
+_topic<string>_\*: stream's name, must be unique
+_schema(optional)<object>_: jsonschema Schema
 
 ```ts
 $axios.post<Stream>(`${API_URL}/streams`, {
@@ -34,7 +34,7 @@ $axios.post<Stream>(`${API_URL}/streams`, {
 
 > Publish event
 
--   data(optional)<object>: event's payload
+_data(optional)<object>_: event's payload
 
 ```ts
 $axios.post<Event>(`${API_URL}/stream/my_topic`, {
@@ -48,7 +48,7 @@ $axios.post<Event>(`${API_URL}/stream/my_topic`, {
 
 > Get event
 
--   seq<number>\*: event position on the stream
+_seq<number>\*_: event position on the stream
 
 ```ts
 $axios.get<Event>(`${API_URL}/stream/my_topic/2`);
@@ -56,7 +56,7 @@ $axios.get<Event>(`${API_URL}/stream/my_topic/2`);
 
 ### GET/ping
 
-> Check if HTTP api is up
+> Check HTTP status
 
 ```ts
 $axios.get<"pong">(`${API_URL}/ping`);

@@ -1,0 +1,11 @@
+sudo: false
+dist: trusty
+services: docker
+
+language: node_js
+node_js: 12
+
+install: true
+
+script:
+    - npm run docker:build
