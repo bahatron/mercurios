@@ -1,5 +1,5 @@
-import $streams from "../streams/stream_repository";
-import { Event } from "./event_factory";
+import $streams from "./modules/stream_repository";
+import { Event } from "./modules/event_factory";
 
 export default async function readEvent(
     topic: string,

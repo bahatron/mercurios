@@ -1,25 +1,33 @@
-import $error from "@bahatron/error";
 import $db from "../../services/db";
 import $json from "../../services/json";
 import $dispatcher from "../../services/dispatcher";
 import streamFactory, { Stream } from "./stream_factory";
+import $error from "../../services/error";
+
 export const STREAM_DEFINITIONS = "stream_definitions";
 
-/** @todo: export only class type */
-export class StreamRepository {
+export const STREAM_TABLE = (topic: string): string => {
+    return `stream:_${topic}`;
+};
+
+class StreamRepository {
     private _streams: Map<string, Stream> = new Map();
 
-    /** @todo: use event sourcing */
-    /** @todo validate schema is valid */
     public async create(topic: string, schema?: any): Promise<Stream> {
-        let stream = await streamFactory(topic, schema).init();
+        await $db.createTable(STREAM_TABLE(topic), function(table) {
+            table.increments();
+            table.string("published_at");
+            table.text("data", "longtext");
+        });
 
         await $db.insert(STREAM_DEFINITIONS, {
             topic,
-            schema: $json.stringify(schema)
+            schema: $json.stringify(schema),
         });
 
-        await $dispatcher.publish(`topic_created`, { topic, schema });
+        await $dispatcher.publish(`stream_created`, { topic, schema });
+
+        let stream = streamFactory(topic, schema);
 
         this._streams.set(topic, stream);
 
@@ -75,7 +83,7 @@ const $streams = new Proxy(
 
                 return repo[handler](...args);
             };
-        }
+        },
     }
 ) as StreamRepository;
 

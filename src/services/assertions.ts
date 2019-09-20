@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import moment = require("moment");
-import $error from "@bahatron/error";
+import $error from "./error";
 
 export type Type =
     | "number"
@@ -10,22 +10,6 @@ export type Type =
     | "any"
     | "date_string"
     | "json_string";
-
-const $assertions = {
-    testObjectProperty<T = any>(object: T, key: keyof T, type: Type) {
-        expect(object).to.haveOwnProperty(key as string);
-
-        testPropertyType(object[key], type);
-    },
-
-    testObjectSchema(object: any, schema: Record<string, Type>) {
-        Object.keys(schema).forEach(key => {
-            testPropertyType(object[key], schema[key]);
-        });
-    }
-};
-
-export default $assertions;
 
 function testPropertyType(value: any, type: Type) {
     switch (type) {
@@ -48,7 +32,7 @@ function parseable(value: any) {
     try {
         JSON.parse(value);
     } catch (err) {
-        throw $error.ValidationError(`${value} is not a valid json_string`);
+        throw $error.ValidationFailed(`${value} is not a valid json_string`);
     }
 }
 
@@ -57,3 +41,27 @@ function dateString(val: any) {
 
     expect(moment(val).isValid()).to.be.true;
 }
+
+const $assertions = {
+    testObjectProperty<T = any>(object: T, key: keyof T, type: Type) {
+        expect(object).to.haveOwnProperty(key.toString());
+
+        testPropertyType(object[key], type);
+    },
+
+    testObjectSchema(object: any, schema: Record<string, Type>) {
+        Object.keys(schema).forEach(key => {
+            testPropertyType(object[key], schema[key]);
+        });
+    },
+
+    compareOjbects(expected: any, toTest: any) {
+        Object.entries(expected).forEach(([key, value]) => {
+            expect(toTest[key]).to.deep.eq(value);
+        });
+    },
+
+    expect,
+};
+
+export default $assertions;

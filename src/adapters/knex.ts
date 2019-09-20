@@ -1,5 +1,5 @@
 import knex from "knex";
-import $env from "./env";
+import $env from "@bahatron/env";
 
 const config: knex.Config = {
     client: "mysql2",
@@ -8,8 +8,8 @@ const config: knex.Config = {
         port: parseInt($env.get("MYSQL_PORT", "3306")),
         user: $env.get("MYSQL_USER", "root"),
         password: $env.get("MYSQL_PASSWORD", "secret"),
-        database: $env.get("MYSQL_DATABASE", "mercurios")
-    }
+        database: $env.get("MYSQL_DATABASE", "mercurios"),
+    },
 };
 
 const $knex = knex(config);

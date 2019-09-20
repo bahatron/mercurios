@@ -9,7 +9,7 @@ autocannon -c 100 server:3000/ping
 
 # test publishing events
 # curl -X POST -H "Content-Type: application/json" -d '{"data":{}}' http://server:3000/stream/perf_test
-autocannon -c 100 --method POST -H "Content-Type: application/json" -b '{"data":{}}' http://server:3000/stream/perf_test
+autocannon -c 100 --method POST -H "Content-Type: application/json" -b '{}' http://server:3000/stream/perf_test
 
 # test reading events
 autocannon -c 100 http://server:3000/stream/perf_test/1

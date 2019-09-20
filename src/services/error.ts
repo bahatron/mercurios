@@ -1,7 +1,3 @@
-/**
- * @todo: convert this into a NPM package
- */
-
 type HttpCode = 400 | 401 | 403 | 404 | 409 | 500;
 type Context = Record<string, any>;
 
@@ -51,7 +47,7 @@ const $error = {
 
     Error(message: string, httpCode: HttpCode, context?: Context): Exception {
         return new Exception("Error", message, httpCode, context);
-    }
+    },
 };
 
 type ExceptionType = Exception;

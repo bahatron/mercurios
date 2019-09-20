@@ -2,7 +2,7 @@ import $json from "../../services/json";
 import $date from "../../services/date";
 
 export interface Event {
-    seq: number;
+    id: number;
     data: any;
     published_at: string;
     topic: string;
@@ -10,14 +10,14 @@ export interface Event {
 
 export default function eventFactory(
     topic: string,
-    seq: number,
+    id: number,
     published_at: string,
     data: any
 ): Event {
     return {
         topic,
-        seq,
+        id,
         published_at: $date.dateString(published_at),
-        data: $json.parse(data) // @todo: reduce amount of parsing/stringify calls
+        data: $json.parse(data),
     };
 }

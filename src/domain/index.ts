@@ -1,13 +1,11 @@
-import $streams from "./streams/stream_repository";
-import publishEvent from "./events/publish_event";
-import readEvent from "./events/read_event";
+import createStream from "./create_stream";
+import publishEvent from "./publish_event";
+import readEvent from "./read_event";
 
-/** @todo: remove streams */
 const $domain = {
     publishEvent,
     readEvent,
-    streams: $streams
+    createStream,
 };
 
-export { StreamRepository } from "./streams/stream_repository";
 export default $domain;

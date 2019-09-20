@@ -1,37 +1,18 @@
 import { Schema } from "jsonschema";
 import $error from "../../services/error";
-import eventFactory, { Event } from "../events/event_factory";
 import $date from "../../services/date";
 import $db from "../../services/db";
 import $json from "../../services/json";
 import $dispatcher from "../../services/dispatcher";
 import $validator from "../../services/validator";
+import { STREAM_TABLE } from "./stream_repository";
+import eventFactory, { Event } from "./event_factory";
 
-/** @todo: find a better way to do this so the name of the class can be Stream? */
-export type Stream = StreamClass;
-
-export const TABLE_NAME = (topic: string): string => {
-    return `stream:_${topic}`;
-};
-
-/**
- * @description a Stream is an EventRepository in industry's OOP
- */
-class StreamClass {
+export class Stream {
     public readonly schema: Schema;
 
     constructor(public readonly topic: string, schema?: Schema) {
         this.schema = schema ? $json.parse(schema) : {};
-    }
-
-    public async init(): Promise<StreamClass> {
-        await $db.createTable(TABLE_NAME(this.topic), function(table) {
-            table.increments();
-            table.string("published_at");
-            table.text("data", "longtext");
-        });
-
-        return this;
     }
 
     public async append(data: any = {}): Promise<Event> {
@@ -41,9 +22,9 @@ class StreamClass {
 
         let published_at = $date.create();
 
-        const seq = await $db.insert(TABLE_NAME(this.topic), {
+        const seq = await $db.insert(STREAM_TABLE(this.topic), {
             published_at,
-            data: $json.stringify(data)
+            data: $json.stringify(data),
         });
 
         if (!seq) {
@@ -54,13 +35,13 @@ class StreamClass {
 
         let event = eventFactory(this.topic, seq, published_at, data);
 
-        await $dispatcher.publish(TABLE_NAME(this.topic), event);
+        await $dispatcher.publish(STREAM_TABLE(this.topic), event);
 
         return event;
     }
 
     public async read(seq: number): Promise<Event | undefined> {
-        let result = await $db.findOneBy(TABLE_NAME(this.topic), { id: seq });
+        let result = await $db.findOneBy(STREAM_TABLE(this.topic), { id: seq });
         if (!result) {
             return undefined;
         }
@@ -71,7 +52,7 @@ class StreamClass {
     }
 }
 
-/** @todo: validate schema is valid jsonschema.Schema */
+/** @todo: validate schema is valid jsonschema.Schema. Is that even possible? */
 export default function streamFactory(topic: string, schema?: Schema) {
-    return new StreamClass(topic, schema);
+    return new Stream(topic, schema);
 }

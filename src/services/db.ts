@@ -40,11 +40,15 @@ const $db = {
         table: string,
         callback: (schema: knex.CreateTableBuilder) => void
     ): Promise<void> {
-        if (await $knex.schema.hasTable(table)) {
+        if (await $db.hasTable(table)) {
             return;
         }
 
         await $knex.schema.createTable(table, callback);
+    },
+
+    async dropTable(table: string): Promise<void> {
+        await $knex.schema.dropTableIfExists(table);
     },
 
     async truncate(table: string) {
@@ -53,7 +57,7 @@ const $db = {
         }
 
         await $knex(table).truncate();
-    }
+    },
 };
 
 export default $db;
