@@ -1,4 +1,4 @@
-import $error from "@bahatron/error";
+import $error from "./error";
 
 interface User {
     uid: string;
@@ -18,8 +18,8 @@ const $auth = {
         }
 
         return {
-            uid: token
+            uid: token,
         };
-    }
+    },
 };
 export default $auth;
