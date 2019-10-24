@@ -44,7 +44,10 @@ SERVER.post(
 SERVER.get(
     "/stream/:topic/:seq",
     asyncRoute(async (req, res) => {
-        let event = await $domain.readEvent(req.params.topic, req.params.seq);
+        let event = await $domain.readEvent(
+            req.params.topic,
+            parseInt(req.params.seq)
+        );
 
         return res.status(200).json(event);
     })
