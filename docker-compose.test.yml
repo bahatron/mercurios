@@ -8,7 +8,8 @@ services:
             - nats
 
     mysql:
-        image: mysql:5
+        image: mysql:8
+        command: --default-authentication-plugin=mysql_native_password
         environment:
             MYSQL_ROOT_PASSWORD: secret
             MYSQL_DATABASE: mercurios
@@ -20,6 +21,6 @@ services:
         image: mercurios_http
         depends_on:
             - server
-        command: sh -c "sleep 10 && npm run test && npm run test:perf"
+        command: sh -c "sleep 15 && npm run test && npm run test:perf"
         environment:
             - TEST_API_URL=http://server:3000

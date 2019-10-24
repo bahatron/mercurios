@@ -19,7 +19,8 @@ before_install:
 #     - my_script
 
 script:
-    - npm run docker:build
+    - ./scripts/build.sh
+    - ./scripts/test.sh
 
 # after_script:
 #     - my_script

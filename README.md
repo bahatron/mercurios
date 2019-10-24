@@ -4,7 +4,20 @@ Event streaming made simple
 
 ## Getting started
 
-- run server in development mode: `npm run 
+- `npm run docker:dev`: orchestrate the development environment
+- `npm run docker:build`: build the server's image
+- `npm run docker:test`: test server's image
+- `npm run start`: start server in production mode
+- `npm run start:dev`: start server in developmnet mode
+- `npm run build`: compile typescript files
+- `npm run build:watch`: execute watch mode for typescript files
+- `npm run test`: execute unit tests (requites enviroment to be set)
+- `npm run test:perf`: execute performance test
+
+## Notes
+
+ - Event ordering is not guaranteed. However, it's possible to use `expectedSeq` when publishing to control the order of events in a stream
+
 
 ## API
 
@@ -12,10 +25,11 @@ Event streaming made simple
 
 Creates a stream
 
-- Params:
-        topic*: stream name, must be unique,
-        schema?: [jsonschema](https://github.com/tdegrunt/jsonschema)
-- Example:
+- **Params**:
+  - topic*: stream name, must be unique
+  - schema?: [jsonschema](https://github.com/tdegrunt/jsonschema)
+
+- **Example**:
     ```ts
     $axios.post<Stream>(`${API_URL}/streams`, {
         topic: "topic_name",
@@ -34,11 +48,14 @@ Creates a stream
 
 Publishes an event to the stream
 
-- Params:
-    ```ts
-        data?: event payload
-    ```
-- Example:
+- **Query**:
+  - topic: the topic of the stream
+
+- **Params**:
+  - data?: event payload
+  - expectedSeq?: the new event's expected sequence
+
+- **Example**:
     ```ts
     $axios.post<Event>(`${API_URL}/stream/my_topic`, {
         data: {
@@ -47,24 +64,24 @@ Publishes an event to the stream
     });
     ```
 
-- GET /stream/:topic/:id
+### `GET /stream/:topic/:seq`
 
 Read event
 
-- Params:
-    ```ts
-    id: event sequence
-    ```
-- Example:
+- **Query**:
+  - topic: the topic of the stream
+  - seq: event sequence
+
+- **Example**:
     ```ts
     $axios.get<Event>(`${API_URL}/stream/my_topic/2`);
     ```
 
-### GET /ping
+### `GET /ping`
 
- Check HTTP status
+ Check HTTP server status
 
-- Example:
+- **Example**:
     ```ts
     $axios.get<"pong">(`${API_URL}/ping`);
     ```
