@@ -1,6 +1,6 @@
 import $ws from "ws";
 import { Server } from "http";
-import $nats from "../adapters/nats";
+import $nats from "../services/nats";
 import $json from "../services/json";
 
 const $uuid = require("uuid");

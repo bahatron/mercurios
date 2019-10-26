@@ -4,7 +4,7 @@ import $assertions from "../../src/services/assertions";
 import { STREAM_DEFINITIONS } from "../../src/domain/modules/stream_repository";
 import $json from "../../src/services/json";
 import { STREAM_TABLE } from "../../src/domain/modules/stream";
-import $mysql from "../../src/adapters/mysql";
+import $mysql from "../../src/services/mysql";
 
 const TEST_API_URL = $env.get(`TEST_API_URL`, `http://localhost:3000`);
 

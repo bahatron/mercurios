@@ -1,6 +1,6 @@
 import $streams from "./modules/stream_repository";
 import { Event } from "./modules/event";
-import $nats from "../adapters/nats";
+import $nats from "../services/nats";
 import $json from "../services/json";
 
 interface PublishPayload {

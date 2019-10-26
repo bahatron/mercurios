@@ -5,8 +5,8 @@ import $streams, {
 } from "../../src/domain/modules/stream_repository";
 import $domain from "../../src/domain";
 import { STREAM_TABLE } from "../../src/domain/modules/stream";
-import $nats from "../../src/adapters/nats";
-import $mysql from "../../src/adapters/mysql";
+import $nats from "../../src/services/nats";
+import $mysql from "../../src/services/mysql";
 import $assertions from "../../src/services/assertions";
 
 const TEST_API_URL = $env.get(`TEST_API_URL`, `http://localhost:3000`);

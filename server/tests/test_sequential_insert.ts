@@ -1,4 +1,4 @@
-import $axios from "../src/adapters/axios";
+import $axios from "../src/services/axios";
 import { EventEmitter } from "events";
 import $streams from "../src/domain/modules/stream_repository";
 import $env from "@bahatron/env";

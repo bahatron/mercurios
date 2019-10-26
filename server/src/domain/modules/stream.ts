@@ -4,7 +4,7 @@ import $date from "../../services/date";
 import $json from "../../services/json";
 import $validator from "../../services/validator";
 import eventFactory, { Event } from "./event";
-import $mysql from "../../adapters/mysql";
+import $mysql from "../../services/mysql";
 
 export const STREAM_TABLE = (topic: string): string => {
     return `stream_${topic}`;

@@ -1,7 +1,7 @@
 import $json from "../../services/json";
 import streamFactory, { Stream, STREAM_TABLE } from "./stream";
 import $error from "../../services/error";
-import $mysql from "../../adapters/mysql";
+import $mysql from "../../services/mysql";
 
 export const STREAM_DEFINITIONS = "stream_definitions";
 
