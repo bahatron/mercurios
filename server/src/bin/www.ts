@@ -1,6 +1,6 @@
-import expressServer from "../server/http";
+import expressServer from "../http";
 import http from "http";
-import createWsServer from "../server/websocket";
+import createWsServer from "../websocket";
 
 const PORT = 3000;
 
