@@ -1,4 +1,4 @@
-import $ws from "../../src/websocket";
+import $ws from "ws";
 import $env from "@bahatron/env";
 import $assertions from "../../src/services/assertions";
 import $domain from "../../src/domain";
