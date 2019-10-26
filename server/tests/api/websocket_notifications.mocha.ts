@@ -1,4 +1,4 @@
-import $ws from "../../src/http/node_modules/ws";
+import $ws from "../../src/websocket";
 import $env from "@bahatron/env";
 import $assertions from "../../src/services/assertions";
 import $domain from "../../src/domain";
