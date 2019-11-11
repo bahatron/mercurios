@@ -19,8 +19,8 @@ before_install:
 #     - my_script
 
 script:
-    - ./docker/build.sh
-    - ./docker/test.sh
+    - ./build.sh
+    - ./test.sh
 
 # after_script:
 #     - my_script

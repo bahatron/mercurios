@@ -1,6 +1,7 @@
 import expressServer from "../http";
 import http from "http";
 import createWsServer from "../websocket";
+import $logger from "../services/logger";
 
 const PORT = 3000;
 
@@ -9,15 +10,15 @@ const httpServer = new http.Server(expressServer);
 const wsServer = createWsServer(httpServer);
 
 wsServer.on("listening", () => {
-    console.log(`WebSocket Server - listening`);
+    $logger.info(`Webscoket server listening`);
 });
 
 httpServer.on("listening", () => {
-    console.log(`HTTP Server - listening in port ${PORT}`);
+    $logger.info(`Http server listening on port ${PORT}`);
 });
 
 httpServer.on("error", err => {
-    console.log(`HTTP Server - ERROR:`, err.message);
+    $logger.error(`Http server error: ${err.message}`);
 });
 
 httpServer.listen(PORT);

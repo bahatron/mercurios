@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 curl -X POST -H "Content-Type: application/json" -d '{"topic":"perf_test"}' http://server:3000/streams
 

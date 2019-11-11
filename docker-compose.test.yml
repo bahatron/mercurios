@@ -3,10 +3,10 @@ version: "3.7"
 services:
     server:
         image: mercurios_http
-        command: sh -c "sleep 15 && npm run test && npm run test:perf"
         depends_on:
             - mysql
             - nats
+        command: sh -c "sleep 20 && npm start"
 
     mysql:
         image: mysql:8
@@ -22,6 +22,6 @@ services:
         image: mercurios_http
         depends_on:
             - server
-        command: sh -c "sleep 15 && npm run test && npm run test:perf"
+        command: sh -c "sleep 25 && npm run test && npm run test:perf"
         environment:
             - TEST_API_URL=http://server:3000

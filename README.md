@@ -1,22 +1,22 @@
 # Mercurious
 
-Http based event sourcing
+Event streaming made simple
 
 ## Notes
 
 -   Event ordering is not guaranteed. However, it's possible to use `expectedSeq` when publishing to control the order of events in a stream
 
-## Docker scripts
+## Scripts
 
 ```sh
 # build server image
-./docker/build.sh
+./build.sh
 
 # test image
-./docker/test.sh
+./test.sh
 
 # dev environment
-./docker/dev.sh
+./dev.sh
 ```
 
 ## NPM scripts

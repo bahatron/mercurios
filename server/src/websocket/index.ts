@@ -53,7 +53,10 @@ export default function createWsServer(httpServer: Server): $ws.Server {
         });
     });
 
-    /** @description: ping all clients every 30 seconds and terminate the ones that do not respond */
+    /**
+     * @description: ping all clients every 30 seconds
+     * and terminate the ones that do not respond
+     */
     setInterval(function ping() {
         wss.clients.forEach(function each(ws) {
             if ((ws as any).isAlive === false) {
