@@ -7,9 +7,12 @@ const $json = {
         }
     },
 
-    stringify(data: any) {
-        return typeof data === "string" ? data : JSON.stringify(data);
-    }
+    /** @todo: add recursive behaviour */
+    stringify(data: any, replacer?: (key, value) => any, spaces: number = 4) {
+        return typeof data === "string"
+            ? data
+            : JSON.stringify(data, replacer, spaces);
+    },
 };
 
 export default $json;

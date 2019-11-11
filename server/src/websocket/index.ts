@@ -2,6 +2,7 @@ import $ws from "ws";
 import { Server } from "http";
 import $nats from "../services/nats";
 import $json from "../services/json";
+import $logger from "../services/logger";
 
 const $uuid = require("uuid");
 
@@ -10,8 +11,8 @@ export default function createWsServer(httpServer: Server): $ws.Server {
 
     /** @todo: use proper logging */
     wss.on("error", err => {
-        console.log(`WEBSCOKET SERVER Error - ${err.message}`);
-        console.log(err);
+        $logger.error(`WebSocket Server onError - ${err.message}`);
+        $logger.debug(`err: `, err);
     });
 
     wss.on("connection", async (socket, request) => {
@@ -21,7 +22,12 @@ export default function createWsServer(httpServer: Server): $ws.Server {
 
         /** @todo: figure this out */
         socket.on("unexpected-response", (req, res) => {
-            console.log(`WEBSCOKET SERVER - Client unexpected response`);
+            $logger.warning(
+                `WebSocket Server - Client: ${req.getHeader(
+                    "REQUEST_ID"
+                )} unexpected response`
+            );
+            $logger.debug(`request: `, req);
         });
 
         let dispatcher = await $nats.connect(`client_${id}`);
@@ -30,7 +36,9 @@ export default function createWsServer(httpServer: Server): $ws.Server {
             try {
                 socket.send($json.stringify(data));
             } catch (err) {
-                console.log(`dispatcher caught error: ${err.message}`);
+                $logger.error(
+                    `WebSocket Server - Error on dispachter subscription: ${err.message}`
+                );
             }
         });
 

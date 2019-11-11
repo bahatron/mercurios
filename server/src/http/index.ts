@@ -3,6 +3,7 @@ import $error, { Exception } from "../services/error";
 import $domain from "../domain";
 import helmet from "helmet";
 import asyncRoute from "./middleware/asyncRoute";
+import $logger from "../services/logger";
 
 const SERVER = express();
 
@@ -57,7 +58,8 @@ SERVER.use(
     (err: Exception, req: Request, res: Response, next: NextFunction) => {
         let code = err.httpCode || 500;
         if (code >= 500) {
-            console.log(err);
+            $logger.error(`HTTP Server - http error: ${code} - ${err.message}`);
+            $logger.debug(`err`, err);
         }
 
         return res

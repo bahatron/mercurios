@@ -2,6 +2,7 @@ import $json from "../../services/json";
 import streamFactory, { Stream, STREAM_TABLE } from "./stream";
 import $error from "../../services/error";
 import $mysql from "../../services/mysql";
+import $logger from "../../services/logger";
 
 export const STREAM_DEFINITIONS = "stream_definitions";
 
@@ -74,7 +75,7 @@ const REPOSITORY = (async function factory() {
         return new StreamRepository();
     } catch (err) {
         /** @todo use proper logger */
-        console.log(`!!! Error initiating topic repository\n`, err);
+        $logger.error(`Error connecting to MySQL: ${err.message}`);
         throw process.exit(-1);
     }
 })();

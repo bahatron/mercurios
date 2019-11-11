@@ -13,6 +13,8 @@ services:
             - mysql
             - nats
         command: npm run dev
+        environment:
+            DEBUG_MODE: "true"
 
     mysql:
         image: mysql:8

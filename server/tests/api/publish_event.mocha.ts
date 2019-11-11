@@ -8,6 +8,7 @@ import { STREAM_TABLE } from "../../src/domain/modules/stream";
 import $nats from "../../src/services/nats";
 import $mysql from "../../src/services/mysql";
 import $assertions from "../../src/services/assertions";
+import $logger from "../../src/services/logger";
 
 const TEST_API_URL = $env.get(`TEST_API_URL`, `http://localhost:3000`);
 
@@ -109,7 +110,8 @@ describe("publish event", () => {
                     })
                 );
             } catch (err) {
-                console.log(`Error loading fixtures\n`, err);
+                $logger.error(`Error loading fixtures`);
+                $logger.debug(`err: `, err);
                 throw err;
             }
         });

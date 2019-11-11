@@ -9,6 +9,10 @@ const httpServer = new http.Server(expressServer);
 
 const wsServer = createWsServer(httpServer);
 
+$logger.debug("www", {
+    debug_mode: true,
+});
+
 wsServer.on("listening", () => {
     $logger.info(`Webscoket server listening`);
 });

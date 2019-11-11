@@ -2,6 +2,7 @@ import $axios from "../src/services/axios";
 import { EventEmitter } from "events";
 import $streams from "../src/domain/modules/stream_repository";
 import $env from "@bahatron/env";
+import $logger from "../src/services/logger";
 
 const TOPIC = "sequential_test";
 const TEST_API_URL = $env.get("TEST_API_URL", "http://localhost:3000");
@@ -34,7 +35,7 @@ async function initTest(observer) {
 }
 
 async function main() {
-    console.log(`SEQUENTIAL INSERT BENCHMARK - started`);
+    $logger.info(`SEQUENTIAL INSERT BENCHMARK - started`);
 
     await $streams.delete(TOPIC);
 
@@ -51,11 +52,12 @@ async function main() {
 
 main()
     .then(result => {
-        console.log(
+        $logger.info(
             `SEQUENTIAL INSERT BENCHMARK - inserted ${result} records in 10s`
         );
     })
     .catch(err => {
-        console.log(err);
+        $logger.error(err.message);
+        $logger.debug(`err: `, err);
     })
     .finally(process.exit);
