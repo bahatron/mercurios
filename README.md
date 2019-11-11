@@ -1,6 +1,6 @@
 # Mercurious
 
-Event streaming made simple
+HTTP based event streaming
 
 ## Notes
 
@@ -12,10 +12,10 @@ Event streaming made simple
 # build server image
 ./build.sh
 
-# test image
+# run server tests
 ./test.sh
 
-# dev environment
+# start dev environment
 ./dev.sh
 ```
 
