@@ -21,6 +21,7 @@ before_install:
 script:
     - ./build.sh
     - ./test.sh
+    - ./push.sh
 
 # after_script:
 #     - my_script
