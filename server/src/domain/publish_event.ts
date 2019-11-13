@@ -1,7 +1,7 @@
 import $streams from "./modules/stream_repository";
 import { Event } from "./modules/event";
 import $nats from "../services/nats";
-import $json from "../services/json";
+import $logger from "../services/logger";
 
 interface PublishPayload {
     data?: any;
@@ -17,6 +17,8 @@ export default async function publishEvent(
     let event = await stream.append(data, expectedSeq);
 
     await $nats.publish(`event_published`, event);
+
+    $logger.debug(`published event to topic - ${event.topic}`);
 
     return event;
 }
