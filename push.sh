@@ -1,4 +1,4 @@
-docker login --username $DOCKER_USERNAME  --password $DOCKER_password
+docker login --username $DOCKER_USERNAME  --password $DOCKER_PASSWORD
 
 docker tag mercurios_http bahatron/mercurios_http
 
