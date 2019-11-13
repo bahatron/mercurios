@@ -7,8 +7,6 @@ services:
             - mysql
             - nats
         command: sh -c "sleep 20 && npm start"
-        environment:
-            DEBUG_MODE: "true"
 
     mysql:
         image: mysql:8
