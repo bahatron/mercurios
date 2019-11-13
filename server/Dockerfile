@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM node:lts-slim
 
 RUN npm install -g pm2
 RUN npm install -g autocannon
