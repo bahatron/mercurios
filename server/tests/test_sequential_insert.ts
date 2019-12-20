@@ -13,7 +13,7 @@ async function createStream() {
     });
 }
 
-async function initTest(observer) {
+async function initTest(observer: EventEmitter) {
     let _continue = true;
 
     observer.on("stop", () => {
@@ -35,7 +35,7 @@ async function initTest(observer) {
 }
 
 async function main() {
-    $logger.info(`SEQUENTIAL INSERT BENCHMARK - started`);
+    $logger.info(`SEQUENTIAL INSERT TEST - started`);
 
     await $streams.delete(TOPIC);
 
@@ -52,9 +52,7 @@ async function main() {
 
 main()
     .then(result => {
-        $logger.info(
-            `SEQUENTIAL INSERT BENCHMARK - inserted ${result} records in 10s`
-        );
+        $logger.info(`SEQUENTIAL INSERT TEST - ${result} records in 10s`);
     })
     .catch(err => {
         $logger.error(err.message);

@@ -51,10 +51,10 @@ describe("publish event", () => {
             return new Promise(async resolve => {
                 let event: any;
 
-                $nats.subscribe(`event_published`, (err, { data }) => {
-                    if (data.topic === TOPIC) {
+                $nats.subscribe(`event_published`, (err, msg) => {
+                    if (msg.data.topic === TOPIC) {
                         resolve(
-                            $assertions.expect(data).to.deep.eq(event.data)
+                            $assertions.expect(msg.data).to.deep.eq(event.data)
                         );
                     }
                 });
@@ -105,7 +105,7 @@ describe("publish event", () => {
 
                 // publish event from 1 to 11
                 await Promise.all(
-                    [...Array(11).keys()].map(val => {
+                    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(val => {
                         return publishEvent(TOPIC, val + 1);
                     })
                 );

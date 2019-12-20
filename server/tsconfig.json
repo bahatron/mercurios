@@ -1,10 +1,14 @@
 {
     "compilerOptions": {
+        "moduleResolution": "node",
         "esModuleInterop": true,
-        "module": "commonjs",
-        "target": "esnext",
+        "removeComments": true,
+        "declaration": true,
+        "diagnostics": true,
+        "incremental": true,
+        "sourceMap": true,
+        "outDir": "dist",
         "strict": true,
-        "noImplicitAny": false
     },
     "exclude": [
         "node_modules",
