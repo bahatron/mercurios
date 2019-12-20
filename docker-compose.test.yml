@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
     server:
-        image: mercurios_http
+        image: bahatron/mercurios_http
         depends_on:
             - mysql
             - nats
@@ -19,7 +19,7 @@ services:
         image: nats
 
     test:
-        image: mercurios_http
+        image: bahatron/mercurios_http
         depends_on:
             - server
         command: sh -c "sleep 25 && npm run test && npm run test:perf"
