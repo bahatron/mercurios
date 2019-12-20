@@ -36,14 +36,16 @@ export class Stream {
             throw $error.ValidationFailed("validation failed for event data");
         }
 
-        let published_at = $date.create();
+        let published_at = $date.dateString();
 
         try {
             let seq = await $mysql.transaction(async _trx => {
-                let result = (await _trx(this.table).insert({
-                    published_at,
-                    data: $json.stringify(data),
-                })).shift();
+                let result = (
+                    await _trx(this.table).insert({
+                        published_at,
+                        data: $json.stringify(data),
+                    })
+                ).shift();
 
                 if (!result) {
                     throw $error.InternalError(`unexpected mysql response`);

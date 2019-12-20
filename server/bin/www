@@ -1,8 +1,10 @@
-import expressServer from "../http";
-import http from "http";
-import createWsServer from "../websocket";
-import $logger from "../services/logger";
-import $env from "@bahatron/env";
+#!/usr/bin/node
+
+const http = require("http");
+const expressServer = require("../dist/http/index").default;
+const $logger = require("../dist/services/logger").default;
+const $env = require("@bahatron/env").default;
+const createWsServer = require("../dist/websocket").default;
 
 const PORT = parseInt($env.get("PORT", "3000"));
 

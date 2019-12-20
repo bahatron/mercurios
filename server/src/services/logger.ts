@@ -3,9 +3,9 @@ import $env from "@bahatron/env";
 import $json from "./json";
 import { isEmpty } from "lodash";
 
-const debug = $env.get("DEBUG", "");
+const DEBUG = $env.get("DEBUG", "");
 
-const DEBUG_MODE = debug === "false" ? false : Boolean(debug);
+const DEBUG_MODE = DEBUG === "false" ? false : Boolean(DEBUG);
 
 const $logger = winston.createLogger({
     format: winston.format.combine(

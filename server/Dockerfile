@@ -3,8 +3,6 @@ FROM node:lts-slim
 RUN npm install -g pm2
 RUN npm install -g autocannon
 
-RUN pm2 install typescript
-
 WORKDIR /app
 
 COPY . .
