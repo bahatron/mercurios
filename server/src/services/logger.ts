@@ -1,9 +1,11 @@
-import winston, { LeveledLogMethod, LogCallback } from "winston";
+import winston from "winston";
 import $env from "@bahatron/env";
 import $json from "./json";
 import { isEmpty } from "lodash";
 
-const DEBUG_MODE = $env.get("DEBUG_MODE", "") || false;
+const debug = $env.get("DEBUG", "");
+
+const DEBUG_MODE = debug === "false" ? false : Boolean(debug);
 
 const $logger = winston.createLogger({
     format: winston.format.combine(
@@ -17,25 +19,25 @@ const $logger = winston.createLogger({
                 winston.format.align(),
                 winston.format.prettyPrint(),
                 winston.format.printf(info => {
-                    let message = `${info.timestamp}: [${info.level}]: ${info.message}`;
+                    let message = `${info.timestamp} [${process.pid}] ${info.level}: ${info.message}`;
 
                     if (info.level.includes("debug")) {
                         let context = Object.getOwnPropertyNames(info)
                             .filter(
-                                attr =>
+                                key =>
                                     !["level", "timestamp", "message"].includes(
-                                        attr
+                                        key
                                     )
                             )
-                            .reduce((previous: Record<string, any>, key) => {
-                                previous[key] = info[key];
-
-                                return previous;
-                            }, {});
+                            .map(key => `\n${$json.stringify(info[key])}`)
+                            .reduce((_context, stringified) => {
+                                _context += stringified;
+                                return _context;
+                            }, "");
 
                         return isEmpty(context)
                             ? message
-                            : `${message}:\n${$json.stringify(context)}`;
+                            : `${message}${context}`;
                     }
 
                     return message;
@@ -44,9 +46,5 @@ const $logger = winston.createLogger({
         }),
     ],
 });
-
-// export interface Logger extends winston.Logger {
-//     debug(message: string, meta: any, callback: LogCallback): Logger;
-// }
 
 export default $logger;
