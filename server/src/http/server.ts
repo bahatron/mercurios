@@ -57,9 +57,11 @@ SERVER.get(
 SERVER.use(
     (err: Exception, req: Request, res: Response, next: NextFunction) => {
         let code = err.httpCode || 500;
+
+        $logger.debug(err.message, err);
+
         if (code >= 500) {
             $logger.error(`HTTP Server - http error: ${code} - ${err.message}`);
-            $logger.debug(`err`, err);
         }
 
         return res

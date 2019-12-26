@@ -1,7 +1,5 @@
 import winston from "winston";
 import $env from "@bahatron/env";
-import $json from "./json";
-import { isEmpty } from "lodash";
 
 const DEBUG = $env.get("DEBUG", "");
 
@@ -22,22 +20,13 @@ const $logger = winston.createLogger({
                     let message = `${info.timestamp} [${process.pid}] ${info.level}: ${info.message}`;
 
                     if (info.level.includes("debug")) {
-                        let context = Object.getOwnPropertyNames(info)
-                            .filter(
-                                key =>
-                                    !["level", "timestamp", "message"].includes(
-                                        key
-                                    )
-                            )
-                            .map(key => `\n${$json.stringify(info[key])}`)
-                            .reduce((_context, stringified) => {
-                                _context += stringified;
-                                return _context;
-                            }, "");
-
-                        return isEmpty(context)
-                            ? message
-                            : `${message}${context}`;
+                        Object.entries(info).forEach(([key, value]) => {
+                            if (
+                                !["level", "timestamp", "message"].includes(key)
+                            ) {
+                                console.log(key ? `${key}: ` : "", value);
+                            }
+                        });
                     }
 
                     return message;

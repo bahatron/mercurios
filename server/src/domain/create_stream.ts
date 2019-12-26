@@ -5,7 +5,7 @@ export default async function createStream(
     topic: string,
     schema?: any
 ): Promise<Stream | null> {
-    if ((await $streams.exists(topic)) === true) {
+    if (await $streams.exists(topic)) {
         return null;
     }
 

@@ -1,7 +1,7 @@
 #!/usr/bin/node
 
 const http = require("http");
-const expressServer = require("../dist/http/index").default;
+const expressServer = require("../dist/http/server").default;
 const $logger = require("../dist/services/logger").default;
 const $env = require("@bahatron/env").default;
 const createWsServer = require("../dist/websocket").default;
