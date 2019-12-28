@@ -4,14 +4,14 @@
     "description": "an event stream server",
     "author": "simonpiscitelli@gmail.com",
     "scripts": {
-        "start": "pm2-runtime start process.config.js",
-        "dev": "npm run build:watch & pm2-runtime start process.dev.json",
-        "build": "tsc --project tsconfig.build.json",
+        "migrate": "knex migrate:latest",
+        "start": "npm run migrate && pm2-runtime start process.config.js",
+        "dev": "npm run migrate && npm run build:watch & pm2-runtime start process.dev.config.js",
+        "test": "mocha 'dist/**/*.mocha.js'",
+        "test:perf": "./tests/benchmark.sh",
+        "build": "tsc",
         "build:watch": "npm run build -- --watch",
-        "test": "npm run mocha",
-        "mocha": "mocha -b -r ts-node/register \"tests/**/*.mocha.ts\"",
-        "build:clean": "rm -rf dist/ && npm run build",
-        "test:perf": "./tests/benchmark.sh"
+        "build:clean": "rm -rf dist/ && npm run build"
     },
     "dependencies": {
         "@bahatron/env": "^0.1.10",

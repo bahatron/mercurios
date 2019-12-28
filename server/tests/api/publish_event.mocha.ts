@@ -1,23 +1,21 @@
-import $axios from "axios";
+import $http from "axios";
 import $env from "@bahatron/env";
-import $streams, {
-    STREAM_DEFINITIONS,
-} from "../../src/domain/modules/stream_repository";
-import $domain from "../../src/domain";
-import { STREAM_TABLE } from "../../src/domain/modules/stream";
-import $nats from "../../src/services/nats";
-import $mysql from "../../src/services/mysql";
-import $assertions from "../../src/services/assertions";
-import $logger from "../../src/services/logger";
+import $streams from "../../domain/modules/stream_repository";
+import $domain from "../../domain";
+import { STREAM_TABLE } from "../../domain/modules/stream";
+import $nats from "../../services/nats";
+import $mysql from "../../services/mysql";
+import $assertions from "../../services/assertions";
+import $logger from "../../services/logger";
 
-const TEST_API_URL = $env.get(`TEST_API_URL`, `http://localhost:3000`);
+const TEST_SERVER_URL = $env.get(`TEST_SERVER_URL`, `http://localhost:3000`);
 
 export async function publishEvent(
     topic: string,
     data: any,
     expectedSeq?: number
 ) {
-    return $axios.post(`${TEST_API_URL}/stream/${topic}`, {
+    return $http.post(`${TEST_SERVER_URL}/stream/${topic}`, {
         data,
         expectedSeq,
     });
@@ -116,7 +114,7 @@ describe("publish event", () => {
             }
         });
 
-        it("will return http status coe 417 if seq number is already taken", async () => {
+        it("will return http status code 417 if seq number is already taken", async () => {
             return new Promise(async resolve => {
                 try {
                     await publishEvent(TOPIC, "another message", 5);
@@ -126,7 +124,7 @@ describe("publish event", () => {
             });
         });
 
-        it("will return http status coe 417 if expected sequence number is higher than actual", async () => {
+        it("will return http status code 417 if expected sequence number is higher than actual", async () => {
             return new Promise(async resolve => {
                 try {
                     await publishEvent(TOPIC, "another message", 15);

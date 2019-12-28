@@ -1,10 +1,10 @@
 #!/usr/bin/node
 
 const http = require("http");
+const $env = require("@bahatron/env").default;
 const expressServer = require("../dist/http/server").default;
 const $logger = require("../dist/services/logger").default;
-const $env = require("@bahatron/env").default;
-const createWsServer = require("../dist/websocket").default;
+const createWsServer = require("../dist/websocket/server").default;
 
 const PORT = parseInt($env.get("PORT", "3000"));
 

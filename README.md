@@ -19,12 +19,33 @@ HTTP based event streaming
 ./dev.sh
 ```
 
-## NPM scripts
+## ENV variables
+
+```sh
+# mysql config
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_USERNAME=root
+MYSQL_PASSWORD=secret
+MYSQL_DATABASE=mercurios
+
+# nats config
+NATS_URRL=nats://nats:4222
+
+# starts server in debug mode
+DEBUG=false
+
+# sets the amount of workers
+PROCESSES=2
+
+# server url for tests
+TEST_SERVER_URL=http://localhost:3000
+```
+
+## Notable NPM scripts
 
 -   `npm run start`: start server in production mode
 -   `npm run dev`: start server in developmnet mode
--   `npm run build`: compile typescript files
--   `npm run build:watch`: execute watch mode for typescript files
 -   `npm run test`: execute unit tests (requites enviroment to be set)
 -   `npm run test:perf`: execute performance test
 
@@ -41,7 +62,7 @@ Creates a stream
 
 -   **Example**:
     ```ts
-    $axios.post<Stream>(`${API_URL}/streams`, {
+    axios.post<Stream>(`${API_URL}/streams`, {
         topic: "topic_name",
         schema: {
             type: "object",
@@ -69,7 +90,7 @@ Publishes an event to the stream
 
 -   **Example**:
     ```ts
-    $axios.post<Event>(`${API_URL}/stream/my_topic`, {
+    axios.post<Event>(`${API_URL}/stream/my_topic`, {
         data: {
             foo: "bar",
         },
@@ -87,7 +108,7 @@ Read event
 
 -   **Example**:
     ```ts
-    $axios.get<Event>(`${API_URL}/stream/my_topic/2`);
+    axios.get<Event>(`${API_URL}/stream/my_topic/2`);
     ```
 
 ### `GET /ping`
@@ -96,5 +117,5 @@ Check HTTP server status
 
 -   **Example**:
     ```ts
-    $axios.get<"pong">(`${API_URL}/ping`);
+    axios.get<"pong">(`${API_URL}/ping`);
     ```

@@ -1,7 +1,7 @@
 import knex from "knex";
 import $env from "@bahatron/env";
 
-const config: knex.Config = {
+const config = {
     client: "mysql2",
     connection: {
         host: $env.get("MYSQL_HOST", "mysql"),
@@ -14,5 +14,4 @@ const config: knex.Config = {
 
 const $mysql = knex(config);
 
-export { knex };
 export default $mysql;

@@ -2,8 +2,6 @@ import $json from "../../services/json";
 import streamFactory, { Stream, STREAM_TABLE } from "./stream";
 import $error from "../../services/error";
 import $mysql from "../../services/mysql";
-import $logger from "../../services/logger";
-
 export const STREAM_DEFINITIONS = "stream_definitions";
 
 class StreamRepository {
@@ -63,34 +61,6 @@ class StreamRepository {
     }
 }
 
-const REPOSITORY = (async function factory() {
-    try {
-        if (!(await $mysql.schema.hasTable(STREAM_DEFINITIONS))) {
-            await $mysql.schema.createTable(STREAM_DEFINITIONS, table => {
-                table.string("topic").unique();
-                table.text("schema", "longtext");
-            });
-        }
-
-        return new StreamRepository();
-    } catch (err) {
-        /** @todo use proper logger */
-        $logger.error(`Error connecting to MySQL: ${err.message}`);
-        throw process.exit(-1);
-    }
-})();
-
-const $streams = new Proxy(
-    {},
-    {
-        get(target, handler) {
-            return async function(...args: any[]) {
-                let repo: any = await REPOSITORY;
-
-                return repo[handler](...args);
-            };
-        },
-    }
-) as StreamRepository;
+const $streams = new StreamRepository();
 
 export default $streams;

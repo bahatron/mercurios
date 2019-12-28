@@ -1,15 +1,15 @@
-import $axios from "axios";
+import $http from "axios";
 import $env from "@bahatron/env";
-import $assertions from "../../src/services/assertions";
-import $domain from "../../src/domain";
-import { Event } from "../../src/domain/modules/event";
-import $streams from "../../src/domain/modules/stream_repository";
+import $assertions from "../../services/assertions";
+import $domain from "../../domain";
+import { Event } from "../../domain/modules/event";
+import $streams from "../../domain/modules/stream_repository";
 
-const TEST_API_URL = $env.get(`TEST_API_URL`, `http://localhost:3000`);
+const TEST_SERVER_URL = $env.get(`TEST_SERVER_URL`, `http://localhost:3000`);
 
 describe("read event", () => {
     async function readEvent(topic: string, id: number) {
-        return $axios.get(`${TEST_API_URL}/stream/${topic}/${id}`);
+        return $http.get(`${TEST_SERVER_URL}/stream/${topic}/${id}`);
     }
 
     describe("Scenario: topic does not exist", () => {

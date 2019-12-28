@@ -1,10 +1,10 @@
 import $ws from "ws";
 import $env from "@bahatron/env";
-import $assertions from "../../src/services/assertions";
-import $domain from "../../src/domain";
-import $json from "../../src/services/json";
+import $assertions from "../../services/assertions";
+import $domain from "../../domain";
+import $json from "../../services/json";
 
-const TEST_API_URL = $env.get(`TEST_API_URL`, `http://localhost:3000`);
+const TEST_SERVER_URL = $env.get(`TEST_SERVER_URL`, `http://localhost:3000`);
 
 describe("websocket connection", () => {
     let TOPIC = `websocket_connection_test`;
@@ -15,7 +15,7 @@ describe("websocket connection", () => {
 
     it("will stablish a ws connection", async () => {
         return new Promise(async resolve => {
-            const client = new $ws(TEST_API_URL);
+            const client = new $ws(TEST_SERVER_URL);
 
             client.on("open", () => {
                 resolve();
@@ -25,7 +25,7 @@ describe("websocket connection", () => {
 
     it("will recieve messages when a event is published", async () => {
         return new Promise(async resolve => {
-            const ws = new $ws(TEST_API_URL);
+            const ws = new $ws(TEST_SERVER_URL);
 
             ws.on("message", data => {
                 $assertions
