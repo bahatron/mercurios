@@ -1,39 +1,49 @@
-import winston from "winston";
 import $env from "@bahatron/env";
+import moment from "moment";
 
 const DEBUG = $env.get("DEBUG", "");
 
 const DEBUG_MODE = DEBUG === "false" ? false : Boolean(DEBUG);
 
-const $logger = winston.createLogger({
-    format: winston.format.combine(
-        winston.format.timestamp({ format: "YYYY-MM-DD hh:mm:ss" })
-    ),
-    transports: [
-        new winston.transports.Console({
-            level: DEBUG_MODE ? "debug" : "info",
-            format: winston.format.combine(
-                winston.format.colorize(),
-                winston.format.align(),
-                winston.format.prettyPrint(),
-                winston.format.printf(info => {
-                    let message = `${info.timestamp} [${process.pid}] ${info.level}: ${info.message}`;
+const green = (text: string) => `\x1b[32m${text}\x1b[0m`;
+const cyan = (text: string) => `\x1b[96m${text}\x1b[0m`;
+const orange = (text: string) => `\x1b[33m${text}\x1b[0m`;
+const red = (text: string) => `\x1b[31m${text}\x1b[0m`;
 
-                    if (info.level.includes("debug")) {
-                        Object.entries(info).forEach(([key, value]) => {
-                            if (
-                                !["level", "timestamp", "message"].includes(key)
-                            ) {
-                                console.log(key ? `${key}: ` : "", value);
-                            }
-                        });
-                    }
+function log(text: string, colour: Function, level: string) {
+    let timestamp = moment().format("YYYY-MM-DD HH:mm:ss");
 
-                    return message;
-                })
-            ),
-        }),
-    ],
-});
+    let message = `${timestamp}: [${process.pid}] ${colour(
+        level.padEnd(9)
+    )} ${text}`;
+
+    console.log(message);
+}
+
+const $logger = {
+    debug(message: string, context?: object): void {
+        if (!DEBUG_MODE) {
+            return;
+        }
+
+        log(message, cyan, "DEBUG");
+
+        Object.entries(context || {}).forEach(([key, value]) => {
+            console.log(`${key}: `, value);
+        });
+    },
+
+    info(message: string) {
+        log(message, green, "INFO");
+    },
+
+    warning(message: string) {
+        log(message, orange, "WARNING");
+    },
+
+    error(message: string) {
+        log(message, red, "ERROR");
+    },
+};
 
 export default $logger;

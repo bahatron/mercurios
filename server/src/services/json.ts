@@ -9,12 +9,14 @@ const $json = {
 
     stringify(
         data: any,
-        replacer?: (key: any, value: any) => any,
-        spaces: number = 4
+        options: {
+            replacer?: (key: any, value: any) => any;
+            spaces?: number;
+        } = {}
     ) {
         return typeof data === "string"
             ? data
-            : JSON.stringify(data, replacer, spaces);
+            : JSON.stringify(data, options.replacer, options.spaces);
     },
 };
 
