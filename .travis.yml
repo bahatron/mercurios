@@ -5,14 +5,12 @@ dist: trusty
 services:
     - docker
 
-language: node_js
-node_js: 12
+# language: node_js
+# node_js: 12
 
 before_install:
-    - sudo rm /usr/local/bin/docker-compose
-    - curl -L https://github.com/docker/compose/releases/download/1.24.0/docker-compose-`uname-s`-`uname -m` > docker-compose
-    - chmod +x docker-compose
-    - sudo mv docker-compose /usr/local/bin
+    - sudo curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/bin/docker-compose
+    - sudo chmod +x /usr/bin/docker-compose
 
 # before_script:
 #     - my_script
