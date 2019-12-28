@@ -2,6 +2,7 @@ version: "3.7"
 
 services:
     server:
+        user: node
         build: ./server
         image: bahatron/mercurios_http
         volumes:

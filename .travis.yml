@@ -5,13 +5,12 @@ dist: trusty
 services:
     - docker
 
-language: node_js
-node_js: 12
+# language: node_js
+# node_js: 12
 
 before_install:
     - sudo rm /usr/local/bin/docker-compose
-    - curl -L https://github.com/docker/compose/releases/download/1.24.0/docker-compose-`uname
-      -s`-`uname -m` > docker-compose
+    - curl -L https://github.com/docker/compose/releases/download/1.24.0/docker-compose-`uname-s`-`uname -m` > docker-compose
     - chmod +x docker-compose
     - sudo mv docker-compose /usr/local/bin
 
@@ -19,9 +18,9 @@ before_install:
 #     - my_script
 
 script:
-    - ./build.sh
     - ./test.sh
-    - ./push.sh
+    - docker login --username $DOCKER_USERNAME  --password $DOCKER_PASSWORD
+    - docker push bahatron/mercurios_http
 
 # after_script:
 #     - my_script
@@ -32,6 +31,6 @@ notifications:
             - simonpiscitelli@gmail.com
         on_success: never # default: change
         on_failure: change # default: always
-env:
-    global:
-        - MY_ENV_VAR=123
+# env:
+#     global:
+#         - MY_ENV_VAR=123
