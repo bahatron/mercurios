@@ -2,7 +2,7 @@ module.exports = {
     apps: [
         {
             name: "dev_server",
-            script: "bin/www",
+            script: "dist/bin/www.js",
             exec_mode: "cluster",
             instances: 2,
             watch: ["dist"],

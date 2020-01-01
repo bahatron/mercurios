@@ -37,11 +37,11 @@ const $logger = {
         log(message, green, "INFO");
     },
 
-    warning(message: string) {
+    warning(message: string, context?: any) {
         log(message, orange, "WARNING");
     },
 
-    error(message: string) {
+    error(message: string, err?: any) {
         log(message, red, "ERROR");
     },
 };

@@ -8,19 +8,21 @@ services:
         volumes:
             - ./server:/app
         ports:
-            - 3000:3000
+            - ${DOCKER_SERVER_PORT:-3000}:3000
             - 9220:9220
         depends_on:
             - mysql
             - nats
         command: npm run dev
+        environment:
+            - DEBUG=true
         env_file: .env.test
 
     mysql:
         image: mysql:8
         command: --default-authentication-plugin=mysql_native_password
         ports:
-            - 3306:3306
+            - ${DOCKER_MYSQL_PORT:-3306}:3306
         environment:
             MYSQL_ROOT_PASSWORD: secret
             MYSQL_DATABASE: mercurios
@@ -28,5 +30,5 @@ services:
     nats:
         image: nats
         ports:
-            - 4222:4222
-            - 8222:8222
+            - ${DOCKER_NATS_SERVER:-4222}:4222
+            - ${DOCKER_NATS_STATS:-8222}:8222

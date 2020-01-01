@@ -1,14 +1,12 @@
 #!/bin/sh
 
-docker login --username $DOCKER_USERNAME  --password $DOCKER_PASSWORD
-
 ./test.sh
 
-if $TRAVIS_BRANCH != "master" then
- echo "it's not master"
+if [ [$TRAVIS_BRANCH = master] ];
+then
+ docker login --username $DOCKER_USERNAME  --password $DOCKER_PASSWORD
+ docker push bahatron/mercurios_http
 else
-echo "Yes!, it is MASTER!"
+    echo "no master, skipping push"
 fi
 
-
-docker push bahatron/mercurios_http
