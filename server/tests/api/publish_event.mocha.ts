@@ -22,7 +22,7 @@ export async function publishEvent(
 }
 
 describe("publish event", () => {
-    describe("Scenario: simple request with no schema", () => {
+    describe("Scenario: with no schema", () => {
         const TOPIC = `publish_event_test`;
 
         before(async () => {
@@ -62,7 +62,7 @@ describe("publish event", () => {
         });
     });
 
-    describe("Scenario: using schema", () => {
+    describe("Scenario: with valid schema", () => {
         const topic = `test_with_schmea`;
         const schema = {
             type: "object",
@@ -101,10 +101,9 @@ describe("publish event", () => {
 
                 await $domain.createStream(TOPIC);
 
-                // publish event from 1 to 11
                 await Promise.all(
-                    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(val => {
-                        return publishEvent(TOPIC, val + 1);
+                    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(val => {
+                        return publishEvent(TOPIC, val);
                     })
                 );
             } catch (err) {

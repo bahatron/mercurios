@@ -7,7 +7,7 @@ module.exports = {
             instances: 2,
             watch: ["dist"],
             env: {
-                NODE_OPTIONS: "--inspect=0.0.0.0:9220",
+                ENV: "dev",
             },
         },
     ],

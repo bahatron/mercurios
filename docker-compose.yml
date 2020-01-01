@@ -9,7 +9,6 @@ services:
             - ./server:/app
         ports:
             - ${DOCKER_SERVER_PORT:-3000}:3000
-            - 9220:9220
         depends_on:
             - mysql
             - nats

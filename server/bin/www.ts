@@ -5,8 +5,9 @@ import expressApp from "../http/server";
 import $logger from "../services/logger";
 import createWsServer from "../websocket/server";
 import $mysql from "../services/mysql";
-
-$logger.debug("debug mode on");
+import $env from "@bahatron/env";
+import { exec, execSync } from "child_process";
+import $json from "../services/json";
 
 const PORT = 3000;
 const HTTP_SERVER = new http.Server(expressApp);
@@ -23,38 +24,51 @@ process
         process.exit(-1);
     });
 
+[WEBSOCKET_SERVER, HTTP_SERVER].forEach(server => {
+    server.on("listening", () => {
+        $logger.info(`${server.constructor.name} listening on port ${PORT}`);
+    });
+
+    server.on("error", err => {
+        $logger.error(`${server.constructor.name} error - ${err.message}`, err);
+
+        $logger.debug(`error`, err);
+    });
+});
+
 async function start() {
-    try {
-        await $mysql.migrate.latest();
+    $logger.debug("debug mode on");
 
-        [WEBSOCKET_SERVER, HTTP_SERVER].forEach(server => {
-            server.on("listening", () => {
-                $logger.info(
-                    `${server.constructor.name} listening on port ${PORT}`
-                );
-            });
-
-            server.on("error", err => {
-                $logger.error(
-                    `${server.constructor.name} error - ${err.message}`,
-                    err
-                );
-                
-                $logger.debug(`error`, err);
-            });
-        });
-
-        HTTP_SERVER.listen(PORT);
-    } catch (err) {
+    await $mysql.migrate.latest().catch(err => {
         switch (err.code) {
             case "ER_TABLE_EXISTS_ERROR":
                 return;
             default:
-            // nothing
+                $logger.debug(err.message, err);
+                return;
         }
 
         throw err;
-    }
+    });
+
+    HTTP_SERVER.listen(PORT, () => {
+        if ($env.get("ENV", "") === "dev") {
+            try {
+                /** @todo */
+                // execSync("npm run test");
+                $logger.info("test suite sucessful");
+            } catch (err) {
+                $logger.warning(`Test suit run failed - ${err.message}`);
+                $logger.debug(
+                    "error",
+                    ((): any => {
+                        let { status, signal } = err;
+                        return { status, signal };
+                    })()
+                );
+            }
+        }
+    });
 }
 
 start();

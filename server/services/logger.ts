@@ -3,7 +3,11 @@ import moment from "moment";
 
 const DEBUG = $env.get("DEBUG", "");
 
-const DEBUG_MODE = DEBUG === "false" ? false : Boolean(DEBUG);
+/** @todo: review needed; particullary because it execpts package.json to set ENV var */
+const DEBUG_MODE =
+    DEBUG === "false"
+        ? false
+        : Boolean(DEBUG) && Boolean($env.get("ENV", "") !== "test");
 
 const green = (text: string) => `\x1b[32m${text}\x1b[0m`;
 const cyan = (text: string) => `\x1b[96m${text}\x1b[0m`;

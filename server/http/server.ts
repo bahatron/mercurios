@@ -1,17 +1,31 @@
-import express, { Response, Request, NextFunction } from "express";
+import $express, { Response, Request, NextFunction } from "express";
 import $error, { Exception } from "../services/error";
 import $domain from "../domain";
 import helmet from "helmet";
 import asyncRoute from "./middleware/asyncRoute";
 import $logger from "../services/logger";
+import $nats from "../services/nats";
+import $uuid from "uuid";
+import { EventEmitter } from "events";
 
-const SERVER = express();
+const SERVER = $express();
 
-SERVER.use(express.json());
+SERVER.use($express.json());
 SERVER.use(helmet());
 
+const OBS = new EventEmitter();
+$nats.subscribe("ping_received", (err, { data }) => {
+    OBS.emit(data.uid);
+});
+
 SERVER.get("/ping", (req, res) => {
-    res.json("pong");
+    let uid = $uuid.v4();
+
+    OBS.once(uid, () => {
+        return res.json("pong");
+    });
+
+    $nats.publish("ping_received", { uid });
 });
 
 SERVER.post(

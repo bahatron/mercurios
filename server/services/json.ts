@@ -20,4 +20,6 @@ const $json = {
     },
 };
 
+$json.stringify("hi", { spaces: 4 });
+
 export default $json;
