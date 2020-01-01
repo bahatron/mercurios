@@ -1,4 +1,4 @@
-import knex from "knex";
+import knex, { MigratorConfig } from "knex";
 import $env from "@bahatron/env";
 
 const config = {

@@ -5,8 +5,8 @@
     "author": "simonpiscitelli@gmail.com",
     "scripts": {
         "migrate": "knex migrate:latest",
-        "start": "npm run migrate && pm2-runtime start process.config.js",
-        "dev": "npm run migrate && npm run build:watch & pm2-runtime start process.dev.config.js",
+        "start": "pm2-runtime start process.config.js",
+        "dev": "npm run build:watch & pm2-runtime start process.dev.config.js",
         "test": "mocha 'dist/**/*.mocha.js'",
         "test:perf": "./tests/benchmark.sh",
         "build": "tsc",

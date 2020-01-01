@@ -18,9 +18,7 @@ before_install:
 #     - my_script
 
 script:
-    - ./test.sh
-    - docker login --username $DOCKER_USERNAME  --password $DOCKER_PASSWORD
-    - docker push bahatron/mercurios_http
+    - ./build.sh
 
 # after_script:
 #     - my_script

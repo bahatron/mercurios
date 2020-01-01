@@ -14,8 +14,7 @@ services:
             - mysql
             - nats
         command: npm run dev
-        environment:
-            DEBUG: "true"
+        env_file: .env.test
 
     mysql:
         image: mysql:8

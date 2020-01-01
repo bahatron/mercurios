@@ -1,29 +1,56 @@
 #!/usr/bin/node
 
 const http = require("http");
-const $env = require("@bahatron/env").default;
-const expressServer = require("../dist/http/server").default;
+const expressApp = require("../dist/http/server").default;
 const $logger = require("../dist/services/logger").default;
 const createWsServer = require("../dist/websocket/server").default;
+const $mysql = require("../dist/services/mysql").default;
 
-const PORT = parseInt($env.get("PORT", "3000"));
+const PORT = 3000;
 
-const httpServer = new http.Server(expressServer);
+const HTTP_SERVER = new http.Server(expressApp);
 
-const wsServer = createWsServer(httpServer);
+const WEBSOCKET_SERVER = createWsServer(HTTP_SERVER);
 
 $logger.debug("debug mode on");
 
-wsServer.on("listening", () => {
-    $logger.info(`Webscoket server listening`);
-});
+process
+    .on("unhandledRejection", (reason, promise) => {
+        $logger.warning(reason);
+        $logger.debug("PROCESS: unhlanded rejection", promise);
+    })
+    .on("uncaughtException", err => {
+        $logger.error(err.message);
+        $logger.debug(err);
+        process.exit(-1);
+    });
 
-httpServer.on("listening", () => {
-    $logger.info(`Http server listening on port ${PORT}`);
-});
+$mysql.migrate
+    .latest()
+    .then(function onMigrationSucess() {
+        [(HTTP_SERVER, WEBSOCKET_SERVER)].forEach(server =>
+            server.on("listening", () => {
+                $logger.info(
+                    `${server.constructor.name} server listening on port ${PORT}`
+                );
 
-httpServer.on("error", err => {
-    $logger.error(`Http server error: ${err.message}`);
-});
+                server.on("listening", () => {
+                    $logger.error(
+                        `${server.constructor.name} server error: ${err.message}`
+                    );
+                });
+            })
+        );
 
-httpServer.listen(PORT);
+        HTTP_SERVER.listen(PORT);
+    })
+    .catch(err => {
+        switch (err.code) {
+            case "ER_TABLE_EXISTS_ERROR":
+                return;
+            default:
+            // nothing
+        }
+
+        throw err;
+    });
