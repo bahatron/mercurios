@@ -43,10 +43,12 @@ const $logger = {
 
     warning(message: string, context?: any) {
         log(message, orange, "WARNING");
+        $logger.debug(context);
     },
 
     error(message: string, err?: any) {
         log(message, red, "ERROR");
+        $logger.debug(err);
     },
 };
 

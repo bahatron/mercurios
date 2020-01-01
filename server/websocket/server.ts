@@ -11,8 +11,7 @@ export default function createWsServer(httpServer: Server): $ws.Server {
 
     /** @todo: use proper logging */
     wss.on("error", err => {
-        $logger.error(`WebSocket Server onError - ${err.message}`);
-        $logger.debug(`err: `, err);
+        $logger.error(`WebSocket Server onError - ${err.message}`, err);
     });
 
     wss.on("connection", async (socket, request) => {
@@ -25,9 +24,9 @@ export default function createWsServer(httpServer: Server): $ws.Server {
             $logger.warning(
                 `WebSocket Server - Client: ${req.getHeader(
                     "REQUEST_ID"
-                )} unexpected response`
+                )} unexpected response`,
+                req
             );
-            $logger.debug(`request: `, req);
         });
 
         let dispatcher = await $nats.connect(`client_${id}`);
@@ -37,7 +36,8 @@ export default function createWsServer(httpServer: Server): $ws.Server {
                 socket.send($json.stringify(data));
             } catch (err) {
                 $logger.error(
-                    `WebSocket Server - Error on dispachter subscription: ${err.message}`
+                    `WebSocket Server - Error on dispachter subscription: ${err.message}`,
+                    err
                 );
             }
         });

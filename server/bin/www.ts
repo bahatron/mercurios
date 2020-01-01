@@ -6,8 +6,6 @@ import $logger from "../services/logger";
 import createWsServer from "../websocket/server";
 import $mysql from "../services/mysql";
 import $env from "@bahatron/env";
-import { exec, execSync } from "child_process";
-import $json from "../services/json";
 
 const PORT = 3000;
 const HTTP_SERVER = new http.Server(expressApp);
@@ -15,12 +13,10 @@ const WEBSOCKET_SERVER = createWsServer(HTTP_SERVER);
 
 process
     .on("unhandledRejection", (reason, promise) => {
-        $logger.warning("PROCESS: unhlanded rejection");
-        $logger.debug("rejection: ", { reason, promise });
+        $logger.warning("PROCESS: unhlanded rejection", { reason, promise });
     })
     .on("uncaughtException", err => {
-        $logger.error(`PROCESS: uncaught exception - ${err.message}`);
-        $logger.debug(`exepction: `, err);
+        $logger.error(`PROCESS: uncaught exception - ${err.message}`, err);
         process.exit(-1);
     });
 
@@ -31,8 +27,6 @@ process
 
     server.on("error", err => {
         $logger.error(`${server.constructor.name} error - ${err.message}`, err);
-
-        $logger.debug(`error`, err);
     });
 });
 
@@ -44,11 +38,9 @@ async function start() {
             case "ER_TABLE_EXISTS_ERROR":
                 return;
             default:
-                $logger.debug(err.message, err);
-                return;
+                $logger.warning(err.message, err);
+                process.exit(-1);
         }
-
-        throw err;
     });
 
     HTTP_SERVER.listen(PORT, () => {
@@ -56,16 +48,8 @@ async function start() {
             try {
                 /** @todo */
                 // execSync("npm run test");
-                $logger.info("test suite sucessful");
             } catch (err) {
                 $logger.warning(`Test suit run failed - ${err.message}`);
-                $logger.debug(
-                    "error",
-                    ((): any => {
-                        let { status, signal } = err;
-                        return { status, signal };
-                    })()
-                );
             }
         }
     });

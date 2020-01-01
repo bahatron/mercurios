@@ -75,7 +75,10 @@ SERVER.use(
         $logger.debug(err.message, err);
 
         if (code >= 500) {
-            $logger.error(`HTTP Server - http error: ${code} - ${err.message}`);
+            $logger.error(
+                `HTTP Server - http error: ${code} - ${err.message}`,
+                err
+            );
         }
 
         return res
