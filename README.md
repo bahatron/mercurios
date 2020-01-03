@@ -42,13 +42,6 @@ PROCESSES=2
 TEST_SERVER_URL=http://localhost:3000
 ```
 
-## Notable NPM scripts
-
--   `npm run start`: start server in production mode
--   `npm run dev`: start server in developmnet mode
--   `npm run test`: execute unit tests (requites enviroment to be set)
--   `npm run test:perf`: execute performance test
-
 ## API
 
 ### `POST /streams`

@@ -10,4 +10,4 @@ COPY . .
 RUN npm ci
 RUN npm run build:clean
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "start:docker"]

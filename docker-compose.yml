@@ -12,7 +12,7 @@ services:
         depends_on:
             - mysql
             - nats
-        command: npm run dev
+        command: npm run dev:docker
         environment:
             - DEBUG=true
         env_file: .env.test

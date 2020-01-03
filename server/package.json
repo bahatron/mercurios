@@ -4,9 +4,8 @@
     "description": "an event stream server",
     "author": "simonpiscitelli@gmail.com",
     "scripts": {
-        "migrate": "knex migrate:latest",
-        "start": "pm2-runtime start process.config.js",
-        "dev": "npm run build:watch & pm2-runtime start process.dev.config.js",
+        "start:docker": "pm2-runtime start process.config.js",
+        "dev:docker": "npm run build:watch & pm2-runtime start process.dev.config.js",
         "test": "ENV=test mocha 'dist/**/*.mocha.js'",
         "test:perf": "./tests/benchmark.sh",
         "build": "tsc",
