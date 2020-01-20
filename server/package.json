@@ -6,7 +6,8 @@
     "scripts": {
         "start:docker": "pm2-runtime start process.config.js",
         "dev:docker": "npm run build:watch & pm2-runtime start process.dev.config.js",
-        "test": "ENV=test mocha 'dist/**/*.mocha.js'",
+        "test": "npm run mocha",
+        "mocha": "mocha 'dist/**/*.mocha.js'",
         "test:perf": "./tests/benchmark.sh",
         "build": "tsc",
         "build:watch": "npm run build -- --watch",

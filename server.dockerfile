@@ -5,7 +5,7 @@ RUN npm install -g autocannon
 
 WORKDIR /app
 
-COPY . .
+COPY ./server .
 
 RUN npm ci
 RUN npm run build:clean
