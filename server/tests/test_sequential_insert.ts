@@ -1,4 +1,4 @@
-import $http from "../services/http";
+import $axios from "../services/axios";
 import { EventEmitter } from "events";
 import $streams from "../domain/modules/stream_repository";
 import $env from "@bahatron/env";
@@ -8,7 +8,7 @@ const TOPIC = "sequential_test";
 const TEST_SERVER_URL = $env.get("TEST_SERVER_URL", "http://localhost:3000");
 
 async function createStream() {
-    await $http.post(`${TEST_SERVER_URL}/streams`, {
+    await $axios.post(`${TEST_SERVER_URL}/streams`, {
         topic: TOPIC,
     });
 }
@@ -23,7 +23,7 @@ async function initTest(observer: EventEmitter) {
     let counter = 1;
 
     while (_continue) {
-        await $http.post(`${TEST_SERVER_URL}/stream/${TOPIC}`, {
+        await $axios.post(`${TEST_SERVER_URL}/stream/${TOPIC}`, {
             data: counter,
             expectedSeq: counter,
         });

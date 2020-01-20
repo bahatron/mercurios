@@ -1,4 +1,4 @@
-import $http from "axios";
+import $axios from "axios";
 import $env from "@bahatron/env";
 import $assertions from "../../services/assertions";
 import $domain from "../../domain";
@@ -9,7 +9,7 @@ const TEST_SERVER_URL = $env.get(`TEST_SERVER_URL`, `http://localhost:3000`);
 
 describe("read event", () => {
     async function readEvent(topic: string, id: number) {
-        return $http.get(`${TEST_SERVER_URL}/stream/${topic}/${id}`);
+        return $axios.get(`${TEST_SERVER_URL}/stream/${topic}/${id}`);
     }
 
     describe("Scenario: topic does not exist", () => {

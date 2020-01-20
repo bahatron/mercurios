@@ -1,24 +1,19 @@
 #!/usr/bin/node
-
 import http from "http";
 import expressApp from "../http/server";
 import $logger from "../services/logger";
 import createWsServer from "../websocket/server";
 import $mysql from "../services/mysql";
-import $env from "@bahatron/env";
 
 const PORT = 3000;
+
 const HTTP_SERVER = new http.Server(expressApp);
 const WEBSOCKET_SERVER = createWsServer(HTTP_SERVER);
 
-process
-    .on("unhandledRejection", (reason, promise) => {
-        $logger.warning("PROCESS: unhlanded rejection", { reason, promise });
-    })
-    .on("uncaughtException", err => {
-        $logger.error(`PROCESS: uncaught exception - ${err.message}`, err);
-        process.exit(-1);
-    });
+process.on("uncaughtException", err => {
+    $logger.error(`PROCESS: uncaught exception - ${err.message}`, err);
+    process.exit(-1);
+});
 
 [WEBSOCKET_SERVER, HTTP_SERVER].forEach(server => {
     server.on("listening", () => {
@@ -38,21 +33,12 @@ async function start() {
             case "ER_TABLE_EXISTS_ERROR":
                 return;
             default:
-                $logger.warning(err.message, err);
+                $logger.error(err.message, err);
                 process.exit(-1);
         }
     });
 
-    HTTP_SERVER.listen(PORT, () => {
-        if ($env.get("ENV", "") === "dev") {
-            try {
-                /** @todo */
-                // execSync("npm run test");
-            } catch (err) {
-                $logger.warning(`Test suit run failed - ${err.message}`);
-            }
-        }
-    });
+    HTTP_SERVER.listen(PORT);
 }
 
 start();

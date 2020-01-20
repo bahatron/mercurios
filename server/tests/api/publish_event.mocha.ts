@@ -1,4 +1,4 @@
-import $http from "axios";
+import $axios from "axios";
 import $env from "@bahatron/env";
 import $streams from "../../domain/modules/stream_repository";
 import $domain from "../../domain";
@@ -15,7 +15,7 @@ export async function publishEvent(
     data: any,
     expectedSeq?: number
 ) {
-    return $http.post(`${TEST_SERVER_URL}/stream/${topic}`, {
+    return $axios.post(`${TEST_SERVER_URL}/stream/${topic}`, {
         data,
         expectedSeq,
     });

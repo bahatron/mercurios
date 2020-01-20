@@ -15,40 +15,50 @@ const orange = (text: string) => `\x1b[33m${text}\x1b[0m`;
 const red = (text: string) => `\x1b[31m${text}\x1b[0m`;
 
 function log(text: string, colour: Function, level: string) {
-    let timestamp = moment().format("YYYY-MM-DD HH:mm:ss");
+    let timestamp = moment().format("YYYY-MM-DD HH:mm:ss:SSS");
 
-    let message = `${timestamp}: [${process.pid}] ${colour(
-        level.padEnd(9)
-    )} ${text}`;
+    console.log(
+        `${timestamp} [${process.pid}] ${colour(level.padEnd(9))} ${text}`
+    );
+}
 
-    console.log(message);
+function inspect(context: any = {}) {
+    if (!DEBUG_MODE) {
+        return;
+    }
+
+    Object.entries(context || {}).forEach(([key, value]) => {
+        console.log(`${cyan(key)}: `, value);
+    });
 }
 
 const $logger = {
-    debug(message: string, context?: object): void {
+    debug(message: string, context?: object | any[]): void {
         if (!DEBUG_MODE) {
             return;
         }
 
         log(message, cyan, "DEBUG");
+        inspect(context);
+    },
 
-        Object.entries(context || {}).forEach(([key, value]) => {
-            console.log(`${key}: `, value);
-        });
+    dd(message: string, context?: any) {
+        $logger.debug(message, context);
+        process.exit(-25);
     },
 
     info(message: string) {
         log(message, green, "INFO");
     },
 
-    warning(message: string, context?: any) {
+    warning(message: string, context?: object | any[]) {
         log(message, orange, "WARNING");
-        $logger.debug(context);
+        inspect(context);
     },
 
     error(message: string, err?: any) {
         log(message, red, "ERROR");
-        $logger.debug(err);
+        inspect(err && err.response ? err.response.config : err);
     },
 };
 
