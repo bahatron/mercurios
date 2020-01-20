@@ -1,7 +1,7 @@
-import knex, { MigratorConfig } from "knex";
+import knex, { Config } from "knex";
 import $env from "@bahatron/env";
 
-const config = {
+const config: Config = {
     client: "mysql2",
     connection: {
         host: $env.get("MYSQL_HOST", "mysql"),
@@ -9,6 +9,9 @@ const config = {
         user: $env.get("MYSQL_USER", "root"),
         password: $env.get("MYSQL_PASSWORD", "secret"),
         database: $env.get("MYSQL_DATABASE", "mercurios"),
+    },
+    migrations: {
+        tableName: "migrations",
     },
 };
 

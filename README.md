@@ -15,6 +15,9 @@ HTTP based event streaming
 # run server tests
 ./test.sh
 
+# setup dev environment
+./dev:setup.sh
+
 # start dev environment
 ./dev.sh
 ```
@@ -30,7 +33,7 @@ MYSQL_PASSWORD=secret
 MYSQL_DATABASE=mercurios
 
 # nats config
-NATS_URRL=nats://nats:4222
+NATS_URL=nats://nats:4222
 
 # starts server in debug mode
 DEBUG=false
