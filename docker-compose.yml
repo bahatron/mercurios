@@ -2,7 +2,6 @@ version: "3.5"
 
 services:
     server:
-        user: node
         image: bahatron/mercurios_http
         volumes:
             - ./server:/app

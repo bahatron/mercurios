@@ -1,6 +1,9 @@
 import knex, { Config } from "knex";
 import $env from "@bahatron/env";
+import $path from "path";
+import $logger from "./logger";
 
+/** @todo: Fix migrations directory name */
 const config: Config = {
     client: "mysql2",
     connection: {
@@ -12,6 +15,7 @@ const config: Config = {
     },
     migrations: {
         tableName: "migrations",
+        directory: $path.resolve(`/app/migrations`),
     },
 };
 

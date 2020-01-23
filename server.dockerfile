@@ -1,7 +1,6 @@
-FROM node:lts-slim
+FROM node:lts-alpine
 
 RUN npm install -g pm2
-RUN npm install -g autocannon
 
 WORKDIR /app
 
