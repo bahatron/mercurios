@@ -4,21 +4,22 @@ import moment from "moment";
 const DEBUG = $env.get("DEBUG", "");
 
 /** @todo: review needed; particullary because it execpts package.json to set ENV var */
+/** @todo: formalize debug mode; refactor logger to exose constructor function */
 const DEBUG_MODE =
     DEBUG === "false"
         ? false
         : Boolean(DEBUG) && Boolean($env.get("ENV", "") !== "test");
 
-const green = (text: string) => `\x1b[32m${text}\x1b[0m`;
-const cyan = (text: string) => `\x1b[96m${text}\x1b[0m`;
-const orange = (text: string) => `\x1b[33m${text}\x1b[0m`;
-const red = (text: string) => `\x1b[31m${text}\x1b[0m`;
+export const green = (text: string) => `\x1b[32m${text}\x1b[0m`;
+export const cyan = (text: string) => `\x1b[96m${text}\x1b[0m`;
+export const orange = (text: string) => `\x1b[33m${text}\x1b[0m`;
+export const red = (text: string) => `\x1b[31m${text}\x1b[0m`;
 
 function log(text: string, colour: Function, level: string) {
     let timestamp = moment().format("YYYY-MM-DD HH:mm:ss:SSS");
 
     console.log(
-        `${timestamp} [${process.pid}] ${colour(level.padEnd(9))} ${text}`
+        `${timestamp} [${process.pid}] ${colour(level.padEnd(9))}- ${text}`
     );
 }
 

@@ -61,6 +61,64 @@ class StreamRepository {
     }
 }
 
-const $streams = new StreamRepository();
+const Repository = () => {
+    const _streams: Map<string, Stream> = new Map();
+
+    return {
+        async create(topic: string, schema?: any): Promise<Stream> {
+            await $mysql(STREAM_DEFINITIONS).insert({
+                topic,
+                schema: $json.stringify(schema),
+            });
+
+            let stream = streamFactory({ topic, schema });
+
+            await stream.init();
+
+            _streams.set(topic, stream);
+
+            return stream;
+        },
+
+        async fetch(topic: string): Promise<Stream> {
+            if (_streams.has(topic)) {
+                return _streams.get(topic) as Stream;
+            }
+
+            let result = await $mysql(STREAM_DEFINITIONS)
+                .where({ topic })
+                .first();
+
+            if (!result) {
+                throw $error.NotFound(`${topic} not found`);
+            }
+
+            let stream = streamFactory(result);
+
+            _streams.set(topic, stream);
+
+            return stream;
+        },
+
+        async exists(topic: string): Promise<boolean> {
+            let result = await $mysql(STREAM_DEFINITIONS)
+                .where({ topic })
+                .first();
+
+            return Boolean(result);
+        },
+
+        async delete(topic: string): Promise<void> {
+            await $mysql(STREAM_DEFINITIONS)
+                .where({ topic })
+                .delete();
+
+            await $mysql.schema.dropTableIfExists(STREAM_TABLE(topic));
+
+            _streams.delete(topic);
+        },
+    };
+};
+const $streams = Repository();
 
 export default $streams;
