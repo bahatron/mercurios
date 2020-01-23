@@ -5,7 +5,7 @@ const NATS_URL = $env.get("NATS_URL", "nats://nats:4222");
 
 const CLIENT = connect(`mercurios_server_${process.pid}`);
 
-async function connect(name: string): Promise<nats.Client> {
+export async function connect(name: string): Promise<nats.Client> {
     return nats.connect({
         name: name,
         url: NATS_URL,

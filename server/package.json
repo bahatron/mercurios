@@ -5,10 +5,11 @@
     "author": "simonpiscitelli@gmail.com",
     "scripts": {
         "start:docker": "pm2-runtime start process.config.js",
+        "start:dev": "npm run build:clean && npm run dev:docker",
         "dev:docker": "npm run build:watch & pm2-runtime start process.dev.config.js",
         "test": "npm run mocha",
         "mocha": "mocha 'dist/**/*.mocha.js'",
-        "test:perf": "./tests/benchmark.sh",
+        "test:bench": "./tests/benchmark.sh",
         "build": "tsc",
         "build:watch": "npm run build -- --watch",
         "build:clean": "rm -rf dist/ && npm run build"
