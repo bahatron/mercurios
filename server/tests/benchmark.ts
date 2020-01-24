@@ -11,7 +11,7 @@ async function pingBench() {
         connections: 100,
         pipelining: 10,
         url: `${TEST_SERVER_URL}/ping`,
-    });
+    }).then(breakdown);
 }
 
 async function writeBench() {
@@ -26,7 +26,7 @@ async function writeBench() {
                 body: "{}",
             })
         )
-    );
+    ).then(breakdown);
 }
 
 async function readBench() {
@@ -39,7 +39,7 @@ async function readBench() {
                 url: `${TEST_SERVER_URL}/stream/${topic}/1`,
             });
         })
-    );
+    ).then(breakdown);
 }
 
 function breakdown(result: autocannon.Result | autocannon.Result[]) {
@@ -64,9 +64,14 @@ function breakdown(result: autocannon.Result | autocannon.Result[]) {
 async function main() {
     await Promise.all(TEST_TOPICS.map(topic => $createStream(topic)));
 
-    $logger.debug(`ping benchmark`, breakdown(await pingBench()));
-    $logger.debug(`write benchmark`, breakdown(await writeBench()));
-    $logger.debug(`read benchmark`, breakdown(await readBench()));
+    $logger.info(`ping benchmark`);
+    $logger.inspect(await pingBench());
+
+    $logger.info(`write benchmark`);
+    ((await writeBench()) as any[]).forEach($logger.inspect);
+
+    $logger.debug(`read benchmark`);
+    ((await readBench()) as any[]).forEach($logger.inspect);
 }
 
 main()

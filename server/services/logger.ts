@@ -24,10 +24,6 @@ function log(text: string, colour: Function, level: string) {
 }
 
 function inspect(context: any = {}) {
-    if (!DEBUG_MODE) {
-        return;
-    }
-
     Object.entries(context || {}).forEach(([key, value]) => {
         console.log(`${cyan(key)}: `, value);
     });
@@ -61,6 +57,8 @@ const $logger = {
         log(message, red, "ERROR");
         inspect(err && err.response ? err.response.config : err);
     },
+
+    inspect,
 };
 
 export default $logger;
