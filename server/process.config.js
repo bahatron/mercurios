@@ -5,7 +5,7 @@ module.exports = {
             script: "dist/bin/www.js",
             exec_mode: "cluster",
             instances: parseInt(process.env.PROCESSES) || "max",
-            max_restarts: 10,
+            max_restarts: 3,
         },
     ],
 };

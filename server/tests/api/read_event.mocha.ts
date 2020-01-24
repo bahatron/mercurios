@@ -1,9 +1,10 @@
 import $axios from "axios";
 import $env from "@bahatron/env";
 import $assertions from "../../services/assertions";
-import $domain from "../../domain";
 import { Event } from "../../domain/modules/event";
 import $streams from "../../domain/modules/stream_repository";
+import $createStream from "../../domain/create_stream";
+import $publishEvent from "../../domain/publish_event";
 
 const TEST_SERVER_URL = $env.get(`TEST_SERVER_URL`, `http://localhost:3000`);
 
@@ -28,7 +29,7 @@ describe("read event", () => {
         before(async () => {
             await $streams.delete(TOPIC);
 
-            await $domain.createStream(TOPIC);
+            await $createStream(TOPIC);
         });
 
         it("responds with http 200", async () => {
@@ -43,8 +44,8 @@ describe("read event", () => {
 
         let EVENT: Event;
         before(async () => {
-            await $domain.createStream(TOPIC);
-            EVENT = await $domain.publishEvent(TOPIC, {
+            await $createStream(TOPIC);
+            EVENT = await $publishEvent(TOPIC, {
                 data: ["npm", "start"],
             });
         });

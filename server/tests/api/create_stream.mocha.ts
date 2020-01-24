@@ -10,7 +10,7 @@ import { AxiosResponse } from "axios";
 const TEST_SERVER_URL = $env.get(`TEST_SERVER_URL`, `http://localhost:3000`);
 
 describe("create stream", () => {
-    async function createStream(topic: string, schema = {}) {
+    async function _createStream(topic: string, schema = {}) {
         return $axios.post(`${TEST_SERVER_URL}/streams`, { topic, schema });
     }
 
@@ -21,7 +21,7 @@ describe("create stream", () => {
         before(async () => {
             await $mysql(STREAM_DEFINITIONS).truncate();
 
-            RESPONSE = await createStream(TOPIC);
+            RESPONSE = await _createStream(TOPIC);
         });
 
         it("responds with http 201", async () => {
@@ -29,7 +29,7 @@ describe("create stream", () => {
         });
 
         it("responds http 200 if the stream already exists", async () => {
-            let response = await createStream(TOPIC);
+            let response = await _createStream(TOPIC);
 
             $assertions.expect(response.status).to.eq(200);
         });

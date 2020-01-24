@@ -8,7 +8,7 @@ interface PublishPayload {
     expectedSeq?: number;
 }
 
-export default async function publishEvent(
+export default async function $publishEvent(
     topic: string,
     { data, expectedSeq }: PublishPayload = {}
 ): Promise<Event> {
