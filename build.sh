@@ -1,7 +1,7 @@
 #!/bin/sh
 
 docker-compose -f docker-compose.build.yml build || exit 1
-./test.sh
+./test.sh || exit 1
 
 if [ [$TRAVIS_BRANCH = master] ];
 then

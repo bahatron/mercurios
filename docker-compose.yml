@@ -13,7 +13,7 @@ services:
         command: npm run start:dev
         environment:
             - DEBUG=true
-        env_file: .env.test
+        env_file: .env
 
     mysql:
         image: mysql:8

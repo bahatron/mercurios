@@ -8,6 +8,7 @@ const TEST_TOPICS = ["benchmark_1", "benchmark_2", "benchmark_3"];
 
 async function pingBench() {
     return autocannon({
+        title: "ping benchmark",
         connections: 100,
         pipelining: 10,
         url: `${TEST_SERVER_URL}/ping`,
@@ -46,6 +47,7 @@ function breakdown(result: autocannon.Result | autocannon.Result[]) {
     function readResult(result: autocannon.Result) {
         return {
             urL: result.url,
+            title: result.title,
             average_requests: `${result.requests.average} req/sec`,
             average_latency: `${result.latency.average} ms`,
             average_throughput: `${result.throughput.average} bytes/sec`,
