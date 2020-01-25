@@ -31,5 +31,4 @@ notifications:
         on_failure: change # default: always
 env:
     global:
-        - MY_ENV_VAR=123
         - $BRANCH=${TRAVIS_BRANCH}
