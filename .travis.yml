@@ -18,7 +18,7 @@ before_install:
 #     - my_script
 
 script:
-    - MASTER=${TRAVIS_BRANCH:-false} ./build.sh
+    - env MASTER=${TRAVIS_BRANCH:-false} ./build.sh
 
 # after_script:
 #     - my_script
