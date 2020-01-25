@@ -44,7 +44,7 @@ async function readBench() {
 }
 
 function breakdown(result: autocannon.Result | autocannon.Result[]) {
-    function readResult(result: autocannon.Result) {
+    function transform(result: autocannon.Result) {
         return {
             urL: result.url,
             title: result.title,
@@ -57,10 +57,10 @@ function breakdown(result: autocannon.Result | autocannon.Result[]) {
 
     /** @todo: aggregate results */
     if (Array.isArray(result)) {
-        return result.map(readResult);
+        return result.map(transform);
     }
 
-    return readResult(result);
+    return transform(result);
 }
 
 async function main() {
@@ -72,7 +72,7 @@ async function main() {
     $logger.info(`write benchmark`);
     ((await writeBench()) as any[]).forEach($logger.inspect);
 
-    $logger.debug(`read benchmark`);
+    $logger.info(`read benchmark`);
     ((await readBench()) as any[]).forEach($logger.inspect);
 }
 
