@@ -6,12 +6,6 @@ import $error from "../services/error";
 
 const $router = express.Router();
 
-export const ROUTES = Object.freeze({
-    STREAM_COLLECTION: "/streams",
-    STREAM: "/stream/:topic",
-    EVENT: "/stream/:topic/:seq",
-});
-
 export function asyncRoute(controller: (req: Request, res: Response) => void) {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
@@ -24,12 +18,12 @@ export function asyncRoute(controller: (req: Request, res: Response) => void) {
 }
 
 $router.post(
-    ROUTES.STREAM_COLLECTION,
+    "/streams",
     asyncRoute(async (req, res) => {
         const { topic, schema } = req.body;
 
         if (!topic) {
-            throw $error.Error("topic is required", 400);
+            throw $error.BadRequest("topic is required");
         }
 
         const stream = await $createStream(topic, schema);
@@ -41,24 +35,22 @@ $router.post(
         return res.status(201).json(stream);
     })
 );
-$router.post(
-    ROUTES.STREAM,
-    asyncRoute(async (req, res) => {
-        let event = await $publishEvent(req.params.topic, req.body);
 
-        return res.status(201).json(event);
+$router.post(
+    "/stream/:topic",
+    asyncRoute(async (req, res) => {
+        return res
+            .status(201)
+            .json(await $publishEvent(req.params.topic, req.body));
     })
 );
 
 $router.get(
-    ROUTES.EVENT,
+    "/stream/:topic/:seq",
     asyncRoute(async (req, res) => {
-        let event = await $readEvent(
-            req.params.topic,
-            parseInt(req.params.seq)
-        );
-
-        return res.status(200).json(event);
+        return res
+            .status(200)
+            .json(await $readEvent(req.params.topic, parseInt(req.params.seq)));
     })
 );
 
