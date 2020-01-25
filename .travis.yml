@@ -18,7 +18,7 @@ before_install:
 #     - my_script
 
 script:
-    - env MASTER=${TRAVIS_BRANCH:-false} ./build.sh
+    - ./build.sh
 
 # after_script:
 #     - my_script
@@ -29,6 +29,7 @@ notifications:
             - simonpiscitelli@gmail.com
         on_success: never # default: change
         on_failure: change # default: always
-# env:
-#     global:
-#         - MY_ENV_VAR=123
+env:
+    global:
+        - MY_ENV_VAR=123
+        - $BRANCH=${TRAVIS_BRANCH}
