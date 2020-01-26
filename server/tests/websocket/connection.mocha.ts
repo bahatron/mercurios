@@ -20,29 +20,30 @@ describe("websocket connection", () => {
         });
     });
 
-    it("can subcribe to a stream", async () => {
-        return new Promise(resolve => {
-            let wsc = new $ws($config.TEST_SERVER_URL);
+    /** @todo */
+    // it("can subcribe to a stream", async () => {
+    //     return new Promise(resolve => {
+    //         let wsc = new $ws($config.TEST_SERVER_URL);
 
-            $logger.debug(`!!!! here`);
+    //         $logger.debug(`!!!! here`);
 
-            wsc.on("open", () => {
-                wsc.on("message", data => {
-                    let payload = $json.parse(data.toString());
+    //         wsc.on("open", () => {
+    //             wsc.on("message", data => {
+    //                 let payload = $json.parse(data.toString());
 
-                    $logger.debug(`response payload`, payload);
+    //                 $logger.debug(`response payload`, payload);
 
-                    resolve(payload);
-                });
+    //                 resolve(payload);
+    //             });
 
-                wsc.send(
-                    $json.stringify({
-                        action: "subscribe",
-                        topic: "ws_subscribe_test",
-                    })
-                );
-                $logger.debug(`sent message`);
-            });
-        });
-    });
+    //             wsc.send(
+    //                 $json.stringify({
+    //                     action: "subscribe",
+    //                     topic: "ws_subscribe_test",
+    //                 })
+    //             );
+    //             $logger.debug(`sent message`);
+    //         });
+    //     });
+    // });
 });
