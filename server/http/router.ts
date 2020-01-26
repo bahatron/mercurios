@@ -4,7 +4,7 @@ import $publishEvent from "../domain/publish_event";
 import $readEvent from "../domain/read_event";
 import $error from "../services/error";
 import $json from "../services/json";
-
+import $logger from "../services/logger";
 const $router = express.Router();
 
 export function asyncRoute(controller: (req: Request, res: Response) => void) {
@@ -40,9 +40,12 @@ $router.post(
 $router.post(
     "/stream/:topic",
     asyncRoute(async (req, res) => {
-        return res
-            .status(201)
-            .json(await $publishEvent(req.params.topic, $json.parse(req.body)));
+        return res.status(201).json(
+            await $publishEvent({
+                topic: req.params.topic,
+                ...req.body,
+            })
+        );
     })
 );
 

@@ -45,7 +45,8 @@ describe("read event", () => {
         let EVENT: Event;
         before(async () => {
             await $createStream(TOPIC);
-            EVENT = await $publishEvent(TOPIC, {
+            EVENT = await $publishEvent({
+                topic: TOPIC,
                 data: ["npm", "start"],
             });
         });

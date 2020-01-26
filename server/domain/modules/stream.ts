@@ -5,6 +5,7 @@ import $json from "../../services/json";
 import $validator from "../../services/validator";
 import eventFactory, { Event } from "./event";
 import $mysql from "../../services/mysql";
+import $logger from "../../services/logger";
 
 export const STREAM_TABLE = (topic: string): string => {
     return `stream_${topic}`;
@@ -32,7 +33,7 @@ export class Stream {
     }
 
     public async append(data: any = {}, expectedSeq?: number): Promise<Event> {
-        if (!$validator.validate(data, this.schema)) {
+        if (!$validator.validate($json.parse(data), this.schema)) {
             throw $error.ValidationFailed("validation failed for event data");
         }
 
