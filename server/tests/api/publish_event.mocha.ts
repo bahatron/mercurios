@@ -7,6 +7,7 @@ import $mysql from "../../services/mysql";
 import $assertions from "../../services/assertions";
 import $logger from "../../services/logger";
 import $createStream from "../../domain/create_stream";
+import $json from "../../services/json";
 
 const TEST_SERVER_URL = $env.get(`TEST_SERVER_URL`, `http://localhost:3000`);
 
@@ -22,6 +23,35 @@ export async function _publishEvent(
 }
 
 describe("publish event", () => {
+    describe(`Scenario: stringified request payload`, () => {
+        const _stream = "publish_double_stringified_test";
+
+        before(async () => {
+            await $createStream(_stream);
+        });
+
+        it("level 1", async () => {
+            await _publishEvent(_stream, {
+                data: $json.stringify({ rick: "sanchez" }),
+            });
+        });
+
+        it("level 2", async () => {
+            await _publishEvent(_stream, {
+                data: JSON.stringify($json.stringify({ rick: "sanchez" })),
+            });
+        });
+
+        it("level 3", async () => {
+            await _publishEvent(
+                _stream,
+                $json.stringify({
+                    data: JSON.stringify($json.stringify({ rick: "sanchez" })),
+                })
+            );
+        });
+    });
+
     describe("Scenario: with no schema", () => {
         const TOPIC = `publish_event_test`;
 
