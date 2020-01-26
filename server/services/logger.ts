@@ -19,7 +19,9 @@ function log(text: string, colour: Function, level: string) {
     let timestamp = moment().format("YYYY-MM-DD HH:mm:ss:SSS");
 
     console.log(
-        `${timestamp} [${process.pid}] ${colour(level.padEnd(9))}- ${text}`
+        `${timestamp} ${`[${process.pid}]`.padEnd(5)} ${colour(
+            level.padEnd(9)
+        )}- ${text}`
     );
 }
 
