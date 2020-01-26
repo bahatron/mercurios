@@ -34,6 +34,7 @@ export class Stream {
 
     public async append(data: any = {}, expectedSeq?: number): Promise<Event> {
         if (!$validator.validate($json.parse(data), this.schema)) {
+            $logger.warning(`validation failed`, { data, schema: this.schema });
             throw $error.ValidationFailed("validation failed for event data");
         }
 

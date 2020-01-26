@@ -26,19 +26,27 @@ describe("publish event", () => {
     describe(`Scenario: stringified request payload`, () => {
         const _stream = "publish_double_stringified_test";
 
+        const _schema = {
+            type: "object",
+            properties: {
+                foo: { type: "string" },
+                required: ["foo"],
+            },
+        };
+
         before(async () => {
-            await $createStream(_stream);
+            await $createStream(_stream, _schema);
         });
 
         it("level 1", async () => {
             await _publishEvent(_stream, {
-                data: $json.stringify({ rick: "sanchez" }),
+                data: $json.stringify({ foo: "sanchez" }),
             });
         });
 
         it("level 2", async () => {
             await _publishEvent(_stream, {
-                data: JSON.stringify($json.stringify({ rick: "sanchez" })),
+                data: JSON.stringify($json.stringify({ foo: "sanchez" })),
             });
         });
 
@@ -46,7 +54,7 @@ describe("publish event", () => {
             await _publishEvent(
                 _stream,
                 $json.stringify({
-                    data: JSON.stringify($json.stringify({ rick: "sanchez" })),
+                    data: JSON.stringify($json.stringify({ foo: "sanchez" })),
                 })
             );
         });
