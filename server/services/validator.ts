@@ -1,11 +1,16 @@
 import { Validator, Schema } from "jsonschema";
 import $error from "./error";
+import $logger from "./logger";
 
 const validator = new Validator();
 
 const $validator = {
     validate(object: any, schema: Schema = {}): boolean {
         let result = validator.validate(object, schema);
+
+        if (!result.valid) {
+            $logger.debug(`validation failed `, result);
+        }
 
         return result.valid;
     },

@@ -3,6 +3,7 @@ import $createStream from "../domain/create_stream";
 import $publishEvent from "../domain/publish_event";
 import $readEvent from "../domain/read_event";
 import $error from "../services/error";
+import $json from "../services/json";
 
 const $router = express.Router();
 
@@ -41,7 +42,7 @@ $router.post(
     asyncRoute(async (req, res) => {
         return res
             .status(201)
-            .json(await $publishEvent(req.params.topic, req.body));
+            .json(await $publishEvent(req.params.topic, $json.parse(req.body)));
     })
 );
 
