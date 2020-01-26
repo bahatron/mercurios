@@ -10,6 +10,7 @@
         "test": "npm run mocha",
         "mocha": "mocha 'dist/**/*.mocha.js'",
         "test:benchmark": "node dist/tests/benchmark.js",
+        "test:ws": "node dist/tests/ws.js",
         "build": "tsc",
         "build:watch": "npm run build -- --watch",
         "build:clean": "rm -rf dist/ && npm run build"

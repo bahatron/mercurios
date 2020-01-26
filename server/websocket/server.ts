@@ -1,27 +1,58 @@
 import $ws from "ws";
 import { Server } from "http";
 import $nats from "../services/nats";
-import $json from "../services/json";
 import $logger from "../services/logger";
-import $connection from "./connection";
+import { Client } from "ts-nats";
+import $error from "../services/error";
+import $json from "../services/json";
 
 const $uuid = require("uuid");
 
-export default function createWsServer(httpServer: Server): $ws.Server {
-    const _wss = new $ws.Server({ server: httpServer });
-    const _clients: Map<string, any> = new Map();
+interface ActionContext {
+    id: string;
+    socket: $ws;
+    dispatcher: Client;
+    options?: any;
+}
 
-    function ping() {
-        _wss.clients.forEach(function each(ws) {
-            if ((ws as any).isAlive === false) {
-                return ws.terminate();
+const _actions: Record<string, (context: ActionContext) => void> = {
+    subscribe: ({ id, socket, dispatcher, options }: ActionContext) => {
+        let { topic } = $json.parse(options);
+        if (!topic) {
+            throw $error.ExpectationFailed(
+                `ws connection - no topic for subscripton`
+            );
+        }
+
+        dispatcher.subscribe(`event_published`, (err, msg) => {
+            $logger.debug(`ws connection - got event - ws id: ${id}`);
+            if (err) {
+                $logger.warning(`ws conn - subscribe error: ${err.message}`);
             }
 
-            (ws as any).isAlive = false;
-
-            ws.ping();
+            if (msg.data.topic === topic) {
+                socket.send($json.stringify(msg.data));
+            }
         });
-    }
+    },
+};
+
+function ping(wss: $ws.Server) {
+    wss.clients.forEach(function each(ws: any) {
+        $logger.debug(`pinging client id: ${ws._id}`);
+
+        if (ws.isAlive === false) {
+            return ws.terminate();
+        }
+
+        ws.isAlive = false;
+
+        ws.ping();
+    });
+}
+
+export default function createWsServer(httpServer: Server): $ws.Server {
+    const _wss = new $ws.Server({ server: httpServer });
 
     /** @todo: use proper logging */
     _wss.on("error", err => {
@@ -31,9 +62,18 @@ export default function createWsServer(httpServer: Server): $ws.Server {
     _wss.on("connection", async (socket, request) => {
         let id = $uuid.v4();
 
+        (socket as any)._id = id;
+
         let dispatcher = await $nats.connect(`ws_client_${id}`);
 
-        _clients.set(id, $connection({ id, dispatcher, socket, request }));
+        socket.on("message", data => {
+            // let { action, options }: ClientMessage = $json.parse(data);
+            let { action, options } = $json.parse(data);
+
+            $logger.debug(`message`, { action, options });
+
+            _actions[action]({ id, socket, dispatcher, options });
+        });
 
         socket.on("pong", () => {
             (socket as any).isAlive = true;
@@ -65,8 +105,7 @@ export default function createWsServer(httpServer: Server): $ws.Server {
         });
 
         socket.on("open", async () => {
-            await ping();
-            $logger.info(`ws - `);
+            await ping(_wss);
         });
     });
 
@@ -74,7 +113,7 @@ export default function createWsServer(httpServer: Server): $ws.Server {
      * @description: ping all clients every 30 seconds
      * and terminate the ones that do not respond
      */
-    setInterval(ping, 10000);
+    setInterval(() => ping(_wss), 10000);
 
     return _wss;
 }

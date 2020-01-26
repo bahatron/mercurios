@@ -1,5 +1,6 @@
 import $env from "@bahatron/env";
 import moment from "moment";
+import { AxiosError } from "axios";
 
 const DEBUG = $env.get("DEBUG", "");
 
@@ -32,7 +33,7 @@ function inspect(context: any = {}) {
 }
 
 const $logger = {
-    debug(message: string, context?: object | any[]): void {
+    debug(message: string, context?: any): void {
         if (!DEBUG_MODE) {
             return;
         }
@@ -50,12 +51,12 @@ const $logger = {
         log(message, green, "INFO");
     },
 
-    warning(message: string, context?: object | any[]) {
+    warning(message: string, context?: any) {
         log(message, orange, "WARNING");
         inspect(context);
     },
 
-    error(message: string, err?: any) {
+    error(message: string, err?: AxiosError | Error | any) {
         log(message, red, "ERROR");
         inspect(err && err.response ? err.response.config : err);
     },
