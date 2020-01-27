@@ -3,7 +3,9 @@ version: "3.5"
 services:
     server:
         user: node
-        build:
-            context: .
-            dockerfile: server.dockerfile
+        build: ./server
         image: bahatron/mercurios_http
+
+    client:
+        build: ./client
+        image: bahatron/mercurios_client

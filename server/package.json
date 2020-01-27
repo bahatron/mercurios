@@ -5,8 +5,8 @@
     "author": "simonpiscitelli@gmail.com",
     "scripts": {
         "start:docker": "pm2-runtime start process.config.js",
-        "start:dev": "npm run build:clean && npm run dev:docker",
-        "dev:docker": "npm run build:watch & pm2-runtime start process.dev.config.js",
+        "dev": "npm run build:clean && npm run dev:docker",
+        "dev:docker": "npm run build:watch & npm run start:docker",
         "test": "npm run mocha",
         "mocha": "mocha 'dist/**/*.mocha.js'",
         "test:benchmark": "node dist/tests/benchmark.js",

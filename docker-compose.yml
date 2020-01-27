@@ -1,20 +1,6 @@
 version: "3.5"
 
 services:
-    server:
-        image: bahatron/mercurios_http
-        volumes:
-            - ./server:/app
-        ports:
-            - ${DOCKER_SERVER_PORT:-3000}:3000
-        depends_on:
-            - mysql
-            - nats
-        command: npm run start:dev
-        environment:
-            - DEBUG=true
-        env_file: .env
-
     mysql:
         image: mysql:8
         command: --default-authentication-plugin=mysql_native_password
@@ -29,3 +15,26 @@ services:
         ports:
             - ${DOCKER_NATS_SERVER:-4222}:4222
             - ${DOCKER_NATS_STATS:-8222}:8222
+
+    server:
+        image: bahatron/mercurios_http
+        volumes:
+            - ./server:/app
+        ports:
+            - 3000:3000
+        depends_on:
+            - mysql
+            - nats
+        command: npm run dev
+        environment:
+            - DEBUG=true
+        env_file: .env
+
+    client:
+        user: node
+        image: bahatron/mercurios_client
+        volumes:
+            - ./client:/app
+        command: npm run dev
+        ports:
+            - 3100:3100
