@@ -37,4 +37,4 @@ services:
             - ./client:/app
         command: npm run dev
         ports:
-            - 3100:3100
+            - 3100:3000

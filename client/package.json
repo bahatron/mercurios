@@ -1,26 +1,26 @@
 {
-  "name": "nuxt_app",
-  "version": "1.0.0",
-  "description": "",
-  "author": "simonpiscitelli@gmail.com",
-  "private": true,
-  "scripts": {
-    "dev": "nuxt",
-    "build": "nuxt build",
-    "start": "nuxt start",
-    "generate": "nuxt generate",
-    "test": "jest"
-  },
-  "dependencies": {
-    "nuxt": "^2.0.0",
-    "@nuxtjs/axios": "^5.3.6",
-    "@nuxtjs/pwa": "^3.0.0-0"
-  },
-  "devDependencies": {
-    "@nuxtjs/vuetify": "^1.0.0",
-    "@vue/test-utils": "^1.0.0-beta.27",
-    "babel-jest": "^24.1.0",
-    "jest": "^24.1.0",
-    "vue-jest": "^4.0.0-0"
-  }
+    "name": "nuxt_app",
+    "version": "1.0.0",
+    "description": "",
+    "author": "simonpiscitelli@gmail.com",
+    "private": true,
+    "scripts": {
+        "dev": "nuxt",
+        "build": "nuxt build",
+        "start": "nuxt start",
+        "generate": "nuxt generate",
+        "test": "jest"
+    },
+    "dependencies": {
+        "@nuxt/typescript-build": "^0.5.6",
+        "@nuxtjs/axios": "^5.3.6",
+        "@nuxtjs/pwa": "^3.0.0-0",
+        "@nuxtjs/vuetify": "^1.10.2",
+        "@types/node": "^13.5.2",
+        "@vue/test-utils": "^1.0.0-beta.27",
+        "babel-jest": "^24.1.0",
+        "jest": "^24.1.0",
+        "nuxt": "^2.0.0",
+        "vue-jest": "^4.0.0-0"
+    }
 }

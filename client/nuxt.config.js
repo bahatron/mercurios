@@ -6,8 +6,8 @@ export default {
      ** Headers of the page
      */
     head: {
-        titleTemplate: "%s - " + process.env.npm_package_name,
-        title: process.env.npm_package_name || "",
+        // titleTemplate: "%s - " + process.env.npm_package_name,
+        title: "Mercurios",
         meta: [
             { charset: "utf-8" },
             {
@@ -37,7 +37,7 @@ export default {
     /*
      ** Nuxt.js dev-modules
      */
-    buildModules: ["@nuxtjs/vuetify"],
+    buildModules: ["@nuxtjs/vuetify", "@nuxt/typescript-build"],
     /*
      ** Nuxt.js modules
      */
@@ -58,23 +58,23 @@ export default {
     vuetify: {
         customVariables: ["~/assets/variables.scss"],
         theme: {
-            dark: true,
+            // dark: true,
             themes: {
                 dark: {
                     primary: colors.blue.darken2,
-                    accent: colors.grey.darken3,
                     secondary: colors.amber.darken3,
+                    accent: colors.grey.darken3,
                     info: colors.teal.lighten1,
+                    success: colors.green.accent3,
                     warning: colors.amber.base,
                     error: colors.deepOrange.accent4,
-                    success: colors.green.accent3,
                 },
             },
         },
     },
     server: {
-      port: 3100, // default: 3000
-      host: '0.0.0.0' // default: localhost
+        port: 3000, // default: 3000
+        host: "0.0.0.0", // default: localhost
     },
     /*
      ** Build configuration
