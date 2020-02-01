@@ -4,9 +4,8 @@
     "description": "an event stream server",
     "author": "simonpiscitelli@gmail.com",
     "scripts": {
-        "start:docker": "pm2-runtime start process.config.js",
-        "dev": "npm run build:clean && npm run dev:docker",
-        "dev:docker": "npm run build:watch & npm run start:docker",
+        "start": "pm2-runtime start process.config.js",
+        "dev": "npm run build:watch & npm start",
         "test": "npm run mocha",
         "mocha": "mocha 'dist/**/*.mocha.js'",
         "test:benchmark": "node dist/tests/benchmark.js",
