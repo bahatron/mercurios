@@ -5,11 +5,10 @@
     "author": "simonpiscitelli@gmail.com",
     "scripts": {
         "start": "pm2-runtime start process.config.js",
-        "dev": "npm run build:watch & npm start",
+        "dev": "NODE_ENV=development npm run build:watch & npm start",
         "test": "npm run mocha",
         "mocha": "mocha 'dist/**/*.mocha.js'",
         "test:benchmark": "node dist/tests/benchmark.js",
-        "test:ws": "node dist/tests/ws.js",
         "build": "tsc",
         "build:watch": "npm run build -- --watch",
         "build:clean": "rm -rf dist/ && npm run build"

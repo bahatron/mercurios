@@ -1,16 +1,16 @@
 import $axios from "axios";
-import $env from "@bahatron/env";
 import $assertions from "../../services/assertions";
 import { Event } from "../../domain/modules/event";
 import $streams from "../../domain/modules/stream_repository";
 import $createStream from "../../domain/create_stream";
 import $publishEvent from "../../domain/publish_event";
+import $config from "../../services/config";
 
-const TEST_SERVER_URL = $env.get(`TEST_SERVER_URL`, `http://localhost:3000`);
+const MERCURIOS_TEST_URL = $config.MERCURIOS_TEST_URL;
 
 describe("read event", () => {
     async function readEvent(topic: string, id: number) {
-        return $axios.get(`${TEST_SERVER_URL}/stream/${topic}/${id}`);
+        return $axios.get(`${MERCURIOS_TEST_URL}/stream/${topic}/${id}`);
     }
 
     describe("Scenario: topic does not exist", () => {

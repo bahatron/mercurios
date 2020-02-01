@@ -26,11 +26,12 @@ process.on("uncaughtException", err => {
 });
 
 async function start() {
-    $logger.debug("debug mode on");
+    $logger.debug("Starting server in dev mode");
 
     await $mysql.migrate.latest().catch(err => {
         switch (err.code) {
             case "ER_TABLE_EXISTS_ERROR":
+                $logger.warning(`migration error - table already exists`);
                 return;
             default:
                 $logger.error(err.message, err);

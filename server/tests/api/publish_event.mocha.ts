@@ -1,5 +1,4 @@
 import $axios from "axios";
-import $env from "@bahatron/env";
 import $streams from "../../domain/modules/stream_repository";
 import { STREAM_TABLE } from "../../domain/modules/stream";
 import $nats from "../../services/nats";
@@ -8,15 +7,16 @@ import $assertions from "../../services/assertions";
 import $logger from "../../services/logger";
 import $createStream from "../../domain/create_stream";
 import $json from "../../services/json";
+import $config from "../../services/config";
 
-const TEST_SERVER_URL = $env.get(`TEST_SERVER_URL`, `http://localhost:3000`);
+const MERCURIOS_TEST_URL = $config.MERCURIOS_TEST_URL;
 
 export async function _publishEvent(
     topic: string,
     data: any,
     expectedSeq?: number
 ) {
-    return $axios.post(`${TEST_SERVER_URL}/stream/${topic}`, {
+    return $axios.post(`${MERCURIOS_TEST_URL}/stream/${topic}`, {
         data,
         expectedSeq,
     });

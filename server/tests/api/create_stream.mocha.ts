@@ -1,4 +1,3 @@
-import $env from "@bahatron/env";
 import $assertions from "../../services/assertions";
 import { STREAM_DEFINITIONS } from "../../domain/modules/stream_repository";
 import $json from "../../services/json";
@@ -6,12 +5,13 @@ import { STREAM_TABLE } from "../../domain/modules/stream";
 import $mysql from "../../services/mysql";
 import $axios from "../../services/axios";
 import { AxiosResponse } from "axios";
+import $config from "../../services/config";
 
-const TEST_SERVER_URL = $env.get(`TEST_SERVER_URL`, `http://localhost:3000`);
+const MERCURIOS_TEST_URL = $config.MERCURIOS_TEST_URL;
 
 describe("create stream", () => {
     async function _createStream(topic: string, schema = {}) {
-        return $axios.post(`${TEST_SERVER_URL}/streams`, { topic, schema });
+        return $axios.post(`${MERCURIOS_TEST_URL}/streams`, { topic, schema });
     }
 
     describe("Scenario: valid request with no schema", () => {

@@ -1,9 +1,9 @@
 import autocannon from "autocannon";
 import $logger from "../services/logger";
-import $env from "@bahatron/env";
 import $createStream from "../domain/create_stream";
+import $config from "../services/config";
 
-const TEST_SERVER_URL = $env.get("TEST_SERVER_URL");
+const MERCURIOS_TEST_URL = $config.MERCURIOS_TEST_URL;
 const TEST_TOPICS = ["benchmark_1", "benchmark_2", "benchmark_3"];
 
 async function pingBench() {
@@ -11,7 +11,7 @@ async function pingBench() {
         title: "ping benchmark",
         connections: 100,
         pipelining: 10,
-        url: `${TEST_SERVER_URL}/ping`,
+        url: `${MERCURIOS_TEST_URL}/ping`,
     }).then(breakdown);
 }
 
@@ -22,7 +22,7 @@ async function writeBench() {
                 title: `write benchmark`,
                 connections: 100,
                 pipelining: 10,
-                url: `${TEST_SERVER_URL}/stream/${topic}`,
+                url: `${MERCURIOS_TEST_URL}/stream/${topic}`,
                 method: "POST",
                 body: "{}",
             })
@@ -37,7 +37,7 @@ async function readBench() {
                 title: "read benchmark",
                 connections: 100,
                 pipelining: 10,
-                url: `${TEST_SERVER_URL}/stream/${topic}/1`,
+                url: `${MERCURIOS_TEST_URL}/stream/${topic}/1`,
             });
         })
     ).then(breakdown);

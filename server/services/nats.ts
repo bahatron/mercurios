@@ -1,7 +1,7 @@
 import * as nats from "ts-nats";
-import $env from "@bahatron/env";
+import $config from "./config";
 
-const NATS_URL = $env.get("NATS_URL", "nats://nats:4222");
+const NATS_URL = $config.NATS.url;
 
 const CLIENT = connect(`mercurios_server_${process.pid}`);
 

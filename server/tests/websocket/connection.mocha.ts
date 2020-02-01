@@ -11,7 +11,7 @@ describe("websocket connection", () => {
 
     it("can stablish a ws connection", async () => {
         return new Promise(async resolve => {
-            let client = new $ws($config.TEST_SERVER_URL);
+            let client = new $ws($config.MERCURIOS_TEST_URL);
 
             client.on("open", () => {
                 $logger.debug(`is opened!`);
@@ -23,7 +23,7 @@ describe("websocket connection", () => {
     /** @todo */
     // it("can subcribe to a stream", async () => {
     //     return new Promise(resolve => {
-    //         let wsc = new $ws($config.TEST_SERVER_URL);
+    //         let wsc = new $ws($config.MERCURIOS_TEST_URL);
 
     //         $logger.debug(`!!!! here`);
 

@@ -4,8 +4,10 @@ module.exports = {
             name: "mercurios",
             script: "dist/bin/www.js",
             exec_mode: "cluster",
-            instances: parseInt(process.env.PROCESSES) || "max",
+            instances: parseInt(process.env.MERCURIOS_PROCESSES) || "max",
             max_restarts: 3,
+            watch:
+                process.env.MERCURIOS_ENV === "production" ? false : ["dist"],
         },
     ],
 };

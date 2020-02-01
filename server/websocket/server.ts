@@ -62,6 +62,8 @@ export default function createWsServer(httpServer: Server): $ws.Server {
     _wss.on("connection", async (socket, request) => {
         let id = $uuid.v4();
 
+        $logger.info(`ws - new connection - id: ${id}`);
+
         (socket as any)._id = id;
 
         let dispatcher = await $nats.connect(`ws_client_${id}`);
@@ -76,6 +78,8 @@ export default function createWsServer(httpServer: Server): $ws.Server {
         });
 
         socket.on("pong", () => {
+            $logger.debug(`pong recieved from client ${id}`);
+
             (socket as any).isAlive = true;
         });
 

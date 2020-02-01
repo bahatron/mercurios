@@ -35,14 +35,14 @@ MYSQL_DATABASE=mercurios
 # nats config
 NATS_URL=nats://nats:4222
 
-# starts server in debug mode
-DEBUG=false
+# production|any
+MERCURIOS_ENV=dev
 
 # sets the amount of workers
-PROCESSES=2
+MERCURIOS_PROCESSES=2
 
 # server url for tests
-TEST_SERVER_URL=http://localhost:3000
+MERCURIOS_TEST_URL=http://localhost:3000
 ```
 
 ## API
