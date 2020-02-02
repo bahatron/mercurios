@@ -6,6 +6,6 @@ services:
         build: ./server
         image: bahatron/mercurios_http
 
-    client:
-        build: ./client
-        image: bahatron/mercurios_client
+    web:
+        build: ./web
+        image: bahatron/mercurios_admin

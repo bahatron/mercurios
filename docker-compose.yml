@@ -30,11 +30,11 @@ services:
             - DEBUG=true
         env_file: .env
 
-    client:
+    web:
         user: node
-        image: bahatron/mercurios_client
+        image: bahatron/mercurios_admin
         volumes:
-            - ./client:/app
+            - ./web:/app
         command: npm run dev
         ports:
             - 3100:3000
