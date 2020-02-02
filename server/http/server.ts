@@ -4,11 +4,13 @@ import helmet from "helmet";
 import $logger from "../services/logger";
 import $router from "./router";
 import ping from "./middleware/ping";
+import cors from "cors";
 
 const SERVER = $express();
 
 SERVER.use($express.json());
 SERVER.use(helmet());
+SERVER.use(cors());
 
 SERVER.get("/ping", ping());
 

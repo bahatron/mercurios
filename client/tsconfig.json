@@ -1,14 +1,13 @@
 {
     "compilerOptions": {
-        "target": "es2018",
-        "module": "esnext",
         "moduleResolution": "node",
         "esModuleInterop": true,
-        "allowJs": true,
+        "target": "es2018",
+        "module": "esnext",
         "sourceMap": true,
+        "allowJs": true,
         "strict": true,
-        "noEmit": true,
-        "baseUrl": ".",
+        // "baseUrl": ".",
         "outDir": "dist"
     },
     "exclude": [
