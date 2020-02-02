@@ -1,6 +1,6 @@
 <template>
     <v-container fluid fill-height>
-        <v-row>
+        <v-row fill-height>
             <v-col cols="6" align-items="top">
                 <h1>actions</h1>
 
@@ -27,10 +27,73 @@
                         publish event
                     </v-btn>
                 </v-div>
+
+                <v-div>
+                    <v-btn color="accent" @click="clearAutoPublish">
+                        clear auto publishes
+                    </v-btn>
+                </v-div>
+
+                <v-div>
+                    <v-dialog
+                        v-model="PUBLISH_EVENT_PERIODIC.visible"
+                        width="500"
+                    >
+                        <template v-slot:activator="{ on }">
+                            <v-btn color="secondary" v-on="on">
+                                automatic publish
+                            </v-btn>
+                        </template>
+
+                        <v-card class="pa-4">
+                            <v-text-field
+                                v-model="PUBLISH_EVENT_PERIODIC.topic"
+                                type="text"
+                                label="topic name"
+                            >
+                            </v-text-field>
+
+                            <v-text-field
+                                v-model="PUBLISH_EVENT_PERIODIC.data"
+                                type="text"
+                                label="data"
+                            >
+                            </v-text-field>
+
+                            <v-text-field
+                                v-model="PUBLISH_EVENT_PERIODIC.interval"
+                                type="text"
+                                label="interval (ms)"
+                            >
+                            </v-text-field>
+
+                            <v-card-actions>
+                                <v-btn @click="periodicPublish">
+                                    publish
+                                </v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+                </v-div>
             </v-col>
 
             <v-col cols="6">
                 <h1>stream</h1>
+
+                <v-div>
+                    <v-list>
+                        <v-list-item
+                            v-for="message in _messages"
+                            :key="message.id"
+                        >
+                            <v-list-item-content>
+                                <v-list-item-title>
+                                    {{ message }}
+                                </v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list>
+                </v-div>
             </v-col>
         </v-row>
 
@@ -88,7 +151,7 @@
                 </v-text-field>
 
                 <v-card-actions>
-                    <v-btn @click="publishEvent">
+                    <v-btn @click="singlePublish">
                         publish
                     </v-btn>
                 </v-card-actions>
@@ -116,6 +179,7 @@ export default Vue.extend({
     data() {
         return {
             ws: WsClient(),
+            workers: [] as NodeJS.Timeout[],
             CREATE_TOPIC: {
                 visible: false,
                 topic: "",
@@ -129,7 +193,21 @@ export default Vue.extend({
                 topic: "",
                 data: "",
             },
+            PUBLISH_EVENT_PERIODIC: {
+                visible: false,
+                interval: null,
+                topic: "",
+                data: "",
+            },
         };
+    },
+
+    destroyed() {
+        if (!this.ws) {
+            return;
+        }
+
+        (this.ws as WebSocket).close();
     },
 
     mounted() {
@@ -150,16 +228,33 @@ export default Vue.extend({
         }
     },
 
+    computed: {
+        _messages() {
+            let messages = this.$store.getters["mercurios/messages"];
+
+            return messages;
+        },
+    },
+
     methods: {
+        async clearAutoPublish() {
+            this.workers.forEach(worker => {
+                clearTimeout(worker);
+            });
+        },
+
         async subscribeToTopic() {
             if (!this.ws) {
                 console.warn(`no websocket connection`);
             }
 
+            /** @todo: move this to store, pass ws connection as part of action payload */
             (this.ws as WebSocket).send(
                 JSON.stringify({
                     action: "subscribe",
-                    topic: this.SUBSCRIBE_TOPIC.topic,
+                    options: {
+                        topic: this.SUBSCRIBE_TOPIC.topic,
+                    },
                 })
             );
 
@@ -174,15 +269,42 @@ export default Vue.extend({
             this.CREATE_TOPIC.visible = false;
         },
 
-        async publishEvent() {
-            let { topic, data } = this.PUBLISH_EVENT;
-
+        async publishEvent({ topic, data }: any) {
             await this.$store.dispatch("mercurios/publish", {
                 topic,
                 data,
             });
+        },
+
+        singlePublish() {
+            let { topic, data } = this.PUBLISH_EVENT;
+
+            this.publishEvent({ topic, data });
 
             this.PUBLISH_EVENT.visible = false;
+        },
+
+        periodicPublish() {
+            let { interval, topic, data } = this.PUBLISH_EVENT_PERIODIC;
+
+            let wat: NodeJS.Timeout;
+
+            console.log(`interval type: ${typeof interval}`, interval);
+
+            if (Boolean(interval) && interval !== null) {
+                // let _interval = parseInt((<any>interval) as string);
+                let _interval =
+                    parseInt((<any>interval) as string) < 100
+                        ? 100
+                        : parseInt((<any>interval) as string);
+
+                wat = setInterval(() => {
+                    this.publishEvent({ topic, data });
+                }, _interval);
+                this.workers.push(wat);
+            }
+
+            this.PUBLISH_EVENT_PERIODIC.visible = false;
         },
     },
 });

@@ -1,4 +1,4 @@
-import { ActionTree, GetterTree } from "vuex";
+import { ActionTree, GetterTree, MutationTree } from "vuex";
 import $axios from "../utils/axios";
 
 const MERCURIOS_URL = process.server
@@ -6,13 +6,34 @@ const MERCURIOS_URL = process.server
     : "http://localhost:3000";
 
 export const state = () => {
-    return {};
+    return {
+        messages: {} as Record<string, number>,
+    };
 };
 
 type MercuriosState = ReturnType<typeof state>;
 
 export const getters: GetterTree<MercuriosState, any> = {
     hello: state => "hello from the store!",
+    messages: state =>
+        Object.entries(state.messages).map(([key, value]) => {
+            return {
+                [key]: value,
+            };
+        }),
+};
+
+export const mutations: MutationTree<MercuriosState> = {
+    addMessage(state, { message }) {
+        let { topic } = message;
+
+        state.messages = {
+            ...state.messages,
+            [topic]: (state.messages[topic] || 0) + 1,
+        };
+
+        console.log("mercurios state mutated", state);
+    },
 };
 
 export const actions: ActionTree<MercuriosState, any> = {
@@ -39,7 +60,10 @@ export const actions: ActionTree<MercuriosState, any> = {
     async onError(context, error) {},
     async onOpen(context, event) {},
 
-    async onMessage(context, message) {
-        console.log(`received message \n`, message);
+    async onMessage({ state, commit }, message: MessageEvent) {
+        let payload = JSON.parse(message.data);
+        console.log(`received message \n`, payload);
+
+        commit("addMessage", { message: payload });
     },
 };
