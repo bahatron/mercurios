@@ -145,7 +145,8 @@ describe("publish event", () => {
                     })
                 );
             } catch (err) {
-                $logger.error(`Error loading fixtures`, err);
+                $logger.warning("error loading fixtures");
+                $logger.error(err);
                 throw err;
             }
         });

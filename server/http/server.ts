@@ -1,10 +1,9 @@
-import $express, { Response, Request, NextFunction } from "express";
-import $error, { Exception } from "../services/error";
+import $express from "express";
 import helmet from "helmet";
-import $logger from "../services/logger";
 import $router from "./router";
 import ping from "./middleware/ping";
 import cors from "cors";
+import errorHandler from "./middleware/error_handler";
 
 const SERVER = $express();
 
@@ -16,23 +15,6 @@ SERVER.get("/ping", ping());
 
 SERVER.use($router);
 
-SERVER.use(
-    (err: Exception, req: Request, res: Response, next: NextFunction) => {
-        let code = err.httpCode || 500;
-
-        $logger.debug(err.message, err);
-
-        if (code >= 500) {
-            $logger.error(
-                `HTTP Server - http error: ${code} - ${err.message}`,
-                err
-            );
-        }
-
-        return res
-            .status(code)
-            .json(err.httpCode ? err.message : "Internal Error");
-    }
-);
+SERVER.use(errorHandler);
 
 export default SERVER;

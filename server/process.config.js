@@ -1,11 +1,12 @@
 module.exports = {
     apps: [
         {
-            name: "mercurios",
             script: "dist/bin/www.js",
+            name: "mercurios",
             exec_mode: "cluster",
-            instances: parseInt(process.env.MERCURIOS_PROCESSES) || "2",
             max_restarts: 3,
+            restart_delay: "5000",
+            instances: parseInt(process.env.MERCURIOS_PROCESSES) || "2",
             watch:
                 process.env.MERCURIOS_ENV === "production" ? false : ["dist"],
         },

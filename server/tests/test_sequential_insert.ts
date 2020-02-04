@@ -55,7 +55,5 @@ main()
     .then(result => {
         $logger.info(`SEQUENTIAL INSERT TEST - ${result} records in 10s`);
     })
-    .catch(err => {
-        $logger.error(err.message, err);
-    })
+    .catch($logger.error)
     .finally(process.exit);

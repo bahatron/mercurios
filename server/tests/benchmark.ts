@@ -1,5 +1,5 @@
 import autocannon from "autocannon";
-import $logger from "../services/logger";
+import $logger, { inspect } from "../services/logger";
 import $createStream from "../domain/create_stream";
 import $config from "../services/config";
 
@@ -67,13 +67,13 @@ async function main() {
     await Promise.all(TEST_TOPICS.map(topic => $createStream(topic)));
 
     $logger.info(`ping benchmark`);
-    $logger.inspect(await pingBench());
+    inspect(await pingBench());
 
     $logger.info(`write benchmark`);
-    ((await writeBench()) as any[]).forEach($logger.inspect);
+    ((await writeBench()) as any[]).forEach(inspect);
 
     $logger.info(`read benchmark`);
-    ((await readBench()) as any[]).forEach($logger.inspect);
+    ((await readBench()) as any[]).forEach(inspect);
 }
 
 main()

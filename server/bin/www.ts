@@ -11,7 +11,7 @@ const HTTP_SERVER = new http.Server(expressApp);
 const WEBSOCKET_SERVER = createWsServer(HTTP_SERVER);
 
 process.on("uncaughtException", err => {
-    $logger.error(`PROCESS: uncaught exception - ${err.message}`, err);
+    $logger.error(err);
     process.exit(-1);
 });
 
@@ -21,7 +21,8 @@ process.on("uncaughtException", err => {
     });
 
     server.on("error", err => {
-        $logger.error(`${server.constructor.name} error - ${err.message}`, err);
+        $logger.warning(`${server.constructor.name} error - ${err.message}`);
+        $logger.error(err);
     });
 });
 
@@ -34,8 +35,7 @@ async function start() {
                 $logger.warning(`migration error - table already exists`);
                 return;
             default:
-                $logger.error(err.message, err);
-                process.exit(-1);
+                throw err;
         }
     });
 

@@ -56,7 +56,8 @@ export default function createWsServer(httpServer: Server): $ws.Server {
 
     /** @todo: use proper logging */
     _wss.on("error", err => {
-        $logger.error(`ws server error - ${err.message}`, err);
+        $logger.warning(`ws server error - ${err.message}`);
+        $logger.error(err);
     });
 
     _wss.on("connection", async (socket, request) => {
@@ -101,7 +102,8 @@ export default function createWsServer(httpServer: Server): $ws.Server {
         });
 
         socket.on("error", async err => {
-            $logger.error(`ws - coonection error - ${err.message}`, err);
+            $logger.warning(`ws - coonection error - ${err.message}`);
+            $logger.error(err);
             await dispatcher.drain();
             await dispatcher.close();
 
