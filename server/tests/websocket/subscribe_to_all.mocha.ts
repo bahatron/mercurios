@@ -2,7 +2,6 @@ import $createStream from "../../domain/create_stream";
 import { expect } from "chai";
 import $config from "../../services/config";
 import $ws from "ws";
-import $logger from "../../services/logger";
 import $json from "../../services/json";
 import $publishEvent from "../../domain/publish_event";
 
@@ -26,6 +25,8 @@ describe("Feature: subscribe to all topics", () => {
                     action: "subscribe_all",
                 })
             );
+
+            await new Promise(resolve => setTimeout(resolve, 10));
 
             let results = await Promise.all(
                 _topics.map(topic => {
