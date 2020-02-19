@@ -7,7 +7,7 @@ const config: Config = {
     client: "mysql2",
     connection: $config.mysql,
     migrations: {
-        tableName: "migrations",
+        tableName: "mercurios_migrations",
         directory: $path.resolve(`/app/migrations`),
     },
 };
