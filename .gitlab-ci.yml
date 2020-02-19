@@ -15,4 +15,4 @@ stages:
 build_server:
     stage: build
     script:
-        - BRANCH: ${CI_COMMIT_BRANCH:-none} ./build.sh
+        - BRANCH=${CI_COMMIT_BRANCH:-none} ./build.sh

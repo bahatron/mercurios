@@ -1,16 +1,17 @@
 import * as nats from "ts-nats";
 import $config from "./config";
 
-const NATS_URL = $config.NATS.url;
+const NATS_URL = $config.nats.url;
+const CLIENT_NAME = `mercurios_server_${process.pid}`;
 
-const CLIENT = connect(`mercurios_server_${process.pid}`);
+const CLIENT = _connect(CLIENT_NAME);
 
-export async function connect(name: string): Promise<nats.Client> {
+export async function _connect(name: string): Promise<nats.Client> {
     return nats.connect({
         name: name,
         url: NATS_URL,
         payload: nats.Payload.JSON,
-    });
+    } as nats.NatsConnectionOptions);
 }
 
 async function publish(topic: string, message: any): Promise<void> {
@@ -26,7 +27,7 @@ async function subscribe(
 }
 
 const $nats = {
-    connect,
+    connect: _connect,
     publish,
     subscribe,
 };

@@ -5,7 +5,7 @@ import $config from "../services/config";
 /** @todo: Fix migrations directory name */
 const config: Config = {
     client: "mysql2",
-    connection: $config.MYSQL,
+    connection: $config.mysql,
     migrations: {
         tableName: "migrations",
         directory: $path.resolve(`/app/migrations`),

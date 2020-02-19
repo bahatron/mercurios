@@ -1,9 +1,9 @@
 import $express from "express";
 import helmet from "helmet";
 import $router from "./router";
-import ping from "./middleware/ping";
+import ping from "./utils/ping";
 import cors from "cors";
-import errorHandler from "./middleware/error_handler";
+import errorHandler from "./utils/error_handler";
 
 const SERVER = $express();
 

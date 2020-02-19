@@ -1,14 +1,14 @@
-import $axios from "axios";
+import $axios, { AxiosResponse } from "axios";
 import $assertions from "../../services/assertions";
-import { Event } from "../../domain/modules/event";
 import $streams from "../../domain/modules/stream_repository";
 import $createStream from "../../domain/create_stream";
 import $publishEvent from "../../domain/publish_event";
 import $config from "../../services/config";
+import { MercuriosEvent } from "../../domain/modules/event";
 
-const MERCURIOS_TEST_URL = $config.MERCURIOS_TEST_URL;
+const MERCURIOS_TEST_URL = $config.test_url;
 
-describe("read event", () => {
+describe("Feature: read event", () => {
     async function readEvent(topic: string, id: number) {
         return $axios.get(`${MERCURIOS_TEST_URL}/stream/${topic}/${id}`);
     }
@@ -25,24 +25,27 @@ describe("read event", () => {
 
     describe("Scenario: topic exists but event does not", () => {
         const TOPIC = `read_event_test`;
+        let _response: AxiosResponse;
 
         before(async () => {
             await $streams.delete(TOPIC);
-
             await $createStream(TOPIC);
+            _response = await readEvent(TOPIC, 2);
         });
 
-        it("responds with http 200", async () => {
-            let response = await readEvent(TOPIC, 2);
+        it("responds with http 204", () => {
+            $assertions.expect(_response.status).to.eq(204);
+        });
 
-            $assertions.expect(Boolean(response.data)).to.be.false;
+        it("response payload is empty", async () => {
+            $assertions.expect(Boolean(_response.data)).to.be.false;
         });
     });
 
     describe("Scenario: topic and event exists", () => {
         const TOPIC = `read_event_test`;
 
-        let EVENT: Event;
+        let EVENT: MercuriosEvent;
         before(async () => {
             await $createStream(TOPIC);
             EVENT = await $publishEvent({
@@ -51,16 +54,16 @@ describe("read event", () => {
             });
         });
 
+        it("responds with an event", async () => {
+            let response = await readEvent(TOPIC, EVENT.seq);
+
+            $assertions.expect(response.data).to.deep.eq(EVENT);
+        });
+
         it("has the expected schema", async () => {
             $assertions
                 .expect(EVENT)
                 .to.have.all.keys(["seq", "published_at", "data", "topic"]);
-        });
-
-        it("returns an event", async () => {
-            let response = await readEvent(TOPIC, EVENT.seq);
-
-            $assertions.expect(response.data).to.deep.eq(EVENT);
         });
     });
 });

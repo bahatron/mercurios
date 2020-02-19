@@ -1,6 +1,6 @@
 import $axios from "axios";
 import $streams from "../../domain/modules/stream_repository";
-import { STREAM_TABLE } from "../../domain/modules/stream";
+import { streamTable } from "../../domain/modules/stream_repository";
 import $nats from "../../services/nats";
 import $mysql from "../../services/mysql";
 import $assertions from "../../services/assertions";
@@ -9,7 +9,7 @@ import $createStream from "../../domain/create_stream";
 import $json from "../../services/json";
 import $config from "../../services/config";
 
-const MERCURIOS_TEST_URL = $config.MERCURIOS_TEST_URL;
+const MERCURIOS_TEST_URL = $config.test_url;
 
 export async function _publishEvent(
     topic: string,
@@ -22,7 +22,7 @@ export async function _publishEvent(
     });
 }
 
-describe("publish event", () => {
+describe("Feature: publish event", () => {
     describe(`Scenario: stringified request payload`, () => {
         const _stream = "publish_double_stringified_test";
 
@@ -60,7 +60,7 @@ describe("publish event", () => {
         });
     });
 
-    describe("Scenario: with no schema", () => {
+    describe("Scenario: publish to a stream without schema", () => {
         const TOPIC = `publish_event_test`;
 
         before(async () => {
@@ -74,7 +74,7 @@ describe("publish event", () => {
 
             let event = await _publishEvent(TOPIC, payload);
 
-            let result = await $mysql(STREAM_TABLE(TOPIC))
+            let result = await $mysql(streamTable(TOPIC))
                 .where({
                     seq: event.data.seq,
                 })
@@ -83,16 +83,14 @@ describe("publish event", () => {
             $assertions.expect(result).not.to.be.undefined;
         });
 
-        it("emits an event", async () => {
+        it("emits an event related to the topic", async () => {
             return new Promise(async resolve => {
                 let event: any;
 
-                $nats.subscribe(`event_published`, (err, msg) => {
-                    if (msg.data.topic === TOPIC) {
-                        resolve(
-                            $assertions.expect(msg.data).to.deep.eq(event.data)
-                        );
-                    }
+                $nats.subscribe(`stream.${TOPIC}`, (err, msg) => {
+                    resolve(
+                        $assertions.expect(msg.data).to.deep.eq(event.data)
+                    );
                 });
 
                 event = await _publishEvent(TOPIC, "hello from test");
@@ -113,13 +111,13 @@ describe("publish event", () => {
             await $createStream(topic, schema);
         });
 
-        it("will publish an event if complies with the schema", async () => {
+        it("publishes an event if complies with the schema", async () => {
             let response = await _publishEvent(topic, { test: 5 });
 
             $assertions.expect(response.status).to.eq(201);
         });
 
-        it("will rejct the request if the message does not complies with the schema", async () => {
+        it("rejects the request if the payload does not comply with the schema", async () => {
             return new Promise(async resolve => {
                 try {
                     await _publishEvent(topic, "invalid message");
@@ -151,7 +149,7 @@ describe("publish event", () => {
             }
         });
 
-        it("will return http status code 417 if seq number is already taken", async () => {
+        it("responds with http status code 417 if seq number is already taken", async () => {
             return new Promise(async resolve => {
                 try {
                     await _publishEvent(TOPIC, "another message", 5);
@@ -161,7 +159,7 @@ describe("publish event", () => {
             });
         });
 
-        it("will return http status code 417 if expected sequence number is higher than actual", async () => {
+        it("responds with http status code 417 if expected sequence number is higher than actual", async () => {
             return new Promise(async resolve => {
                 try {
                     await _publishEvent(TOPIC, "another message", 15);
@@ -171,7 +169,7 @@ describe("publish event", () => {
             });
         });
 
-        it("will publish the event if 'next' sequence number matches the expected", async () => {
+        it("publishes the event if 'next' sequence number matches the expected", async () => {
             let response = await _publishEvent(TOPIC, "12 from test", 12);
 
             $assertions.expect(response.data.seq).to.eq(12);

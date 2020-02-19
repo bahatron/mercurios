@@ -4,15 +4,21 @@ import expressApp from "../http/server";
 import $logger from "../services/logger";
 import createWsServer from "../websocket/server";
 import $mysql from "../services/mysql";
+import $config from "../services/config";
 
-const PORT = 3000;
+const PORT = parseInt($config.server_port);
 
 const HTTP_SERVER = new http.Server(expressApp);
 const WEBSOCKET_SERVER = createWsServer(HTTP_SERVER);
 
 process.on("uncaughtException", err => {
+    $logger.warning("uncaught expection");
     $logger.error(err);
     process.exit(-1);
+});
+
+process.on("unhandledRejection", reason => {
+    $logger.warning("unhandled rejection", reason);
 });
 
 [WEBSOCKET_SERVER, HTTP_SERVER].forEach(server => {

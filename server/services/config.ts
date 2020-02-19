@@ -1,19 +1,27 @@
 import $env from "@bahatron/env";
+import $lodash from "lodash";
 
-const $config = Object.freeze({
-    MERCURIOS_TEST_URL: $env.get(`MERCURIOS_TEST_URL`, `http://localhost:3000`),
-    DEV_MODE: Boolean($env.get("MERCURIOS_ENV", "") !== "production"),
-    TEST_URL: $env.get("MERCURIOS_TEST_URL", "http://localhost:3000"),
-    MYSQL: {
-        host: $env.get("MYSQL_HOST", "mysql"),
-        port: parseInt($env.get("MYSQL_PORT", "3306")),
-        user: $env.get("MYSQL_USER", "root"),
-        password: $env.get("MYSQL_PASSWORD", "secret"),
-        database: $env.get("MYSQL_DATABASE", "mercurios"),
+const $config = new Proxy(
+    {
+        server_port: $env.get("MERCURIOS_PORT", "4254"),
+        test_url: $env.get("MERCURIOS_TEST_URL", "http://server:4254"),
+        dev_mode: Boolean($env.get("MERCURIOS_ENV", "") !== "production"),
+        mysql: {
+            host: $env.get("MYSQL_HOST"),
+            port: parseInt($env.get("MYSQL_PORT")),
+            user: $env.get("MYSQL_USER"),
+            password: $env.get("MYSQL_PASSWORD"),
+            database: $env.get("MYSQL_DATABASE"),
+        },
+        nats: {
+            url: $env.get("NATS_URL"),
+        },
     },
-    NATS: {
-        url: $env.get("NATS_URL", "nats://nats:4222"),
-    },
-});
+    {
+        get<T>(_object: T, attribute: keyof T) {
+            return $lodash.cloneDeep(_object[attribute]);
+        },
+    }
+);
 
 export default $config;

@@ -1,43 +1,43 @@
 import { Schema } from "jsonschema";
 import $error from "../../services/error";
-import $date from "../../services/date";
 import $json from "../../services/json";
 import $validator from "../../services/validator";
-import eventFactory, { Event } from "./event";
 import $mysql from "../../services/mysql";
-import $logger from "../../services/logger";
-
-export const STREAM_TABLE = (topic: string): string => {
-    return `stream_${topic}`;
-};
+import $moment from "moment";
+import $event, { MercuriosEvent } from "./event";
 
 export class Stream {
     public readonly schema: Schema;
-    private readonly table: string;
 
-    constructor(public readonly topic: string, schema?: Schema) {
-        this.table = STREAM_TABLE(topic);
+    constructor(
+        public readonly topic: string,
+        public readonly table: string,
+        schema?: Schema
+    ) {
         this.schema = schema ? $json.parse(schema) : {};
     }
 
-    public async init(): Promise<void> {
-        if (await $mysql.schema.hasTable(this.table)) {
-            return;
+    public async init(): Promise<ThisType<Stream>> {
+        if (!(await $mysql.schema.hasTable(this.table))) {
+            await $mysql.schema.createTable(this.table, function(table) {
+                table.increments("seq").primary();
+                table.string("published_at");
+                table.text("data", "longtext");
+            });
         }
 
-        await $mysql.schema.createTable(this.table, function(table) {
-            table.increments("seq").primary();
-            table.string("published_at");
-            table.text("data", "longtext");
-        });
+        return this;
     }
 
-    public async append(data: any = {}, expectedSeq?: number): Promise<Event> {
+    public async append(
+        data: any = {},
+        expectedSeq?: number
+    ): Promise<MercuriosEvent> {
         if (!$validator.validate($json.parse(data), this.schema)) {
             throw $error.ValidationFailed("validation failed for event data");
         }
 
-        let published_at = $date.dateString();
+        let published_at = $moment().toISOString();
 
         try {
             let seq = await $mysql.transaction(async _trx => {
@@ -61,7 +61,7 @@ export class Stream {
                 return result;
             });
 
-            return eventFactory(this.topic, seq, published_at, data);
+            return $event(this.topic, seq, published_at, data);
         } catch (err) {
             await $mysql.raw(`ALTER TABLE ${this.table} auto_increment = 1`);
 
@@ -69,7 +69,7 @@ export class Stream {
         }
     }
 
-    public async read(id: number): Promise<Event | undefined> {
+    public async read(id: number): Promise<MercuriosEvent | undefined> {
         let result = await $mysql(this.table)
             .where({ seq: id })
             .first();
@@ -80,15 +80,20 @@ export class Stream {
 
         let { seq, published_at, data } = result;
 
-        return eventFactory(this.topic, seq, published_at, data);
+        return $event(this.topic, seq, published_at, data);
     }
 }
 
 interface StreamFactory {
     topic: string;
+    table_name: string;
     schema?: Schema;
 }
 /** @todo: validate schema is valid jsonschema.Schema. Is that even possible? */
-export default function streamFactory({ topic, schema }: StreamFactory) {
-    return new Stream(topic, schema);
+export default function streamFactory({
+    topic,
+    table_name,
+    schema,
+}: StreamFactory) {
+    return new Stream(topic, table_name, schema);
 }

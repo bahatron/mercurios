@@ -3,11 +3,12 @@ import $axios from "../utils/axios";
 
 const MERCURIOS_URL = process.server
     ? "http://server:3000"
-    : "http://localhost:3000";
+    : `http://localhost:4254`;
 
 export const state = () => {
     return {
-        messages: {} as Record<string, number>,
+        topics: {} as Record<string, { count: number; seq: number }>,
+        messages: [] as Record<string, any>[],
     };
 };
 
@@ -15,21 +16,23 @@ type MercuriosState = ReturnType<typeof state>;
 
 export const getters: GetterTree<MercuriosState, any> = {
     hello: state => "hello from the store!",
-    messages: state =>
-        Object.entries(state.messages).map(([key, value]) => {
-            return {
-                [key]: value,
-            };
-        }),
+    stats: state => {
+        return Object.entries(state.topics).map(([topic, state]) => {
+            return { topic, ...state };
+        });
+    },
 };
 
 export const mutations: MutationTree<MercuriosState> = {
     addMessage(state, { message }) {
         let { topic } = message;
 
-        state.messages = {
-            ...state.messages,
-            [topic]: (state.messages[topic] || 0) + 1,
+        state.topics = {
+            ...state.topics,
+            [topic]: {
+                seq: message.seq,
+                count: state.topics[topic] ? state.topics[topic].count + 1 : 1,
+            },
         };
 
         console.log("mercurios state mutated", state);
@@ -40,10 +43,9 @@ export const actions: ActionTree<MercuriosState, any> = {
     async createStream(this: any, context, { topic }) {
         console.log(`creating stream....`);
 
-        // let response = await this.$axios.$post(MERCURIOS_URL, { topic });
         let response = await $axios.post(`${MERCURIOS_URL}/streams`, { topic });
 
-        console.log("got data! \n", response.data);
+        console.log("created stream...success! \n", response.data);
     },
 
     async publish(context, { topic, data }) {

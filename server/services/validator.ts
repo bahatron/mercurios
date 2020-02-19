@@ -1,6 +1,7 @@
 import { Validator, Schema } from "jsonschema";
 import $error from "./error";
 import $logger from "./logger";
+import moment = require("moment");
 
 const validator = new Validator();
 
@@ -62,6 +63,14 @@ const $validator = {
         }
 
         return parseFloat(val);
+    },
+
+    isoDate(val: any, format?: string): string {
+        if (!val || !moment(val, format).isValid()) {
+            throw $error.ValidationFailed(`${val} not a valid date string`);
+        }
+
+        return moment(val).toISOString();
     },
 };
 

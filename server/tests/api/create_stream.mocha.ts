@@ -1,15 +1,17 @@
 import $assertions from "../../services/assertions";
-import { STREAM_DEFINITIONS } from "../../domain/modules/stream_repository";
+import {
+    STREAM_DEFINITIONS,
+    streamTable,
+} from "../../domain/modules/stream_repository";
 import $json from "../../services/json";
-import { STREAM_TABLE } from "../../domain/modules/stream";
 import $mysql from "../../services/mysql";
 import $axios from "../../services/axios";
 import { AxiosResponse } from "axios";
 import $config from "../../services/config";
 
-const MERCURIOS_TEST_URL = $config.MERCURIOS_TEST_URL;
+const MERCURIOS_TEST_URL = $config.test_url;
 
-describe("create stream", () => {
+describe("Feature: create stream", () => {
     async function _createStream(topic: string, schema = {}) {
         return $axios.post(`${MERCURIOS_TEST_URL}/streams`, { topic, schema });
     }
@@ -36,7 +38,7 @@ describe("create stream", () => {
 
         it("creates a stream table", async () => {
             $assertions
-                .expect(await $mysql.schema.hasTable(STREAM_TABLE(TOPIC)))
+                .expect(await $mysql.schema.hasTable(streamTable(TOPIC)))
                 .to.eq(true);
         });
 

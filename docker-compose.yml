@@ -21,7 +21,7 @@ services:
         volumes:
             - ./server:/app
         ports:
-            - 3000:3000
+            - ${MERCURIOS_PORT}:${MERCURIOS_PORT}
         depends_on:
             - mysql
             - nats

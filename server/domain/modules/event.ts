@@ -1,23 +1,23 @@
 import $json from "../../services/json";
-import $date from "../../services/date";
+import $validator from "../../services/validator";
 
-export interface Event {
+export interface MercuriosEvent {
     seq: number;
     data: any;
     published_at: string;
     topic: string;
 }
 
-export default function eventFactory(
+export default function $event(
     topic: string,
     seq: number,
     published_at: string,
     data: any
-): Event {
+): MercuriosEvent {
     return {
-        topic,
-        seq,
-        published_at: $date.dateString(published_at),
+        topic: $validator.string(topic),
+        seq: $validator.int(seq),
+        published_at: $validator.isoDate(published_at),
         data: $json.parse(data),
     };
 }

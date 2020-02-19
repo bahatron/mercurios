@@ -3,8 +3,7 @@ import $createStream from "../domain/create_stream";
 import $publishEvent from "../domain/publish_event";
 import $readEvent from "../domain/read_event";
 import $error from "../services/error";
-import $json from "../services/json";
-import $logger from "../services/logger";
+
 const $router = express.Router();
 
 export function asyncRoute(controller: (req: Request, res: Response) => void) {
@@ -33,7 +32,10 @@ $router.post(
             return res.status(200).json();
         }
 
-        return res.status(201).json(stream);
+        return res.status(201).json({
+            topic: stream.topic,
+            schema: stream.schema,
+        });
     })
 );
 
@@ -52,9 +54,16 @@ $router.post(
 $router.get(
     "/stream/:topic/:seq",
     asyncRoute(async (req, res) => {
-        return res
-            .status(200)
-            .json(await $readEvent(req.params.topic, parseInt(req.params.seq)));
+        let event = await $readEvent(
+            req.params.topic,
+            parseInt(req.params.seq)
+        );
+
+        if (!event) {
+            return res.status(204).json();
+        }
+
+        return res.status(200).json(event);
     })
 );
 

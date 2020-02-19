@@ -12,7 +12,7 @@
 
                 <v-div>
                     <v-btn
-                        color="primary"
+                        color="secondary"
                         @click="SUBSCRIBE_TOPIC.visible = true"
                     >
                         subscribe to topic
@@ -20,16 +20,13 @@
                 </v-div>
 
                 <v-div>
-                    <v-btn
-                        color="primary"
-                        @click="PUBLISH_EVENT.visible = true"
-                    >
+                    <v-btn color="accent" @click="PUBLISH_EVENT.visible = true">
                         publish event
                     </v-btn>
                 </v-div>
 
                 <v-div>
-                    <v-btn color="accent" @click="clearAutoPublish">
+                    <v-btn color="info" @click="clearAutoPublish">
                         clear auto publishes
                     </v-btn>
                 </v-div>
@@ -40,7 +37,7 @@
                         width="500"
                     >
                         <template v-slot:activator="{ on }">
-                            <v-btn color="secondary" v-on="on">
+                            <v-btn color="warning" v-on="on">
                                 automatic publish
                             </v-btn>
                         </template>
@@ -75,24 +72,36 @@
                         </v-card>
                     </v-dialog>
                 </v-div>
+
+                <v-div>
+                    <v-btn color="error" @click="subscribeToAll">
+                        subscribe to all
+                    </v-btn>
+                </v-div>
             </v-col>
 
             <v-col cols="6">
-                <h1>stream</h1>
+                <h1>streams</h1>
 
                 <v-div>
-                    <v-list>
-                        <v-list-item
-                            v-for="message in _messages"
-                            :key="message.id"
-                        >
-                            <v-list-item-content>
-                                <v-list-item-title>
-                                    {{ message }}
-                                </v-list-item-title>
-                            </v-list-item-content>
-                        </v-list-item>
-                    </v-list>
+                    <v-simple-table>
+                        <template v-slot:default>
+                            <thead>
+                                <tr>
+                                    <th class="text-left">topic</th>
+                                    <th class="text-left">sequence</th>
+                                    <th class="text-left">messages recieved</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="item in _messages" :key="item.topic">
+                                    <td>{{ item.topic }}</td>
+                                    <td>{{ item.seq }}</td>
+                                    <td>{{ item.count }}</td>
+                                </tr>
+                            </tbody>
+                        </template>
+                    </v-simple-table>
                 </v-div>
             </v-col>
         </v-row>
@@ -169,7 +178,7 @@ function WsClient() {
         return null;
     }
 
-    return new WebSocket(`ws://localhost:3000`);
+    return new WebSocket(`ws://localhost:${"4254"}`);
 }
 
 export default Vue.extend({
@@ -230,9 +239,9 @@ export default Vue.extend({
 
     computed: {
         _messages() {
-            let messages = this.$store.getters["mercurios/messages"];
+            return this.$store.getters["mercurios/stats"];
 
-            return messages;
+            // return messages;
         },
     },
 
@@ -255,6 +264,20 @@ export default Vue.extend({
                     options: {
                         topic: this.SUBSCRIBE_TOPIC.topic,
                     },
+                })
+            );
+
+            this.SUBSCRIBE_TOPIC.visible = false;
+        },
+
+        async subscribeToAll() {
+            if (!this.ws) {
+                console.warn(`no websocket connection`);
+            }
+
+            (this.ws as WebSocket).send(
+                JSON.stringify({
+                    action: "subscribe_all",
                 })
             );
 
