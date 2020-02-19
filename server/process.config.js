@@ -8,7 +8,7 @@ module.exports = {
             exec_mode: "cluster",
             max_restarts: 3,
             restart_delay: "5000",
-            instances: parseInt($env.get("MERCURIOS_PROCESSES", "0")) || "max",
+            instances: parseInt($env.get("MERCURIOS_WORKERS", "0")) || "max",
             watch:
                 $env.get("MERCURIOS_ENV", "production") === "production"
                     ? false

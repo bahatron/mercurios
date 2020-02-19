@@ -35,13 +35,16 @@ MYSQL_DATABASE=mercurios
 # nats config
 NATS_URL=nats://nats:4222
 
-# production|any
+# optional, production|any
 MERCURIOS_ENV=dev
 
-# sets the amount of workers
-MERCURIOS_PROCESSES=2
+# optional, sets the amount of workers, default: "max"
+MERCURIOS_WORKERS=2
 
-# server url for tests
+# optional, sets the logger id
+MERCURIOS_LOGGER_ID=my_mercurios_instance
+
+# optional, server url for tests
 MERCURIOS_TEST_URL=http://localhost:3000
 ```
 
