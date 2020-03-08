@@ -6,7 +6,7 @@ import $publishEvent from "../../domain/publish_event";
 import { before } from "mocha";
 import $createStream from "../../domain/create_stream";
 
-describe("Feature: subscribe to topic", () => {
+describe("Feature: unsubscribe to topic", () => {
     let _wsc: $ws;
 
     before(async () => {
@@ -21,12 +21,12 @@ describe("Feature: subscribe to topic", () => {
 
     /** @todo: find why second tests does not send msg to ws server */
     it("can subcribe to a topic", async () => {
-        const _topic = "ws_subscribe_test";
+        const _topic = "ws_unsubscribe_test";
 
         await $createStream(_topic);
 
-        return new Promise(resolve => {
-            _wsc.on("message", data => {
+        await new Promise(resolve => {
+            _wsc.once("message", data => {
                 let payload = $json.parse(data.toString());
 
                 $logger.debug(`ws server message payload`, payload);
