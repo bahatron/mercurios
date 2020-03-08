@@ -31,6 +31,10 @@ const $error = {
         return new HttpError("BadRequest", message, 400, context);
     },
 
+    Conflict(message: string = "Conflict", context?: Context): HttpError {
+        return new HttpError("Conflict", message, 409, context);
+    },
+
     Unauthorized(
         message: string = "Unauthorized Request",
         context?: Context

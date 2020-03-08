@@ -3,6 +3,7 @@ import $createStream from "../domain/create_stream";
 import $publishEvent from "../domain/publish_event";
 import $readEvent from "../domain/read_event";
 import $error from "../services/error";
+import $logger from "../services/logger";
 
 const $router = express.Router();
 
@@ -28,14 +29,7 @@ $router.post(
 
         const stream = await $createStream(topic, schema);
 
-        if (!stream) {
-            return res.status(200).json();
-        }
-
-        return res.status(201).json({
-            topic: stream.topic,
-            schema: stream.schema,
-        });
+        return res.status(stream ? 201 : 204).json(stream);
     })
 );
 

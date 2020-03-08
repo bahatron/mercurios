@@ -10,7 +10,7 @@ export default function errorHandler(
 ) {
     let code = err.httpCode || 500;
 
-    $logger.warning(`http server - ${err.message}`);
+    $logger.warning(`http server - ${err.message}`, err.context);
 
     if (code >= 500) {
         $logger.error(err);

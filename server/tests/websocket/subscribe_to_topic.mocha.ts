@@ -37,9 +37,7 @@ describe("Feature: subscribe to topic", () => {
             _wsc.send(
                 $json.stringify({
                     action: "subscribe",
-                    options: {
-                        topic: _topic,
-                    },
+                    topic: _topic,
                 }),
 
                 err => {

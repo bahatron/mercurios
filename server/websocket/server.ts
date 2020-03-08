@@ -11,7 +11,7 @@ function ping(wss: $ws.Server) {
         $logger.debug(`ws connection id: ${id} - pinging...`);
         try {
             if (conn.socket.readyState !== 1) {
-                $logger.warning(`ws connection id: ${id} - closed, removing`);
+                $logger.warning(`ws connection removed - id: ${id}`);
                 await conn.close();
                 return _clients.delete(id);
             }
@@ -46,7 +46,9 @@ export default function createWsServer(httpServer: Server): $ws.Server {
 
     _wss.on("connection", async (socket, request) => {
         let id = $uuid.v4();
-        _clients.set(id, await $connection({ id, socket, request }));
+        let connection = await $connection({ id, socket, request });
+        _clients.set(id, await connection);
+        connection.socket.once("close", () => {});
 
         $logger.info(`ws - new connection - id: ${id}`);
     });

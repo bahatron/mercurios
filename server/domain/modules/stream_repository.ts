@@ -45,7 +45,7 @@ const Repository = () => {
                 .first();
 
             if (!result) {
-                throw $error.NotFound(`${topic} not found`);
+                throw $error.NotFound(`stream ${topic} not found`);
             }
 
             let stream = streamFactory(result);
@@ -56,11 +56,21 @@ const Repository = () => {
         },
 
         async exists(topic: string): Promise<boolean> {
+            if (_streams.get(topic)) {
+                return true;
+            }
+
             let result = await $mysql(STREAM_DEFINITIONS)
                 .where({ topic })
                 .first();
 
-            return Boolean(result);
+            if (!result) {
+                return false;
+            }
+
+            _streams.set(topic, streamFactory(result));
+
+            return true;
         },
 
         async delete(topic: string): Promise<void> {

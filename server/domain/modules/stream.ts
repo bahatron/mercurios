@@ -54,7 +54,7 @@ export class Stream {
 
                 if (expectedSeq && expectedSeq !== result) {
                     throw $error.ExpectationFailed(
-                        `expected seq ${expectedSeq} but got ${result}`
+                        `error writing to stream - expected seq ${expectedSeq} but got ${result}`
                     );
                 }
 

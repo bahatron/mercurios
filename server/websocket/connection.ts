@@ -1,4 +1,4 @@
-import $ws from "ws";
+import ws from "ws";
 import $logger from "../services/logger";
 import { Client, Subscription } from "ts-nats";
 import $error from "../services/error";
@@ -8,16 +8,14 @@ import $nats from "../services/nats";
 
 interface ActionContext {
     id: string;
-    socket: $ws;
+    socket: ws;
     dispatcher: Client;
-    options?: any;
+    topic: string;
 }
 
 const _actions: Record<string, (context: ActionContext) => void> = {
-    subscribe: ({ id, socket, dispatcher, options }: ActionContext) => {
-        $logger.info(`ws connection - subscribed to topic ${options.topic}`);
-
-        let { topic } = $json.parse(options);
+    subscribe: ({ socket, dispatcher, topic }: ActionContext) => {
+        $logger.info(`ws connection - subscribed to topic ${topic}`);
 
         if (!topic) {
             throw $error.ExpectationFailed(
@@ -36,44 +34,35 @@ const _actions: Record<string, (context: ActionContext) => void> = {
             socket.send($json.stringify(msg.data));
         });
     },
-
-    subscribe_all: ({ id, socket, dispatcher, options }: ActionContext) => {
-        dispatcher.subscribe(`stream.*`, (err, msg) => {
-            socket.send($json.stringify(msg.data));
-        });
-    },
 };
 
 export interface ConnectionParams {
     id: string;
-    socket: $ws;
+    socket: ws;
     request: IncomingMessage;
 }
 
 export class WsConnection {
-    private _subscriptions: Subscription[] = [];
-
     constructor(
         public readonly id: string,
         public readonly request: IncomingMessage,
-        public readonly socket: $ws,
+        public readonly socket: ws,
         private dispatcher: Client
     ) {
         this.socket.on("message", data => {
-            // let { action, options }: ClientMessage = $json.parse(data);
             try {
-                let { action, options } = $json.parse(data);
+                let { action, topic } = $json.parse(data);
 
                 $logger.debug(`ws connection - got message from client`, {
                     action,
-                    options,
+                    topic,
                 });
 
                 _actions[action]({
                     id,
                     socket: this.socket,
                     dispatcher: this.dispatcher,
-                    options,
+                    topic,
                 });
             } catch (err) {
                 $logger.warning("ws connection - message error", err);
@@ -90,12 +79,15 @@ export class WsConnection {
         });
 
         this.socket.on("close", async () => {
-            $logger.warning(`ws - connection closed - id: ${id}`);
+            $logger.warning(`ws connection closed - id: ${id}`);
             await this.close();
         });
 
         this.socket.on("error", async err => {
-            $logger.warning(`ws - coonection error - ${err.message}`);
+            $logger.warning(`ws - coonection error`, {
+                msg: err.message,
+                name: err.name,
+            });
             $logger.error(err);
             await this.close();
         });
