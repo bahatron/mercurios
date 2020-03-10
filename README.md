@@ -50,30 +50,6 @@ MERCURIOS_TEST_URL=http://localhost:3000
 
 ## API
 
-### `POST /streams`
-
-Creates a stream
-
--   **Params**:
-
-    -   topic\*: stream name, must be unique
-    -   schema?: [jsonschema](https://github.com/tdegrunt/jsonschema)
-
--   **Example**:
-    ```ts
-    axios.post<Stream>(`${API_URL}/streams`, {
-        topic: "topic_name",
-        schema: {
-            type: "object",
-            properties: {
-                foo: {
-                    type: "string",
-                },
-            },
-        },
-    });
-    ```
-
 ### `POST /stream/:topic`
 
 Publishes an event to the stream
