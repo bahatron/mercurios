@@ -1,6 +1,5 @@
 import autocannon from "autocannon";
 import $logger from "../services/logger";
-import $createStream from "../domain/create_stream";
 import $config from "../services/config";
 
 const MERCURIOS_TEST_URL = $config.test_url;
@@ -81,8 +80,6 @@ function breakdown(result: autocannon.Result | autocannon.Result[]) {
 }
 
 async function main() {
-    await Promise.all(TEST_TOPICS.map(topic => $createStream(topic)));
-
     await pingBench();
 
     await writeBench();

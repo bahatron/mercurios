@@ -40,14 +40,6 @@ export const mutations: MutationTree<MercuriosState> = {
 };
 
 export const actions: ActionTree<MercuriosState, any> = {
-    async createStream(this: any, context, { topic }) {
-        console.log(`creating stream....`);
-
-        let response = await $axios.post(`${MERCURIOS_URL}/streams`, { topic });
-
-        console.log("created stream...success! \n", response.data);
-    },
-
     async publish(context, { topic, data }) {
         console.log(`publishing to topic`);
 

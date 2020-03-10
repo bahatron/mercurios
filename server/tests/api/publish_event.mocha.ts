@@ -5,7 +5,6 @@ import $nats from "../../services/nats";
 import $mysql from "../../services/mysql";
 import $assertions from "../../services/assertions";
 import $logger from "../../services/logger";
-import $createStream from "../../domain/create_stream";
 import $json from "../../services/json";
 import $config from "../../services/config";
 
@@ -13,7 +12,7 @@ const MERCURIOS_TEST_URL = $config.test_url;
 
 export async function _publishEvent(
     topic: string,
-    data: any,
+    data?: any,
     expectedSeq?: number
 ) {
     return $axios.post(`${MERCURIOS_TEST_URL}/stream/${topic}`, {
@@ -23,48 +22,11 @@ export async function _publishEvent(
 }
 
 describe("Feature: publish event", () => {
-    describe(`Scenario: stringified request payload`, () => {
-        const _stream = "publish_double_stringified_test";
-
-        const _schema = {
-            type: "object",
-            properties: {
-                foo: { type: "string" },
-                required: ["foo"],
-            },
-        };
-
-        before(async () => {
-            await $createStream(_stream, _schema);
-        });
-
-        it("level 1", async () => {
-            await _publishEvent(_stream, {
-                data: $json.stringify({ foo: "sanchez" }),
-            });
-        });
-
-        it("level 2", async () => {
-            await _publishEvent(_stream, {
-                data: JSON.stringify($json.stringify({ foo: "sanchez" })),
-            });
-        });
-
-        it("level 3", async () => {
-            await _publishEvent(
-                _stream,
-                $json.stringify({
-                    data: JSON.stringify($json.stringify({ foo: "sanchez" })),
-                })
-            );
-        });
-    });
-
-    describe("Scenario: publish to a stream without schema", () => {
+    describe("Scenario: publish to unexistant stream", () => {
         const TOPIC = `publish_event_test`;
 
         before(async () => {
-            await $createStream(TOPIC);
+            await $streams.delete(TOPIC);
         });
 
         it("creates a record on the stream table", async () => {
@@ -98,33 +60,28 @@ describe("Feature: publish event", () => {
         });
     });
 
-    describe("Scenario: with valid schema", () => {
-        const topic = `test_with_schmea`;
-        const schema = {
-            type: "object",
-            properties: {
-                test: { type: "number" },
-            },
-        };
+    describe(`Scenario: stringified request payload`, () => {
+        const _stream = "publish_double_stringified_test";
 
-        before(async () => {
-            await $createStream(topic, schema);
-        });
-
-        it("publishes an event if complies with the schema", async () => {
-            let response = await _publishEvent(topic, { test: 5 });
-
-            $assertions.expect(response.status).to.eq(201);
-        });
-
-        it("rejects the request if the payload does not comply with the schema", async () => {
-            return new Promise(async resolve => {
-                try {
-                    await _publishEvent(topic, "invalid message");
-                } catch (err) {
-                    resolve($assertions.expect(err.response.status).to.eq(400));
-                }
+        it("level 1", async () => {
+            await _publishEvent(_stream, {
+                data: JSON.stringify({ foo: "sanchez" }),
             });
+        });
+
+        it("level 2", async () => {
+            await _publishEvent(_stream, {
+                data: JSON.stringify(JSON.stringify({ foo: "sanchez" })),
+            });
+        });
+
+        it("level 3", async () => {
+            await _publishEvent(
+                _stream,
+                JSON.stringify({
+                    data: JSON.stringify(JSON.stringify({ foo: "sanchez" })),
+                })
+            );
         });
     });
 
@@ -135,7 +92,7 @@ describe("Feature: publish event", () => {
             try {
                 await $streams.delete(TOPIC);
 
-                await $createStream(TOPIC);
+                await new Promise(resolve => setTimeout(resolve, 5));
 
                 await Promise.all(
                     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(val => {

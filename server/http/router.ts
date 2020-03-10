@@ -1,5 +1,4 @@
 import express, { Request, Response, NextFunction } from "express";
-import $createStream from "../domain/create_stream";
 import $publishEvent from "../domain/publish_event";
 import $readEvent from "../domain/read_event";
 import $error from "../services/error";
@@ -17,21 +16,6 @@ export function asyncRoute(controller: (req: Request, res: Response) => void) {
         }
     };
 }
-
-$router.post(
-    "/streams",
-    asyncRoute(async (req, res) => {
-        const { topic, schema } = req.body;
-
-        if (!topic) {
-            throw $error.BadRequest("topic is required");
-        }
-
-        const stream = await $createStream(topic, schema);
-
-        return res.status(stream ? 201 : 204).json(stream);
-    })
-);
 
 $router.post(
     "/stream/:topic",

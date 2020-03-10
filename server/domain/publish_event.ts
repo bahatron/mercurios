@@ -14,7 +14,8 @@ export default async function $publishEvent({
     expectedSeq,
     topic,
 }: PublishPayload): Promise<MercuriosEvent> {
-    let stream = await $streams.fetch(topic);
+    let stream =
+        (await $streams.fetch(topic)) ?? (await $streams.create(topic));
 
     let event = await stream.append(data, expectedSeq);
 

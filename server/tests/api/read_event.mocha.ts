@@ -1,10 +1,10 @@
 import $axios, { AxiosResponse } from "axios";
 import $assertions from "../../services/assertions";
 import $streams from "../../domain/modules/stream_repository";
-import $createStream from "../../domain/create_stream";
 import $publishEvent from "../../domain/publish_event";
 import $config from "../../services/config";
 import { MercuriosEvent } from "../../domain/modules/event";
+import { _publishEvent } from "./publish_event.mocha";
 
 const MERCURIOS_TEST_URL = $config.test_url;
 
@@ -29,7 +29,7 @@ describe("Feature: read event", () => {
 
         before(async () => {
             await $streams.delete(TOPIC);
-            await $createStream(TOPIC);
+            await _publishEvent(TOPIC, "hello", 1);
             _response = await readEvent(TOPIC, 2);
         });
 
@@ -47,7 +47,6 @@ describe("Feature: read event", () => {
 
         let EVENT: MercuriosEvent;
         before(async () => {
-            await $createStream(TOPIC);
             EVENT = await $publishEvent({
                 topic: TOPIC,
                 data: ["npm", "start"],

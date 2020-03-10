@@ -1,6 +1,7 @@
 import { Response, Request, NextFunction } from "express";
 import { HttpError } from "../../services/error";
 import $logger from "../../services/logger";
+import $config from "../../services/config";
 
 export default function errorHandler(
     err: HttpError,
@@ -10,11 +11,11 @@ export default function errorHandler(
 ) {
     let code = err.httpCode || 500;
 
-    $logger.warning(`http server - ${err.message}`, err.context);
+    $logger.debug(`http server - ${err.message}`, err.context);
 
     if (code >= 500) {
         $logger.error(err);
     }
 
-    return res.status(code).json(err.httpCode ? err.message : "Internal Error");
+    return res.status(code).json($config.dev_mode ? err : "Internal Error");
 }

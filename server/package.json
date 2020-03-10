@@ -8,7 +8,7 @@
         "dev": "NODE_ENV=development npm run build:watch & npm start",
         "test": "npm run mocha",
         "docker": "pm2-runtime start process.config.js",
-        "mocha": "mocha 'dist/**/*.mocha.js' -t 10000",
+        "mocha": "mocha 'dist/**/*.mocha.js' -t 5000",
         "test:benchmark": "node dist/tests/benchmark.js",
         "build": "tsc",
         "build:watch": "npm run build -- --watch",

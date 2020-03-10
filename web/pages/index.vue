@@ -5,12 +5,6 @@
                 <h1>actions</h1>
 
                 <v-div>
-                    <v-btn color="primary" @click="CREATE_TOPIC.visible = true">
-                        create stream
-                    </v-btn>
-                </v-div>
-
-                <v-div>
                     <v-btn
                         color="secondary"
                         @click="SUBSCRIBE_TOPIC.visible = true"
@@ -282,14 +276,6 @@ export default Vue.extend({
             );
 
             this.SUBSCRIBE_TOPIC.visible = false;
-        },
-
-        async createTopic() {
-            await this.$store.dispatch("mercurios/createStream", {
-                topic: this.CREATE_TOPIC.topic,
-            });
-
-            this.CREATE_TOPIC.visible = false;
         },
 
         async publishEvent({ topic, data }: any) {

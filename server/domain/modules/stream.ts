@@ -1,42 +1,18 @@
-import { Schema } from "jsonschema";
 import $error from "../../services/error";
 import $json from "../../services/json";
-import $validator from "../../services/validator";
 import $mysql from "../../services/mysql";
 import $moment from "moment";
 import $event, { MercuriosEvent } from "./event";
 
+// type StreamType = Stream;
+// export { StreamType as Stream };
 export class Stream {
-    public readonly schema: Schema;
-
-    constructor(
-        public readonly topic: string,
-        public readonly table: string,
-        schema?: Schema
-    ) {
-        this.schema = schema ? $json.parse(schema) : {};
-    }
-
-    public async init(): Promise<ThisType<Stream>> {
-        if (!(await $mysql.schema.hasTable(this.table))) {
-            await $mysql.schema.createTable(this.table, function(table) {
-                table.increments("seq").primary();
-                table.string("published_at");
-                table.text("data", "longtext");
-            });
-        }
-
-        return this;
-    }
+    constructor(public readonly topic: string, public readonly table: string) {}
 
     public async append(
         data: any = {},
         expectedSeq?: number
     ): Promise<MercuriosEvent> {
-        if (!$validator.validate($json.parse(data), this.schema)) {
-            throw $error.ValidationFailed("validation failed for event data");
-        }
-
         let published_at = $moment().toISOString();
 
         try {
@@ -84,16 +60,12 @@ export class Stream {
     }
 }
 
-interface StreamFactory {
-    topic: string;
-    table_name: string;
-    schema?: Schema;
-}
-/** @todo: validate schema is valid jsonschema.Schema. Is that even possible? */
 export default function streamFactory({
     topic,
     table_name,
-    schema,
-}: StreamFactory) {
-    return new Stream(topic, table_name, schema);
+}: {
+    topic: string;
+    table_name: string;
+}) {
+    return new Stream(topic, table_name);
 }

@@ -62,13 +62,6 @@ export class MercuriosClient {
         return this._wsc;
     }
 
-    async createStream(topic: string, schema?: any) {
-        let response = await axios.post(`${this._url}/streams`, {
-            topic,
-            schema,
-        });
-    }
-
     async publish<T = any>(
         topic: string,
         data: any,

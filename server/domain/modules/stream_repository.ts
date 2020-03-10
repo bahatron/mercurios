@@ -1,7 +1,7 @@
-import $json from "../../services/json";
 import streamFactory, { Stream } from "./stream";
-import $error from "../../services/error";
 import $mysql from "../../services/mysql";
+import $logger from "../../services/logger";
+import $nats from "../../services/nats";
 
 export const STREAM_DEFINITIONS = "mercurios_streams";
 
@@ -12,30 +12,52 @@ export function streamTable(topic: string): string {
 const Repository = () => {
     const _streams: Map<string, Stream> = new Map();
 
+    $nats.subscribe("mercurios_stream_deleted", (err, msg) => {
+        _streams.delete(msg.data);
+    });
+
+    $nats.subscribe("mercurios_stream_created", (err, msg) => {
+        let topic = msg.data;
+        _streams.set(
+            topic,
+            streamFactory({ topic, table_name: streamTable(topic) })
+        );
+    });
+
     return {
-        async create(topic: string, schema?: any): Promise<Stream> {
-            let table_name: string = streamTable(topic);
+        async create(topic: string): Promise<Stream> {
+            let table_name = streamTable(topic);
+            try {
+                await $mysql.transaction(async trx => {
+                    if (await trx.schema.hasTable(table_name)) {
+                        return;
+                    }
 
-            await $mysql(STREAM_DEFINITIONS).insert({
-                topic,
-                schema: $json.stringify(schema),
-                table_name,
-            });
+                    await trx.schema.createTable(table_name, table => {
+                        table.increments("seq").primary();
+                        table.string("published_at");
+                        table.text("data", "longtext");
+                    });
 
-            let stream = streamFactory({
-                topic,
-                table_name,
-                schema,
-            });
+                    await trx
+                        .table(STREAM_DEFINITIONS)
+                        .insert({ topic, table_name });
+                });
 
-            await stream.init();
+                await $nats.publish("mercurios_stream_created", topic);
 
-            _streams.set(topic, stream);
-
-            return stream;
+                return streamFactory({ topic, table_name });
+            } catch (err) {
+                if (err.code === "ER_TABLE_EXISTS_ERROR") {
+                    $logger.debug("table already exists", err.message);
+                    return streamFactory({ topic, table_name });
+                }
+                $logger.error(err);
+                throw err;
+            }
         },
 
-        async fetch(topic: string): Promise<Stream> {
+        async fetch(topic: string): Promise<Stream | null> {
             if (_streams.has(topic)) {
                 return _streams.get(topic) as Stream;
             }
@@ -45,7 +67,7 @@ const Repository = () => {
                 .first();
 
             if (!result) {
-                throw $error.NotFound(`stream ${topic} not found`);
+                return null;
             }
 
             let stream = streamFactory(result);
@@ -53,24 +75,6 @@ const Repository = () => {
             _streams.set(topic, stream);
 
             return stream;
-        },
-
-        async exists(topic: string): Promise<boolean> {
-            if (_streams.get(topic)) {
-                return true;
-            }
-
-            let result = await $mysql(STREAM_DEFINITIONS)
-                .where({ topic })
-                .first();
-
-            if (!result) {
-                return false;
-            }
-
-            _streams.set(topic, streamFactory(result));
-
-            return true;
         },
 
         async delete(topic: string): Promise<void> {
@@ -81,6 +85,8 @@ const Repository = () => {
             await $mysql.schema.dropTableIfExists(streamTable(topic));
 
             _streams.delete(topic);
+
+            await $nats.publish("mercurios_stream_deleted", topic);
         },
     };
 };

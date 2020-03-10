@@ -4,8 +4,7 @@ import $json from "../../services/json";
 import $logger from "../../services/logger";
 import $publishEvent from "../../domain/publish_event";
 import { before } from "mocha";
-import $createStream from "../../domain/create_stream";
-
+import { _publishEvent } from "../api/publish_event.mocha";
 describe("Feature: subscribe to topic", () => {
     let _wsc: $ws;
 
@@ -23,9 +22,7 @@ describe("Feature: subscribe to topic", () => {
     it("can subcribe to a topic", async () => {
         const _topic = "ws_subscribe_test";
 
-        await $createStream(_topic);
-
-        return new Promise(resolve => {
+        return new Promise(async resolve => {
             _wsc.on("message", data => {
                 let payload = $json.parse(data.toString());
 
@@ -34,22 +31,24 @@ describe("Feature: subscribe to topic", () => {
                 resolve(payload);
             });
 
+            /** @todo: investigate why sometimes the message is sent before the server has stablished a connection */
+            await new Promise(resolve => setTimeout(resolve, 5));
+
             _wsc.send(
                 $json.stringify({
                     action: "subscribe",
                     topic: _topic,
                 }),
-
                 err => {
                     if (err) {
-                        $logger.warning(`wsc error`, err);
+                        return $logger.error(err);
                     }
 
-                    $publishEvent({
-                        topic: _topic,
-                    });
+                    $logger.debug(`ws subscribe message sent`);
                 }
             );
+
+            _publishEvent(_topic);
         });
     });
 });

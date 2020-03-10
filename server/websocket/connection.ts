@@ -14,25 +14,27 @@ interface ActionContext {
 }
 
 const _actions: Record<string, (context: ActionContext) => void> = {
-    subscribe: ({ socket, dispatcher, topic }: ActionContext) => {
-        $logger.info(`ws connection - subscribed to topic ${topic}`);
-
+    subscribe: async ({ socket, dispatcher, topic }: ActionContext) => {
         if (!topic) {
             throw $error.ExpectationFailed(
                 `ws connection - no topic for subscripton`
             );
         }
 
-        dispatcher.subscribe(`stream.${topic}`, (err, msg) => {
+        await dispatcher.subscribe(`stream.${topic}`, (err, msg) => {
             $logger.debug(
                 `ws connection - event on subscribed received: ${msg.data.topic}`
             );
             if (err) {
-                $logger.warning(`ws conn - subscribe error: ${err.message}`);
+                $logger.warning(
+                    `ws connection - subscribe error: ${err.message}`
+                );
             }
 
             socket.send($json.stringify(msg.data));
         });
+
+        $logger.info(`ws connection - subscribed to topic ${topic}`);
     },
 };
 
@@ -54,6 +56,7 @@ export class WsConnection {
                 let { action, topic } = $json.parse(data);
 
                 $logger.debug(`ws connection - got message from client`, {
+                    id: this.id,
                     action,
                     topic,
                 });
