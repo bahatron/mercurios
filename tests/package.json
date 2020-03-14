@@ -6,9 +6,8 @@
     "scripts": {
         "start": "npm run test && npm run test:benchmark",
         "dev": "NODE_ENV=development npm run build:watch",
-        "docker": "pm2-runtime start process.config.js",
         "test": "mocha 'dist/**/*.mocha.js' -t 5000",
-        "test:benchmark": "node dist/tests/benchmark.js",
+        "test:benchmark": "node dist/benchmark.js",
         "build": "tsc",
         "build:watch": "npm run build -- --watch",
         "build:clean": "rm -rf dist/ && npm run build"
@@ -19,20 +18,13 @@
         "@types/autocannon": "^4.1.0",
         "@types/chai": "^4.2.11",
         "@types/cors": "^2.8.6",
-        "@types/express": "^4.17.3",
-        "@types/helmet": "0.0.44",
         "@types/lodash": "^4.14.149",
         "@types/mocha": "^5.2.7",
         "@types/node": "^12.12.30",
-        "@types/uuid": "^3.4.8",
         "@types/ws": "^6.0.4",
         "autocannon": "^4.6.0",
         "axios": "^0.19.2",
         "chai": "^4.2.0",
-        "cors": "^2.8.5",
-        "express": "^4.17.1",
-        "helmet": "^3.21.3",
-        "jsonschema": "^1.2.5",
         "knex": "^0.19.5",
         "lodash": "^4.17.15",
         "mocha": "^6.2.2",
@@ -40,7 +32,6 @@
         "mysql2": "^1.7.0",
         "ts-nats": "^1.2.12",
         "typescript": "^3.8.3",
-        "uuid": "^3.4.0",
         "ws": "^7.2.3"
     }
 }

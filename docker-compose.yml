@@ -37,7 +37,7 @@ services:
         build:
             context: .
             dockerfile: tests.dockerfile
-        image: mercurios-tests
+        image: mercurios_tests
         volumes:
             - ./tests:/app
         env_file: .env.test

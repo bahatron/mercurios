@@ -6,45 +6,10 @@ import $json from "../services/json";
 import { IncomingMessage } from "http";
 import $nats from "../services/nats";
 
-interface ActionContext {
-    id: string;
-    socket: ws;
-    dispatcher: Client;
-    topic: string;
-}
-
-const _actions: Record<string, (context: ActionContext) => void> = {
-    subscribe: async ({ socket, dispatcher, topic }: ActionContext) => {
-        if (!topic) {
-            throw $error.ExpectationFailed(
-                `ws connection - no topic for subscripton`
-            );
-        }
-
-        await dispatcher.subscribe(`stream.${topic}`, (err, msg) => {
-            $logger.debug(
-                `ws connection - event on subscribed received: ${msg.data.topic}`
-            );
-            if (err) {
-                $logger.warning(
-                    `ws connection - subscribe error: ${err.message}`
-                );
-            }
-
-            socket.send($json.stringify(msg.data));
-        });
-
-        $logger.info(`ws connection - subscribed to topic ${topic}`);
-    },
-};
-
-export interface ConnectionParams {
-    id: string;
-    socket: ws;
-    request: IncomingMessage;
-}
-
 export class WsConnection {
+    // private _subscriptions: Record<string, Subscription> = {};
+    private _subscriptions: Map<string, Subscription> = new Map();
+
     constructor(
         public readonly id: string,
         public readonly request: IncomingMessage,
@@ -56,19 +21,23 @@ export class WsConnection {
                 let { action, topic } = $json.parse(data);
 
                 $logger.debug(`ws connection - got message from client`, {
-                    id: this.id,
                     action,
                     topic,
                 });
 
-                _actions[action]({
-                    id,
-                    socket: this.socket,
-                    dispatcher: this.dispatcher,
-                    topic,
-                });
+                switch (action) {
+                    case "subscribe":
+                        this.subscribe(topic);
+                    case "unsubscribe":
+                        this.unsubscribe(topic);
+                    default:
+                        return;
+                }
             } catch (err) {
-                $logger.warning("ws connection - message error", err);
+                $logger.warning(
+                    `ws connection - message error: ${err.message}`,
+                    err
+                );
             }
         });
 
@@ -96,6 +65,50 @@ export class WsConnection {
         });
     }
 
+    private async subscribe(topic: string) {
+        if (!topic) {
+            throw $error.ExpectationFailed(
+                `ws connection - no topic for subscripton`
+            );
+        }
+
+        if (this._subscriptions.has(topic)) {
+            return;
+        }
+
+        let sub = await this.dispatcher.subscribe(
+            `stream.${topic}`,
+            (err, msg) => {
+                $logger.debug(
+                    `ws connection - event on subscribed received: ${msg.data.topic}`
+                );
+                if (err) {
+                    $logger.warning(
+                        `ws connection - subscribe error: ${err.message}`
+                    );
+                }
+
+                this.socket.send($json.stringify(msg.data));
+            }
+        );
+
+        this._subscriptions.set(topic, sub);
+
+        $logger.info(`ws connection - subscribed to topic ${topic}`);
+    }
+
+    private unsubscribe(topic: string) {
+        let sub = this._subscriptions.get(topic);
+
+        if (!sub) {
+            return;
+        }
+
+        sub.unsubscribe();
+
+        this._subscriptions.delete(topic);
+    }
+
     public async close() {
         await this.socket.terminate();
 
@@ -110,7 +123,11 @@ export default async function $connection({
     id,
     socket,
     request,
-}: ConnectionParams): Promise<WsConnection> {
+}: {
+    id: string;
+    socket: ws;
+    request: IncomingMessage;
+}): Promise<WsConnection> {
     let dispatcher = await $nats.connect(`ws_client_${id}`);
 
     return new WsConnection(id, request, socket, dispatcher);

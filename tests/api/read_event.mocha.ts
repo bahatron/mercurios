@@ -7,25 +7,9 @@ import $logger from "@bahatron/logger";
 import { _publishEvent } from "./publish_event.mocha";
 
 const MERCURIOS_TEST_URL = env.get("TEST_URL");
-
-// process.on("uncaughtException", err => {
-//     $logger.warning("unhandled error", err);
-//     $logger.error(err as Error);
-// });
-
-// process.on("unhandledRejection", (reason, promise) => {
-//     $logger.warning("unhandled promise failure", reason);
-//     $logger.error(reason as Error);
-// });
-
 describe("Feature: read event", () => {
     async function readEvent(topic: string, id: number) {
-        return $axios
-            .get(`${MERCURIOS_TEST_URL}/stream/${topic}/${id}`)
-            .catch(err => {
-                $logger.error(err);
-                throw err;
-            });
+        return $axios.get(`${MERCURIOS_TEST_URL}/stream/${topic}/${id}`);
     }
 
     describe("Scenario: topic does not exist", () => {
@@ -43,9 +27,17 @@ describe("Feature: read event", () => {
         let _response: AxiosResponse;
 
         before(async () => {
-            await $mysql(`stream_${_topic}`).truncate();
-            await _publishEvent(_topic, "hello", 1);
-            _response = await readEvent(_topic, 2);
+            try {
+                if (await $mysql.schema.hasTable(`stream_${_topic}`)) {
+                    await $mysql(`stream_${_topic}`).truncate();
+                }
+                
+                await _publishEvent(_topic, "hello", 1);
+                _response = await readEvent(_topic, 2);
+            } catch (err) {
+                $logger.error(err);
+                throw err;
+            }
         });
 
         it("responds with http 204", () => {
@@ -62,7 +54,13 @@ describe("Feature: read event", () => {
         let _event: any;
 
         before(async () => {
-            _event = (await _publishEvent(_topic, { rick: "sanchez" })).data;
+            try {
+                _event = (await _publishEvent(_topic, { rick: "sanchez" }))
+                    .data;
+            } catch (err) {
+                $logger.error(err);
+                throw err;
+            }
         });
 
         it("responds with an event", async () => {

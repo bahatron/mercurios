@@ -12,15 +12,10 @@ export async function _publishEvent(
     data?: any,
     expectedSeq?: number
 ) {
-    return $axios
-        .post(`${MERCURIOS_TEST_URL}/stream/${topic}`, {
-            data,
-            expectedSeq,
-        })
-        .catch(err => {
-            $logger.error(err);
-            throw err;
-        });
+    return $axios.post(`${MERCURIOS_TEST_URL}/stream/${topic}`, {
+        data,
+        expectedSeq,
+    });
 }
 
 describe("Feature: publish event", () => {
