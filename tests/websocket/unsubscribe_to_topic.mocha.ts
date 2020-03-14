@@ -20,7 +20,7 @@ describe("Feature: unsubscribe to topic", () => {
         });
     });
 
-    it("can subcribe to a topic", async () => {
+    it("will stop recieving messages after unsubscribing", async () => {
         const _topic = "ws_unsubscribe_test";
 
         // first subscribe to a topic
