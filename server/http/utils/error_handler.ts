@@ -17,5 +17,5 @@ export default function errorHandler(
         $logger.error(err);
     }
 
-    return res.status(code).json($config.dev_mode ? err : "Internal Error");
+    return res.status(code).json($config.dev_mode ? err : err.message);
 }

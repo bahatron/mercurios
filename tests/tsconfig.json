@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "removeComments": true,
+        "declaration": true,
+        "diagnostics": true,
+        "incremental": true,
+        "sourceMap": true,
+        "outDir": "dist",
+        "strict": true,
+    },
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}

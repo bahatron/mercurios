@@ -7,13 +7,6 @@ const $config = new Proxy(
         test_url: $env.get("MERCURIOS_TEST_URL", "http://server:4254"),
         dev_mode: Boolean($env.get("MERCURIOS_ENV", "") !== "production"),
         logger_id: $env.get("MERCURIOS_LOGGER_ID", ""),
-        mysql: {
-            host: $env.get("MYSQL_HOST"),
-            port: parseInt($env.get("MYSQL_PORT")),
-            user: $env.get("MYSQL_USER"),
-            password: $env.get("MYSQL_PASSWORD"),
-            database: $env.get("MYSQL_DATABASE"),
-        },
         nats: {
             url: $env.get("NATS_URL"),
         },

@@ -1,8 +1,8 @@
 FROM node:lts-alpine
 WORKDIR /app
-COPY . .
+COPY ./server .
 
-RUN npm install -g pm2
+RUN npm install -g autocannon
 RUN npm ci
 RUN npm run build:clean
 

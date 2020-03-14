@@ -32,10 +32,13 @@ $router.post(
 $router.get(
     "/stream/:topic/:seq",
     asyncRoute(async (req, res) => {
+        $logger.debug(`read event req`, { body: req.body, params: req.params });
         let event = await $readEvent(
             req.params.topic,
             parseInt(req.params.seq)
         );
+
+        $logger.debug(`read event result`, event);
 
         if (!event) {
             return res.status(204).json();

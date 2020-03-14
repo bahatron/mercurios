@@ -17,21 +17,37 @@ services:
             - ${DOCKER_NATS_STATS:-8222}:8222
 
     server:
+        build:
+            context: .
+            dockerfile: server.dockerfile
         image: bahatron/mercurios_http
         volumes:
             - ./server:/app
         ports:
-            - ${MERCURIOS_PORT}:${MERCURIOS_PORT}
+            - ${MERCURIOS_PORT:-4254}:${MERCURIOS_PORT:-4254}
         depends_on:
             - mysql
             - nats
         command: sh -c "npm run build:clean && npm run dev"
         environment:
             - DEBUG=true
-        env_file: .env
+        env_file: .env.test
+
+    tests:
+        build:
+            context: .
+            dockerfile: tests.dockerfile
+        image: mercurios-tests
+        volumes:
+            - ./tests:/app
+        env_file: .env.test
+        command: npm run dev
 
     web:
         user: node
+        build:
+            context: .
+            dockerfile: web.dockerfile
         image: bahatron/mercurios_admin
         volumes:
             - ./web:/app

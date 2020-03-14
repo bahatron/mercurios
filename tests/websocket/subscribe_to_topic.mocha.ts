@@ -1,16 +1,16 @@
 import $ws from "ws";
-import $config from "../../services/config";
-import $json from "../../services/json";
-import $logger from "../../services/logger";
-import $publishEvent from "../../domain/publish_event";
-import { before } from "mocha";
+import $env from "@bahatron/env";
+import $logger from "@bahatron/logger";
 import { _publishEvent } from "../api/publish_event.mocha";
+
+const TEST_URL = $env.get("TEST_URL");
+
 describe("Feature: subscribe to topic", () => {
     let _wsc: $ws;
 
     before(async () => {
         return new Promise(resolve => {
-            _wsc = new $ws($config.test_url);
+            _wsc = new $ws(TEST_URL);
 
             _wsc.on("open", () => {
                 resolve();
@@ -24,7 +24,7 @@ describe("Feature: subscribe to topic", () => {
 
         return new Promise(async resolve => {
             _wsc.on("message", data => {
-                let payload = $json.parse(data.toString());
+                let payload = JSON.parse(data.toString());
 
                 $logger.debug(`ws server message payload`, payload);
 
@@ -35,7 +35,7 @@ describe("Feature: subscribe to topic", () => {
             await new Promise(resolve => setTimeout(resolve, 5));
 
             _wsc.send(
-                $json.stringify({
+                JSON.stringify({
                     action: "subscribe",
                     topic: _topic,
                 }),

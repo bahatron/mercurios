@@ -66,12 +66,6 @@
                         </v-card>
                     </v-dialog>
                 </v-div>
-
-                <v-div>
-                    <v-btn color="error" @click="subscribeToAll">
-                        subscribe to all
-                    </v-btn>
-                </v-div>
             </v-col>
 
             <v-col cols="6">
@@ -99,24 +93,6 @@
                 </v-div>
             </v-col>
         </v-row>
-
-        <!-- create stream form -->
-        <v-dialog v-model="CREATE_TOPIC.visible">
-            <v-card class="pa-4">
-                <v-text-field
-                    v-model="CREATE_TOPIC.topic"
-                    type="text"
-                    label="topic name"
-                >
-                </v-text-field>
-
-                <v-card-actions>
-                    <v-btn @click="createTopic">
-                        create
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
 
         <!--  subscribe to topic form -->
         <v-dialog v-model="SUBSCRIBE_TOPIC.visible">
@@ -255,23 +231,7 @@ export default Vue.extend({
             (this.ws as WebSocket).send(
                 JSON.stringify({
                     action: "subscribe",
-                    options: {
-                        topic: this.SUBSCRIBE_TOPIC.topic,
-                    },
-                })
-            );
-
-            this.SUBSCRIBE_TOPIC.visible = false;
-        },
-
-        async subscribeToAll() {
-            if (!this.ws) {
-                console.warn(`no websocket connection`);
-            }
-
-            (this.ws as WebSocket).send(
-                JSON.stringify({
-                    action: "subscribe_all",
+                    topic: this.SUBSCRIBE_TOPIC.topic,
                 })
             );
 

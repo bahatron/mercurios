@@ -1,6 +1,6 @@
 #!/bin/sh
 
-docker-compose -f docker-compose.build.yml build || exit 1
+docker-compose build || exit 1
 ./test.sh || exit 1
 
 if [ ${BRANCH:-local} = master ];

@@ -1,61 +1,57 @@
 import $axios from "axios";
-import $streams from "../../domain/modules/stream_repository";
-import { streamTable } from "../../domain/modules/stream_repository";
-import $nats from "../../services/nats";
-import $mysql from "../../services/mysql";
-import $assertions from "../../services/assertions";
-import $logger from "../../services/logger";
-import $json from "../../services/json";
-import $config from "../../services/config";
+import env from "@bahatron/env";
+import { expect } from "chai";
+import $mysql from "../utils/mysql";
+import $nats from "../utils/nats";
+import $logger from "@bahatron/logger";
 
-const MERCURIOS_TEST_URL = $config.test_url;
+const MERCURIOS_TEST_URL = env.get("TEST_URL");
 
 export async function _publishEvent(
     topic: string,
     data?: any,
     expectedSeq?: number
 ) {
-    return $axios.post(`${MERCURIOS_TEST_URL}/stream/${topic}`, {
-        data,
-        expectedSeq,
-    });
+    return $axios
+        .post(`${MERCURIOS_TEST_URL}/stream/${topic}`, {
+            data,
+            expectedSeq,
+        })
+        .catch(err => {
+            $logger.error(err);
+            throw err;
+        });
 }
 
 describe("Feature: publish event", () => {
     describe("Scenario: publish to unexistant stream", () => {
-        const TOPIC = `publish_event_test`;
-
-        before(async () => {
-            await $streams.delete(TOPIC);
-        });
+        const _topic = `publish_event_test`;
 
         it("creates a record on the stream table", async () => {
             let payload = {
                 foo: "bar",
             };
 
-            let event = await _publishEvent(TOPIC, payload);
+            let event = await _publishEvent(_topic, payload);
 
-            let result = await $mysql(streamTable(TOPIC))
+            let result = await $mysql(`stream_${_topic}`)
                 .where({
                     seq: event.data.seq,
                 })
                 .first();
 
-            $assertions.expect(result).not.to.be.undefined;
+            expect(result).not.to.be.undefined;
         });
 
         it("emits an event related to the topic", async () => {
             return new Promise(async resolve => {
                 let event: any;
 
-                $nats.subscribe(`stream.${TOPIC}`, (err, msg) => {
-                    resolve(
-                        $assertions.expect(msg.data).to.deep.eq(event.data)
-                    );
+                $nats.subscribe(`stream.${_topic}`, (err, msg) => {
+                    resolve(expect(msg.data).to.deep.eq(event.data));
                 });
 
-                event = await _publishEvent(TOPIC, "hello from test");
+                event = await _publishEvent(_topic, "hello from test");
             });
         });
     });
@@ -86,17 +82,19 @@ describe("Feature: publish event", () => {
     });
 
     describe(`Scenario: using expected seq`, () => {
-        let TOPIC = `publish_with_expected_seq_test`;
+        let _topic = `publish_with_expected_seq_test`;
 
         before(async () => {
             try {
-                await $streams.delete(TOPIC);
+                if (await $mysql.schema.hasTable(`stream_${_topic}`)) {
+                    await $mysql(`stream_${_topic}`).truncate();
+                }
 
-                await new Promise(resolve => setTimeout(resolve, 5));
+                // await new Promise(resolve => setTimeout(resolve, 5));
 
                 await Promise.all(
                     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(val => {
-                        return _publishEvent(TOPIC, val);
+                        return _publishEvent(_topic, val);
                     })
                 );
             } catch (err) {
@@ -109,9 +107,9 @@ describe("Feature: publish event", () => {
         it("responds with http status code 417 if seq number is already taken", async () => {
             return new Promise(async resolve => {
                 try {
-                    await _publishEvent(TOPIC, "another message", 5);
+                    await _publishEvent(_topic, "another message", 5);
                 } catch (err) {
-                    resolve($assertions.expect(err.response.status).to.eq(417));
+                    resolve(expect(err.response.status).to.eq(417));
                 }
             });
         });
@@ -119,17 +117,17 @@ describe("Feature: publish event", () => {
         it("responds with http status code 417 if expected sequence number is higher than actual", async () => {
             return new Promise(async resolve => {
                 try {
-                    await _publishEvent(TOPIC, "another message", 15);
+                    await _publishEvent(_topic, "another message", 15);
                 } catch (err) {
-                    resolve($assertions.expect(err.response.status).to.eq(417));
+                    resolve(expect(err.response.status).to.eq(417));
                 }
             });
         });
 
         it("publishes the event if 'next' sequence number matches the expected", async () => {
-            let response = await _publishEvent(TOPIC, "12 from test", 12);
+            let response = await _publishEvent(_topic, "12 from test", 12);
 
-            $assertions.expect(response.data.seq).to.eq(12);
+            expect(response.data.seq).to.eq(12);
         });
     });
 });
