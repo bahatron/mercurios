@@ -7,8 +7,8 @@ import { IncomingMessage } from "http";
 import $nats from "../services/nats";
 
 export class WsConnection {
-    // private _subscriptions: Record<string, Subscription> = {};
-    private _subscriptions: Map<string, Subscription> = new Map();
+    private _subscriptions: Record<string, Subscription> = {};
+    // private _subscriptions: Map<string, Subscription> = new Map();
 
     constructor(
         public readonly id: string,
@@ -72,11 +72,9 @@ export class WsConnection {
             );
         }
 
-        if (this._subscriptions.has(topic)) {
-            return;
-        }
+        $logger.debug(`ws connection - subscribing to ${topic}`);
 
-        let sub = await this.dispatcher.subscribe(
+        this._subscriptions[topic] = await this.dispatcher.subscribe(
             `stream.${topic}`,
             (err, msg) => {
                 $logger.debug(
@@ -92,13 +90,11 @@ export class WsConnection {
             }
         );
 
-        this._subscriptions.set(topic, sub);
-
         $logger.info(`ws connection - subscribed to topic ${topic}`);
     }
 
     private unsubscribe(topic: string) {
-        let sub = this._subscriptions.get(topic);
+        let sub = this._subscriptions[topic];
 
         if (!sub) {
             return;
@@ -106,7 +102,7 @@ export class WsConnection {
 
         sub.unsubscribe();
 
-        this._subscriptions.delete(topic);
+        delete this._subscriptions[topic];
     }
 
     public async close() {

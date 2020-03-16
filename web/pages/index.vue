@@ -5,31 +5,67 @@
                 <h1>actions</h1>
 
                 <v-div>
-                    <v-btn
-                        color="secondary"
-                        @click="SUBSCRIBE_TOPIC.visible = true"
-                    >
-                        subscribe to topic
-                    </v-btn>
+                    <v-dialog v-model="subscribeModal" width="500">
+                        <template v-slot:activator="{ on }">
+                            <v-btn color="priamry" v-on="on">
+                                subscribe
+                            </v-btn>
+                        </template>
+
+                        <v-card class="pa-4">
+                            <v-text-field
+                                v-model="topic"
+                                type="text"
+                                label="topic name"
+                            >
+                            </v-text-field>
+                            <v-card-actions>
+                                <v-btn @click="subscribe">
+                                    subscribe
+                                </v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
                 </v-div>
 
                 <v-div>
-                    <v-btn color="accent" @click="PUBLISH_EVENT.visible = true">
-                        publish event
-                    </v-btn>
+                    <v-dialog v-model="publishModal" width="500">
+                        <template v-slot:activator="{ on }">
+                            <v-btn color="secondary" v-on="on">
+                                publish
+                            </v-btn>
+                        </template>
+
+                        <v-card class="pa-4">
+                            <v-text-field
+                                v-model="topic"
+                                type="text"
+                                label="topic name"
+                            >
+                            </v-text-field>
+
+                            <v-text-field
+                                v-model="publishData"
+                                type="text"
+                                label="data"
+                            >
+                            </v-text-field>
+
+                            <v-card-actions>
+                                <v-btn
+                                    @click="
+                                        publish({ topic, data: publishData })
+                                    "
+                                >
+                                    publish
+                                </v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
                 </v-div>
 
                 <v-div>
-                    <v-btn color="info" @click="clearAutoPublish">
-                        clear auto publishes
-                    </v-btn>
-                </v-div>
-
-                <v-div>
-                    <v-dialog
-                        v-model="PUBLISH_EVENT_PERIODIC.visible"
-                        width="500"
-                    >
+                    <v-dialog v-model="automaticPublishModal" width="500">
                         <template v-slot:activator="{ on }">
                             <v-btn color="warning" v-on="on">
                                 automatic publish
@@ -38,29 +74,59 @@
 
                         <v-card class="pa-4">
                             <v-text-field
-                                v-model="PUBLISH_EVENT_PERIODIC.topic"
+                                v-model="topic"
                                 type="text"
                                 label="topic name"
                             >
                             </v-text-field>
 
                             <v-text-field
-                                v-model="PUBLISH_EVENT_PERIODIC.data"
+                                v-model="publishData"
                                 type="text"
                                 label="data"
                             >
                             </v-text-field>
 
                             <v-text-field
-                                v-model="PUBLISH_EVENT_PERIODIC.interval"
+                                v-model="interval"
                                 type="text"
                                 label="interval (ms)"
                             >
                             </v-text-field>
 
                             <v-card-actions>
-                                <v-btn @click="periodicPublish">
-                                    publish
+                                <v-btn @click="automaticPublish">
+                                    automatic publish
+                                </v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+                </v-div>
+
+                <v-div>
+                    <v-btn color="success" @click="clearAutoPublish">
+                        Clear Auto publissh
+                    </v-btn>
+                </v-div>
+
+                <v-div>
+                    <v-dialog v-model="unSubscribeModal" width="500">
+                        <template v-slot:activator="{ on }">
+                            <v-btn color="info" v-on="on">
+                                unsubscribe
+                            </v-btn>
+                        </template>
+
+                        <v-card class="pa-4">
+                            <v-text-field
+                                v-model="topic"
+                                type="text"
+                                label="topic name"
+                            >
+                            </v-text-field>
+                            <v-card-actions>
+                                <v-btn @click="unsubscribe">
+                                    unsubscribe
                                 </v-btn>
                             </v-card-actions>
                         </v-card>
@@ -93,93 +159,31 @@
                 </v-div>
             </v-col>
         </v-row>
-
-        <!--  subscribe to topic form -->
-        <v-dialog v-model="SUBSCRIBE_TOPIC.visible">
-            <v-card class="pa-4">
-                <v-text-field
-                    v-model="SUBSCRIBE_TOPIC.topic"
-                    type="text"
-                    label="topic name"
-                >
-                </v-text-field>
-
-                <v-card-actions>
-                    <v-btn @click="subscribeToTopic">
-                        subscribe
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-
-        <!--  publish event form -->
-        <v-dialog v-model="PUBLISH_EVENT.visible">
-            <v-card class="pa-4">
-                <v-text-field
-                    v-model="PUBLISH_EVENT.topic"
-                    type="text"
-                    label="topic name"
-                >
-                </v-text-field>
-
-                <v-text-field
-                    v-model="PUBLISH_EVENT.data"
-                    type="text"
-                    label="data"
-                >
-                </v-text-field>
-
-                <v-card-actions>
-                    <v-btn @click="singlePublish">
-                        publish
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
     </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import divider from "../components/divider.vue";
-import ws from "ws";
-
-function WsClient() {
-    if (!process.client) {
-        return null;
-    }
-
-    return new WebSocket(`ws://localhost:${"4254"}`);
-    // return new ws("http://localhost:4254");
-}
+// import mercurios, { MercuriosClient } from "../../lib/index";
+import mercurios, { MercuriosClient } from "@bahatron/mercurios";
 
 export default Vue.extend({
     components: {
         "v-div": divider,
     },
+
     data() {
         return {
-            ws: WsClient(),
-            workers: [] as NodeJS.Timeout[],
-            CREATE_TOPIC: {
-                visible: false,
-                topic: "",
-            },
-            SUBSCRIBE_TOPIC: {
-                visible: false,
-                topic: "",
-            },
-            PUBLISH_EVENT: {
-                visible: false,
-                topic: "",
-                data: "",
-            },
-            PUBLISH_EVENT_PERIODIC: {
-                visible: false,
-                interval: null,
-                topic: "",
-                data: "",
-            },
+            ws: mercurios.connect({ url: "http://localhost:4254" }),
+            workers: [] as any[],
+            publishModal: false,
+            subscribeModal: false,
+            unSubscribeModal: false,
+            automaticPublishModal: false,
+            topic: null,
+            publishData: null,
+            interval: null,
         };
     },
 
@@ -188,90 +192,67 @@ export default Vue.extend({
             return;
         }
 
-        (this.ws as WebSocket).close();
-    },
+        let client: MercuriosClient = this.ws;
 
-    mounted() {
-        let ws = this.ws as WebSocket;
-
-        if (ws) {
-            ws.onclose = event =>
-                this.$store.dispatch(`mercurios/onClose`, event);
-
-            ws.onerror = error =>
-                this.$store.dispatch(`mercurios/onError`, error);
-
-            ws.onopen = event =>
-                this.$store.dispatch(`mercurios/onOpen`, event);
-
-            ws.onmessage = message =>
-                this.$store.dispatch(`mercurios/onMessage`, message);
-        }
+        client.close();
     },
 
     computed: {
         _messages() {
             return this.$store.getters["mercurios/stats"];
-
-            // return messages;
         },
     },
 
     methods: {
-        async clearAutoPublish() {
+        async subscribe() {
+            let client: MercuriosClient = this.ws;
+
+            await client.subsribe(this.topic, event => {
+                this.$store.commit("mercurios/addMessage", { message: event });
+            });
+
+            this.subscribeModal = false;
+        },
+
+        async publish({ topic, data }: any) {
+            let client: MercuriosClient = this.ws;
+
+            let event = await client.publish(topic, data);
+
+            this.publishModal = false;
+        },
+
+        async unsubscribe() {
+            let client: MercuriosClient = this.ws;
+
+            client.unsubscribe(this.topic);
+
+            this.unSubscribeModal = false;
+        },
+
+        automaticPublish() {
+            let interval = this.interval;
+            let data = this.publishData;
+            let topic = this.topic;
+
+            if (Boolean(interval) && interval !== null) {
+                let _interval = parseInt(interval);
+
+                let wat = setInterval(() => {
+                    this.publish({ topic, data });
+                }, _interval);
+                this.workers.push(wat);
+            } else {
+                alert("no interval");
+            }
+
+            this.automaticPublishModal = false;
+        },
+
+        clearAutoPublish() {
             this.workers.forEach(worker => {
                 clearTimeout(worker);
             });
-        },
-
-        async subscribeToTopic() {
-            if (!this.ws) {
-                console.warn(`no websocket connection`);
-            }
-
-            /** @todo: move this to store, pass ws connection as part of action payload */
-            (this.ws as WebSocket).send(
-                JSON.stringify({
-                    action: "subscribe",
-                    topic: this.SUBSCRIBE_TOPIC.topic,
-                })
-            );
-
-            this.SUBSCRIBE_TOPIC.visible = false;
-        },
-
-        async publishEvent({ topic, data }: any) {
-            await this.$store.dispatch("mercurios/publish", {
-                topic,
-                data,
-            });
-        },
-
-        singlePublish() {
-            let { topic, data } = this.PUBLISH_EVENT;
-
-            this.publishEvent({ topic, data });
-
-            this.PUBLISH_EVENT.visible = false;
-        },
-
-        periodicPublish() {
-            let { interval, topic, data } = this.PUBLISH_EVENT_PERIODIC;
-
-            let wat: NodeJS.Timeout;
-
-            console.log(`interval type: ${typeof interval}`, interval);
-
-            if (Boolean(interval) && interval !== null) {
-                let _interval = parseInt((<any>interval) as string);
-
-                wat = setInterval(() => {
-                    this.publishEvent({ topic, data });
-                }, _interval);
-                this.workers.push(wat);
-            }
-
-            this.PUBLISH_EVENT_PERIODIC.visible = false;
         },
     },
 });

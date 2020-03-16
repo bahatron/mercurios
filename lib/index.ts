@@ -1,5 +1,6 @@
 import axios from "axios";
 import ws from "ws";
+import url from "url";
 export interface MercuriosEventHandler<T = any> {
     (event: MercuriosEvent<T>): void;
 }
@@ -34,6 +35,7 @@ export class MercuriosClient {
         }
 
         this._listeners[event].push(handler);
+        console.log(this._listeners[event]);
     }
 
     private off(event: string) {
@@ -44,6 +46,12 @@ export class MercuriosClient {
         this._listeners[event] = [];
     }
 
+    private url() {
+        return typeof window !== "undefined"
+            ? new URL(this._url)
+            : new (require("url").URL)(this._url);
+    }
+
     private wsc() {
         if (this._wsc) {
             return this._wsc;
@@ -52,7 +60,11 @@ export class MercuriosClient {
         this._wsc =
             typeof window === "undefined"
                 ? new ws(this._url)
-                : new WebSocket(this._url);
+                : new WebSocket(
+                      `ws://${this.url().hostname}${
+                          this.url().port ? `:${this.url().port}` : ""
+                      }`
+                  );
 
         this._wsc.onopen = async () => {
             let action: Function | undefined;
@@ -63,8 +75,7 @@ export class MercuriosClient {
         };
 
         this._wsc.onclose = () => {
-            // this._wsc?.close();
-            this._wsc = undefined;
+            this.close();
         };
 
         this._wsc.onerror = (err: any) => {
@@ -82,16 +93,31 @@ export class MercuriosClient {
         return this._wsc;
     }
 
+    async close() {
+        this._listeners = {};
+        this._queued = [];
+        this._wsc?.close();
+        this._wsc = undefined;
+    }
+
     async publish<T = any>(
         topic: string,
         data: any,
         expectedSeq?: number
     ): Promise<MercuriosEvent<T>> {
         try {
-            const response = await axios.post(`${this._url}/stream/${topic}`, {
-                data,
-                expectedSeq,
-            });
+            const response = await axios.post(
+                `${this._url}/stream/${topic}`,
+                {
+                    data,
+                    expectedSeq,
+                },
+                {
+                    headers: {
+                        "Access-Control-Allow-Origin": "*",
+                    },
+                }
+            );
 
             return response.data;
         } catch (err) {
@@ -105,7 +131,12 @@ export class MercuriosClient {
     ): Promise<MercuriosEvent<T> | null> {
         try {
             const response = await axios.get(
-                `${this._url}/stream/${topic}/${seq}`
+                `${this._url}/stream/${topic}/${seq}`,
+                {
+                    headers: {
+                        "Access-Control-Allow-Origin": "*",
+                    },
+                }
             );
             return response.data;
         } catch (err) {

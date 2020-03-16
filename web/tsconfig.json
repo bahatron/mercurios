@@ -5,9 +5,7 @@
         "target": "es2018",
         "module": "esnext",
         "sourceMap": true,
-        "allowJs": true,
         "strict": true,
-        // "baseUrl": ".",
         "outDir": "dist"
     },
     "exclude": [
