@@ -41,7 +41,8 @@ async function start() {
                 $logger.warning(`migration error - table already exists`);
                 return;
             default:
-                throw err;
+                $logger.error(err);
+                process.exit(-10);
         }
     });
 
