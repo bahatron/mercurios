@@ -175,7 +175,10 @@ export default Vue.extend({
 
     data() {
         return {
-            ws: mercurios.connect({ url: "http://localhost:4254" }),
+            ws: mercurios.connect({
+                url: "http://localhost:4254",
+                id: "client_test",
+            }),
             workers: [] as any[],
             publishModal: false,
             subscribeModal: false,

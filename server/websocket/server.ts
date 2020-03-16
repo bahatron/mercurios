@@ -49,12 +49,6 @@ export default function createWsServer(httpServer: Server): $ws.Server {
         let query = $url.parse(request.url ?? "", true).query;
         let id = typeof query.id === "string" ? query.id : $uuid.v4();
 
-        /** @todo: what happens here? */
-        if (_clients.has(id)) {
-            socket.close(1008, "id already used");
-            return;
-        }
-
         _clients.set(id, await $connection({ id, socket, request }));
 
         $logger.info(`ws - new connection - id: ${id}`);
