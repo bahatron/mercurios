@@ -1,6 +1,6 @@
 import axios from "axios";
 import ws from "ws";
-import url from "url";
+
 export interface MercuriosEventHandler<T = any> {
     (event: MercuriosEvent<T>): void;
 }
@@ -17,7 +17,10 @@ export class MercuriosClient {
     private _listeners: Record<string, MercuriosEventHandler[]> = {};
     private _queued: Function[] = [];
 
-    public constructor(private readonly _url: string) {}
+    public constructor(
+        private readonly _url: string,
+        private readonly _id?: string
+    ) {}
 
     private emit(topic: string, event: MercuriosEvent) {
         if (!this._listeners[topic]) {
@@ -35,7 +38,6 @@ export class MercuriosClient {
         }
 
         this._listeners[event].push(handler);
-        console.log(this._listeners[event]);
     }
 
     private off(event: string) {
@@ -59,11 +61,11 @@ export class MercuriosClient {
 
         this._wsc =
             typeof window === "undefined"
-                ? new ws(this._url)
+                ? new ws(`${this._url}${this._id ? `?id=${this._id}` : ""}`)
                 : new WebSocket(
                       `ws://${this.url().hostname}${
                           this.url().port ? `:${this.url().port}` : ""
-                      }`
+                      }${this._id ? `?id=${this._id}` : ""}`
                   );
 
         this._wsc.onopen = async () => {
@@ -80,6 +82,7 @@ export class MercuriosClient {
 
         this._wsc.onerror = (err: any) => {
             console.log(err);
+            this.close();
         };
 
         this._wsc.onmessage = (msg: any) => {
@@ -209,7 +212,7 @@ export class MercuriosClient {
 }
 
 export default {
-    connect({ url }: { url: string }): MercuriosClient {
-        return new MercuriosClient(url);
+    connect({ url, id }: { url: string; id?: string }): MercuriosClient {
+        return new MercuriosClient(url, id);
     },
 };

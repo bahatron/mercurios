@@ -3,6 +3,7 @@ import { Server } from "http";
 import $logger from "../services/logger";
 import $uuid from "uuid";
 import $connection, { WsConnection } from "./connection";
+import $url from "url";
 
 const _clients: Map<string, WsConnection> = new Map();
 
@@ -45,10 +46,16 @@ export default function createWsServer(httpServer: Server): $ws.Server {
     });
 
     _wss.on("connection", async (socket, request) => {
-        let id = $uuid.v4();
-        let connection = await $connection({ id, socket, request });
-        _clients.set(id, await connection);
-        connection.socket.once("close", () => {});
+        let query = $url.parse(request.url ?? "", true).query;
+        let id = typeof query.id === "string" ? query.id : $uuid.v4();
+
+        /** @todo: what happens here? */
+        if (_clients.has(id)) {
+            socket.close(1008, "id already used");
+            return;
+        }
+
+        _clients.set(id, await $connection({ id, socket, request }));
 
         $logger.info(`ws - new connection - id: ${id}`);
     });

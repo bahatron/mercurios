@@ -5,7 +5,7 @@
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
-        "prepublishOnly": "npm run build && npm run test && npm version ${VERSION:-patch}",
+        "prepublishOnly": "npm run build && npm run test",
         "dev": "npm run build -- --watch",
         "build": "rm -rf dist && tsc",
         "test": "echo \"Error: no test specified\""
