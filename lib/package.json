@@ -1,15 +1,14 @@
 {
     "name": "@bahatron/mercurios",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "description": "mercurios client",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
-        "prepublishOnly": "npm run version",
-        "version": "npm run build && npm run test",
+        "prepublishOnly": "npm run build && npm run test && npm version ${VERSION:-patch}",
         "dev": "npm run build -- --watch",
         "build": "rm -rf dist && tsc",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\""
     },
     "author": "simonpiscitelli@gmail.com",
     "license": "Apache-2.0",
