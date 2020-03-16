@@ -142,6 +142,7 @@
 <script lang="ts">
 import Vue from "vue";
 import divider from "../components/divider.vue";
+import ws from "ws";
 
 function WsClient() {
     if (!process.client) {
@@ -149,6 +150,7 @@ function WsClient() {
     }
 
     return new WebSocket(`ws://localhost:${"4254"}`);
+    // return new ws("http://localhost:4254");
 }
 
 export default Vue.extend({
@@ -261,11 +263,7 @@ export default Vue.extend({
             console.log(`interval type: ${typeof interval}`, interval);
 
             if (Boolean(interval) && interval !== null) {
-                // let _interval = parseInt((<any>interval) as string);
-                let _interval =
-                    parseInt((<any>interval) as string) < 100
-                        ? 100
-                        : parseInt((<any>interval) as string);
+                let _interval = parseInt((<any>interval) as string);
 
                 wat = setInterval(() => {
                     this.publishEvent({ topic, data });

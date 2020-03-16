@@ -1,7 +1,6 @@
 import axios from "axios";
 import ws from "ws";
-
-interface MercuriosEventHandler<T = any> {
+export interface MercuriosEventHandler<T = any> {
     (event: MercuriosEvent<T>): void;
 }
 
@@ -13,8 +12,9 @@ export interface MercuriosEvent<T = any> {
 }
 
 export class MercuriosClient {
-    private _wsc: ws | undefined;
+    private _wsc: ws | WebSocket | undefined;
     private _listeners: Record<string, MercuriosEventHandler[]> = {};
+    private _queued: Function[] = [];
 
     public constructor(private readonly _url: string) {}
 
@@ -36,28 +36,48 @@ export class MercuriosClient {
         this._listeners[event].push(handler);
     }
 
-    private wsc(): ws {
+    private off(event: string) {
+        if (!this._listeners[event]) {
+            return;
+        }
+
+        this._listeners[event] = [];
+    }
+
+    private wsc() {
         if (this._wsc) {
             return this._wsc;
         }
 
-        this._wsc = new ws(this._url);
+        this._wsc =
+            typeof window === "undefined"
+                ? new ws(this._url)
+                : new WebSocket(this._url);
 
-        this._wsc.once("close", () => {
-            this._wsc?.terminate();
-            this._listeners = {};
+        this._wsc.onopen = async () => {
+            let action: Function | undefined;
+
+            while ((action = this._queued.shift())) {
+                await action();
+            }
+        };
+
+        this._wsc.onclose = () => {
+            // this._wsc?.close();
             this._wsc = undefined;
-        });
+        };
 
-        this._wsc.on("error", err => {
-            throw err;
-        });
+        this._wsc.onerror = (err: any) => {
+            console.log(err);
+        };
 
-        this._wsc.on("message", msg => {
-            let event: MercuriosEvent = JSON.parse(msg.toString());
+        this._wsc.onmessage = (msg: any) => {
+            let event: MercuriosEvent = JSON.parse(
+                (msg.data ?? msg).toString()
+            );
 
             this.emit(event.topic, event);
-        });
+        };
 
         return this._wsc;
     }
@@ -102,60 +122,56 @@ export class MercuriosClient {
         handler: MercuriosEventHandler<T>
     ): Promise<void> {
         return new Promise(async (resolve, reject) => {
-            let socket = this.wsc();
-            this.on(topic, handler);
+            try {
+                let socket = this.wsc();
+                this.on(topic, handler);
 
-            const action = () => {
-                socket.send(
-                    JSON.stringify({
-                        action: "subscribe",
-                        options: {
+                const action = () => {
+                    socket.send(
+                        JSON.stringify({
+                            action: "subscribe",
                             topic,
-                        },
-                    }),
-                    err => {
-                        if (err) {
-                            reject(err);
-                        }
-                        resolve();
-                    }
-                );
-            };
+                        })
+                    );
 
-            if (socket.readyState === socket.OPEN) {
-                action();
-            } else {
-                socket.once("open", action);
+                    resolve();
+                };
+
+                if (socket.readyState === socket.OPEN) {
+                    action();
+                } else {
+                    this._queued.push(action);
+                }
+            } catch (err) {
+                reject(err);
             }
         });
     }
 
     async unsubscribe(topic: string): Promise<void> {
         return new Promise(async (resolve, reject) => {
-            let socket = this.wsc();
+            try {
+                let socket = this.wsc();
+                this.off(topic);
 
-            const action = () => {
-                socket.send(
-                    JSON.stringify({
-                        action: "unsubscribe",
-                        options: {
+                const action = () => {
+                    socket.send(
+                        JSON.stringify({
+                            action: "unsubscribe",
                             topic,
-                        },
-                    }),
-                    err => {
-                        if (err) {
-                            reject(err);
-                        }
-                        delete this._listeners[topic];
-                        resolve();
-                    }
-                );
-            };
+                        })
+                    );
 
-            if (socket.readyState === socket.OPEN) {
-                action();
-            } else {
-                socket.once("open", action);
+                    resolve();
+                };
+
+                if (socket.readyState === socket.OPEN) {
+                    action();
+                } else {
+                    this._queued.push(action);
+                }
+            } catch (err) {
+                reject(err);
             }
         });
     }

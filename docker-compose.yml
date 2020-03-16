@@ -54,3 +54,12 @@ services:
         command: npm run dev
         ports:
             - 3100:3000
+
+    lib:
+        build:
+            context: .
+            dockerfile: lib.dockerfile
+        env_file: .env.test
+        volumes:
+            - ./lib:/app
+        command: npm run dev
