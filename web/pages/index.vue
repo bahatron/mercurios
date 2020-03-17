@@ -162,11 +162,11 @@
     </v-container>
 </template>
 
-<script lang="ts">
+<script lang="js">
 import Vue from "vue";
 import divider from "../components/divider.vue";
 // import mercurios, { MercuriosClient } from "../../lib/index";
-import mercurios, { MercuriosClient } from "@bahatron/mercurios";
+import mercurios from "@bahatron/mercurios";
 
 export default Vue.extend({
     components: {
@@ -179,7 +179,7 @@ export default Vue.extend({
                 url: "http://localhost:4254",
                 id: "client_test",
             }),
-            workers: [] as any[],
+            workers: [],
             publishModal: false,
             subscribeModal: false,
             unSubscribeModal: false,
@@ -195,7 +195,7 @@ export default Vue.extend({
             return;
         }
 
-        let client: MercuriosClient = this.ws;
+        let client = this.ws;
 
         client.close();
     },
@@ -208,7 +208,7 @@ export default Vue.extend({
 
     methods: {
         async subscribe() {
-            let client: MercuriosClient = this.ws;
+            let client = this.ws;
 
             await client.subsribe(this.topic, event => {
                 this.$store.commit("mercurios/addMessage", { message: event });
@@ -217,8 +217,8 @@ export default Vue.extend({
             this.subscribeModal = false;
         },
 
-        async publish({ topic, data }: any) {
-            let client: MercuriosClient = this.ws;
+        async publish({ topic, data }) {
+            let client = this.ws;
 
             let event = await client.publish(topic, data);
 
@@ -226,7 +226,7 @@ export default Vue.extend({
         },
 
         async unsubscribe() {
-            let client: MercuriosClient = this.ws;
+            let client = this.ws;
 
             client.unsubscribe(this.topic);
 

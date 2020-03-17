@@ -10,6 +10,9 @@ const config: Config = {
         password: $env.get("MYSQL_PASSWORD"),
         database: $env.get("MYSQL_DATABASE"),
     },
+    migrations: {
+        tableName: "mercurios",
+    },
 };
 
 const $mysql = knex(config);

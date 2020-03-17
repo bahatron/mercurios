@@ -1,6 +1,8 @@
 FROM node:lts-alpine
-WORKDIR /app
-COPY ./tests .
+
+COPY ./tests /app/tests
+COPY ./lib /app/lib
+WORKDIR /app/tests
 
 RUN npm install -g autocannon
 RUN npm ci

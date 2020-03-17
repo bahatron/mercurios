@@ -15,6 +15,7 @@
     "dependencies": {
         "@bahatron/env": "^0.1.13",
         "@bahatron/logger": "^1.2.0",
+        "@bahatron/mercurios": "0.0.3",
         "@types/autocannon": "^4.1.0",
         "@types/chai": "^4.2.11",
         "@types/cors": "^2.8.6",
