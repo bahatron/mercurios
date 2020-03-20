@@ -18,7 +18,7 @@ export async function _publishEvent(
     });
 }
 
-describe("Feature: publish event", () => {
+describe("Endpoint: publish event", () => {
     describe("Scenario: publish to unexistant stream", () => {
         const _topic = `publish_event_test`;
 

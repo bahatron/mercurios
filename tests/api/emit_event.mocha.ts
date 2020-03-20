@@ -11,7 +11,7 @@ export async function emitEvent(topic: string, data?: any) {
     });
 }
 
-describe("Feature: emit event", () => {
+describe("Endpoint: emit event", () => {
     describe("Scenario: with data", () => {
         let _topic = "emit_topic_test";
         let _data = {

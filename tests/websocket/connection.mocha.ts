@@ -3,7 +3,7 @@ import $env from "@bahatron/env";
 
 const TEST_URL = $env.get("TEST_URL");
 
-describe("Feature: websocket connection", () => {
+describe("Endpoint: websocket connection", () => {
     let _wsc: $ws;
 
     it("can stablish a ws connection", async () => {

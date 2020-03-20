@@ -5,7 +5,7 @@ import { _publishEvent } from "../api/publish_event.mocha";
 
 const TEST_URL = $env.get("TEST_URL");
 
-describe("Feature: subscribe to topic", () => {
+describe("Endpoint: subscribe to topic", () => {
     let _wsc: $ws;
 
     before(async () => {
