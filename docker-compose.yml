@@ -33,16 +33,6 @@ services:
             - DEBUG=true
         env_file: .env.test
 
-    tests:
-        build:
-            context: .
-            dockerfile: tests.dockerfile
-        image: mercurios_tests
-        volumes:
-            - ./tests:/app
-        env_file: .env.test
-        command: npm run dev
-
     web:
         user: node
         build:

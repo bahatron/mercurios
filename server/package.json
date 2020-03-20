@@ -6,6 +6,8 @@
     "scripts": {
         "start": "pm2-runtime start process.config.js",
         "dev": "NODE_ENV=development npm run build:watch & npm start",
+        "test": "mocha 'dist/**/*.mocha.js' -t 5000",
+        "test:benchmark": "node dist/benchmark.js",
         "build": "tsc",
         "build:watch": "npm run build -- --watch",
         "build:clean": "rm -rf dist/ && npm run build"
@@ -33,6 +35,11 @@
         "ts-nats": "^1.2.12",
         "typescript": "^3.8.3",
         "uuid": "^3.4.0",
-        "ws": "^7.2.3"
+        "ws": "^7.2.3",
+        "@types/autocannon": "^4.1.0",
+        "@types/chai": "^4.2.11",
+        "@types/mocha": "^5.2.7",
+        "autocannon": "^4.6.0",
+        "mocha": "^6.2.2"
     }
 }

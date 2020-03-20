@@ -8,13 +8,6 @@ services:
             - nats
         env_file: .env.test
 
-    tests:
-        image: mercurios_tests
-        depends_on:
-            - server
-        env_file: .env.test
-        command: sh -c "sleep 5 && npm start"
-
     mysql:
         image: mysql:8
         command: --default-authentication-plugin=mysql_native_password
