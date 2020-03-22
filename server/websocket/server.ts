@@ -7,7 +7,7 @@ import $url from "url";
 
 const _clients: Map<string, WsConnection> = new Map();
 
-function ping(wss: $ws.Server) {
+function ping() {
     _clients.forEach(async (conn, id) => {
         $logger.debug(`ws connection id: ${id} - pinging...`);
         try {

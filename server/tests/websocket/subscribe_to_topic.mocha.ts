@@ -26,8 +26,6 @@ describe("Feature: subscribe to topic", () => {
             _wsc.on("message", data => {
                 let payload = JSON.parse(data.toString());
 
-                $logger.debug(`ws server message payload`, payload);
-
                 resolve(payload);
             });
 
@@ -43,8 +41,6 @@ describe("Feature: subscribe to topic", () => {
                     if (err) {
                         return $logger.error(err);
                     }
-
-                    $logger.debug(`ws subscribe message sent`);
                 }
             );
 

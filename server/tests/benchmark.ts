@@ -51,68 +51,12 @@ async function dataWriteBench() {
 async function readBench() {
     breakdown(
         "single stream read benchmark",
-        await Promise.all([
-            autocannon({
-                title: "read benchmark",
-                connections: 100,
-                pipelining: 10,
-                url: `${MERCURIOS_TEST_URL}/stream/${_topic}/1`,
-            }),
-            autocannon({
-                title: "read benchmark",
-                connections: 100,
-                pipelining: 10,
-                url: `${MERCURIOS_TEST_URL}/stream/${_topic}/2`,
-            }),
-            autocannon({
-                title: "read benchmark",
-                connections: 100,
-                pipelining: 10,
-                url: `${MERCURIOS_TEST_URL}/stream/${_topic}/3`,
-            }),
-            autocannon({
-                title: "read benchmark",
-                connections: 100,
-                pipelining: 10,
-                url: `${MERCURIOS_TEST_URL}/stream/${_topic}/4`,
-            }),
-            autocannon({
-                title: "read benchmark",
-                connections: 100,
-                pipelining: 10,
-                url: `${MERCURIOS_TEST_URL}/stream/${_topic}/5`,
-            }),
-            autocannon({
-                title: "read benchmark",
-                connections: 100,
-                pipelining: 10,
-                url: `${MERCURIOS_TEST_URL}/stream/${_topic}/6`,
-            }),
-            autocannon({
-                title: "read benchmark",
-                connections: 100,
-                pipelining: 10,
-                url: `${MERCURIOS_TEST_URL}/stream/${_topic}/7`,
-            }),
-            autocannon({
-                title: "read benchmark",
-                connections: 100,
-                pipelining: 10,
-                url: `${MERCURIOS_TEST_URL}/stream/${_topic}/8`,
-            }),
-            autocannon({
-                title: "read benchmark",
-                connections: 100,
-                pipelining: 10,
-                url: `${MERCURIOS_TEST_URL}/stream/${_topic}/9`,
-            }),
-            autocannon({
-                title: "read benchmark",
-                connections: 100,
-                pipelining: 10,
-                url: `${MERCURIOS_TEST_URL}/stream/${_topic}/10`,
-            }),
-        ])
+        await autocannon({
+            title: "read benchmark",
+            connections: 100,
+            pipelining: 10,
+            url: `${MERCURIOS_TEST_URL}/stream/${_topic}/1`,
+        })
     );
 }
 
