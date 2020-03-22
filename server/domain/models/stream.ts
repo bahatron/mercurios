@@ -22,6 +22,33 @@ export class Stream {
         this.table = $validator.string(table_name);
     }
 
+    private async transaction(
+        expectedSeq: number,
+        published_at: string,
+        data?: any
+    ) {
+        return await $mysql.transaction(async _trx => {
+            let seq = (
+                await _trx(this.table).insert({
+                    published_at,
+                    data: $json.stringify(data),
+                })
+            ).shift();
+
+            if (!seq) {
+                throw $error.InternalError(`unexpected mysql response`);
+            }
+
+            if (expectedSeq !== seq) {
+                throw $error.ExpectationFailed(
+                    `error writing to stream - expected seq ${expectedSeq} but got ${seq}`
+                );
+            }
+
+            return seq;
+        });
+    }
+
     public async append(
         data: any = {},
         expectedSeq?: number
@@ -29,26 +56,12 @@ export class Stream {
         let published_at = $moment().toISOString();
 
         try {
-            let seq = await $mysql.transaction(async _trx => {
-                let result = (
-                    await _trx(this.table).insert({
-                        published_at,
-                        data: $json.stringify(data),
-                    })
-                ).shift();
-
-                if (!result) {
-                    throw $error.InternalError(`unexpected mysql response`);
-                }
-
-                if (expectedSeq && expectedSeq !== result) {
-                    throw $error.ExpectationFailed(
-                        `error writing to stream - expected seq ${expectedSeq} but got ${result}`
-                    );
-                }
-
-                return result;
-            });
+            let seq: number = expectedSeq
+                ? await this.transaction(expectedSeq, published_at, data)
+                : await $mysql(this.table).insert({
+                      published_at,
+                      data: $json.stringify(data),
+                  });
 
             return $event({ topic: this.topic, seq, published_at, data });
         } catch (err) {
