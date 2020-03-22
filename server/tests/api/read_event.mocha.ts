@@ -1,13 +1,12 @@
 import $axios, { AxiosResponse } from "axios";
 import env from "@bahatron/env";
 import { expect } from "chai";
-import $mysql from "../utils/mysql";
-import $nats from "../utils/nats";
 import $logger from "@bahatron/logger";
 import { _publishEvent } from "./publish_event.mocha";
+import $mysql from "../../services/mysql";
 
 const MERCURIOS_TEST_URL = env.get("TEST_URL");
-describe("Endpoint: read event", () => {
+describe("Feature: read event", () => {
     async function readEvent(topic: string, id: number) {
         return $axios.get(`${MERCURIOS_TEST_URL}/stream/${topic}/${id}`);
     }
@@ -31,7 +30,7 @@ describe("Endpoint: read event", () => {
                 if (await $mysql.schema.hasTable(`stream_${_topic}`)) {
                     await $mysql(`stream_${_topic}`).truncate();
                 }
-                
+
                 await _publishEvent(_topic, "hello", 1);
                 _response = await readEvent(_topic, 2);
             } catch (err) {

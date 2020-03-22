@@ -1,5 +1,5 @@
-import $streams from "./modules/stream_repository";
-import { MercuriosEvent } from "./modules/event";
+import $streams from "./models/stream";
+import { MercuriosEvent } from "./models/event";
 import $error from "../services/error";
 
 export default async function $readEvent(

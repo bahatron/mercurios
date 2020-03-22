@@ -1,7 +1,7 @@
-import $streams from "./modules/stream_repository";
+import $streams from "./models/stream";
 import $nats from "../services/nats";
 import $logger from "../services/logger";
-import { MercuriosEvent } from "./modules/event";
+import { MercuriosEvent } from "./models/event";
 
 interface PublishPayload {
     data?: any;
@@ -19,10 +19,10 @@ export default async function $publishEvent({
 
     let event = await stream.append(data, expectedSeq);
 
-    await $nats.publish(`stream.${stream.topic}`, event);
+    await $nats.publish(`topic.${stream.topic}`, event);
 
     $logger.info(
-        `published event to topic - topic: ${event.topic} seq: ${event.seq}`
+        `published event to stream - topic: ${event.topic} seq: ${event.seq}`
     );
 
     return event;

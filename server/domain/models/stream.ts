@@ -1,12 +1,76 @@
-import streamFactory, { Stream } from "./stream";
 import $mysql from "../../services/mysql";
 import $logger from "../../services/logger";
 import $nats from "../../services/nats";
+import $error from "../../services/error";
+import $json from "../../services/json";
+import $moment from "moment";
+import $event, { MercuriosEvent } from "./event";
+import $validator from "../../services/validator";
 
 export const STREAM_DEFINITIONS = "mercurios_streams";
 
 export function streamTable(topic: string): string {
     return `stream_${topic}`;
+}
+
+export class Stream {
+    public readonly topic: string;
+    public readonly table: string;
+
+    constructor({ topic, table_name }: { topic: string; table_name: string }) {
+        this.topic = $validator.string(topic);
+        this.table = $validator.string(table_name);
+    }
+
+    public async append(
+        data: any = {},
+        expectedSeq?: number
+    ): Promise<MercuriosEvent> {
+        let published_at = $moment().toISOString();
+
+        try {
+            let seq = await $mysql.transaction(async _trx => {
+                let result = (
+                    await _trx(this.table).insert({
+                        published_at,
+                        data: $json.stringify(data),
+                    })
+                ).shift();
+
+                if (!result) {
+                    throw $error.InternalError(`unexpected mysql response`);
+                }
+
+                if (expectedSeq && expectedSeq !== result) {
+                    throw $error.ExpectationFailed(
+                        `error writing to stream - expected seq ${expectedSeq} but got ${result}`
+                    );
+                }
+
+                return result;
+            });
+
+            return $event({ topic: this.topic, seq, published_at, data });
+        } catch (err) {
+            await $mysql.raw(`ALTER TABLE ${this.table} auto_increment = 1`);
+
+            throw err;
+        }
+    }
+
+    public async read(id: number): Promise<MercuriosEvent | undefined> {
+        let result = await $mysql(this.table)
+            .where({ seq: id })
+            .first();
+
+        if (!result) {
+            return undefined;
+        }
+
+        let { seq, published_at, data } = result;
+
+        return $event({ topic: this.topic, seq, published_at, data });
+    }
 }
 
 const Repository = () => {
@@ -20,7 +84,7 @@ const Repository = () => {
         let topic = msg.data;
         _streams.set(
             topic,
-            streamFactory({ topic, table_name: streamTable(topic) })
+            new Stream({ topic, table_name: streamTable(topic) })
         );
     });
 
@@ -46,11 +110,11 @@ const Repository = () => {
 
                 await $nats.publish("mercurios_stream_created", topic);
 
-                return streamFactory({ topic, table_name });
+                return new Stream({ topic, table_name });
             } catch (err) {
                 if (err.code === "ER_TABLE_EXISTS_ERROR") {
                     $logger.debug("table already exists", err.message);
-                    return streamFactory({ topic, table_name });
+                    return new Stream({ topic, table_name });
                 }
                 $logger.error(err);
                 throw err;
@@ -70,7 +134,7 @@ const Repository = () => {
                 return null;
             }
 
-            let stream = streamFactory(result);
+            let stream = new Stream(result);
 
             _streams.set(topic, stream);
 

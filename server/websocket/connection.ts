@@ -75,7 +75,7 @@ export class WsConnection {
         $logger.debug(`ws connection - subscribing to ${topic}`);
 
         this._subscriptions[topic] = await this.dispatcher.subscribe(
-            `stream.${topic}`,
+            `topic.${topic}`,
             (err, msg) => {
                 $logger.debug(
                     `ws connection - event on subscribed received: ${msg.data.topic}`

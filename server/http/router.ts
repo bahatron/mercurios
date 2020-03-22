@@ -1,21 +1,10 @@
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
 import $publishEvent from "../domain/publish_event";
 import $readEvent from "../domain/read_event";
-import $error from "../services/error";
-import $logger from "../services/logger";
+import $emitEvent from "../domain/emit_event";
+import asyncRoute from "./utils/async_route";
 
 const $router = express.Router();
-
-export function asyncRoute(controller: (req: Request, res: Response) => void) {
-    return async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            await controller(req, res);
-            next();
-        } catch (err) {
-            next(err);
-        }
-    };
-}
 
 $router.post(
     "/stream/:topic",
@@ -29,16 +18,22 @@ $router.post(
     })
 );
 
+$router.post(
+    "/emit/:topic",
+    asyncRoute(async (req, res) => {
+        return res
+            .status(200)
+            .json($emitEvent({ topic: req.params.topic, data: req.body.data }));
+    })
+);
+
 $router.get(
     "/stream/:topic/:seq",
     asyncRoute(async (req, res) => {
-        $logger.debug(`read event req`, { body: req.body, params: req.params });
         let event = await $readEvent(
             req.params.topic,
             parseInt(req.params.seq)
         );
-
-        $logger.debug(`read event result`, event);
 
         if (!event) {
             return res.status(204).json();

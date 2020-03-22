@@ -1,7 +1,6 @@
 import $express from "express";
 import helmet from "helmet";
 import $router from "./router";
-import ping from "./utils/ping";
 import cors from "cors";
 import errorHandler from "./utils/error_handler";
 
@@ -11,7 +10,9 @@ SERVER.use($express.json());
 SERVER.use(helmet());
 SERVER.use(cors());
 
-SERVER.get("/ping", ping());
+SERVER.get("/ping", (req, res) => {
+    return res.json("pong");
+});
 
 SERVER.use($router);
 

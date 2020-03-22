@@ -7,7 +7,7 @@
         "start": "pm2-runtime start process.config.js",
         "dev": "NODE_ENV=development npm run build:watch & npm start",
         "test": "mocha 'dist/**/*.mocha.js' -t 5000",
-        "test:benchmark": "node dist/benchmark.js",
+        "test:benchmark": "node dist/tests/benchmark.js",
         "build": "tsc",
         "build:watch": "npm run build -- --watch",
         "build:clean": "rm -rf dist/ && npm run build"

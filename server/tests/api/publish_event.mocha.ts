@@ -1,9 +1,9 @@
 import $axios from "axios";
 import env from "@bahatron/env";
 import { expect } from "chai";
-import $mysql from "../utils/mysql";
-import $nats from "../utils/nats";
 import $logger from "@bahatron/logger";
+import $mysql from "../../services/mysql";
+import $nats from "../../services/nats";
 
 const MERCURIOS_TEST_URL = env.get("TEST_URL");
 
@@ -18,7 +18,7 @@ export async function _publishEvent(
     });
 }
 
-describe("Endpoint: publish event", () => {
+describe("Feature: publish event", () => {
     describe("Scenario: publish to unexistant stream", () => {
         const _topic = `publish_event_test`;
 
@@ -42,7 +42,7 @@ describe("Endpoint: publish event", () => {
             return new Promise(async resolve => {
                 let event: any;
 
-                $nats.subscribe(`stream.${_topic}`, (err, msg) => {
+                $nats.subscribe(`topic.${_topic}`, (err, msg) => {
                     resolve(expect(msg.data).to.deep.eq(event.data));
                 });
 

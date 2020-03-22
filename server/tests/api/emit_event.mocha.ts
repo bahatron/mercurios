@@ -1,7 +1,8 @@
 import $axios, { AxiosResponse } from "axios";
 import env from "@bahatron/env";
 import { expect } from "chai";
-import $nats from "../utils/nats";
+import $event from "../../domain/models/event";
+import $nats from "../../services/nats";
 
 const MERCURIOS_TEST_URL = env.get("TEST_URL");
 
@@ -11,7 +12,7 @@ export async function emitEvent(topic: string, data?: any) {
     });
 }
 
-describe("Endpoint: emit event", () => {
+describe("Feature: emit event", () => {
     describe("Scenario: with data", () => {
         let _topic = "emit_topic_test";
         let _data = {
@@ -21,15 +22,20 @@ describe("Endpoint: emit event", () => {
         let _message: any;
         let _response: AxiosResponse;
         before(async () => {
-            $nats.subscribe(`stream.${_topic}`, (err, msg) => {
+            $nats.subscribe(`topic.${_topic}`, (err, msg) => {
                 _message = msg.data;
             });
 
             _response = await emitEvent(_topic, _data);
         });
 
-        // it("responds with http 200", () => {
-        //     expect(_response.status).to.eq(200);
-        // });
+        it("responds with http 200", () => {
+            expect(_response.status).to.eq(200);
+        });
+
+        it("emits a MercuriosEvent", async () => {
+            expect(_message).to.exist;
+            expect($event(_message)).to.deep.eq(_message);
+        });
     });
 });
