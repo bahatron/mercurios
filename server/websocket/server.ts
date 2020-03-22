@@ -54,7 +54,7 @@ export default function createWsServer(httpServer: Server): $ws.Server {
         $logger.info(`ws - new connection - id: ${id}`);
     });
 
-    setInterval(() => ping(_wss), 10000);
+    setInterval(() => ping(), 10000);
 
     return _wss;
 }
