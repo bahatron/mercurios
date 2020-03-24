@@ -11,7 +11,7 @@ const config: Config = {
         database: $env.get("MYSQL_DATABASE"),
     },
     migrations: {
-        tableName: "mercurios",
+        tableName: "mercurios_migrations",
     },
 };
 
