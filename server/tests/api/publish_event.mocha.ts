@@ -23,19 +23,24 @@ describe("Feature: publish event", () => {
         const _topic = `publish_event_test`;
 
         it("creates a record on the stream table", async () => {
-            let payload = {
-                foo: "bar",
-            };
+            try {
+                let payload = {
+                    foo: "bar",
+                };
 
-            let event = await _publishEvent(_topic, payload);
+                let event = await _publishEvent(_topic, payload);
 
-            let result = await $mysql(`stream_${_topic}`)
-                .where({
-                    seq: event.data.seq,
-                })
-                .first();
+                let result = await $mysql(`stream_${_topic}`)
+                    .where({
+                        seq: event.data.seq,
+                    })
+                    .first();
 
-            expect(result).not.to.be.undefined;
+                expect(result).not.to.be.undefined;
+            } catch (err) {
+                $logger.error(err);
+                throw err;
+            }
         });
 
         it("emits an event related to the topic", async () => {

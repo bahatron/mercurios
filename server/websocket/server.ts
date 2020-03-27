@@ -1,27 +1,25 @@
 import $ws from "ws";
 import { Server } from "http";
 import $logger from "../services/logger";
-import $uuid from "uuid";
-import $connection, { WsConnection } from "./connection";
-import $url from "url";
+import { WsConnection } from "./connection";
 
-const _clients: Map<string, WsConnection> = new Map();
+const _clients: Set<WsConnection> = new Set();
 
 function ping() {
-    _clients.forEach(async (conn, id) => {
-        $logger.debug(`ws connection id: ${id} - pinging...`);
+    _clients.forEach(async conn => {
+        $logger.debug(`ws connection id: ${conn.id} - pinging...`);
         try {
             if (conn.socket.readyState !== 1) {
-                $logger.warning(`ws connection removed - id: ${id}`);
+                $logger.warning(`ws connection removed - id: ${conn.id}`);
                 await conn.close();
-                return _clients.delete(id);
+                return _clients.delete(conn);
             }
 
             await new Promise((resolve, reject) => {
                 setTimeout(() => reject("connection timeout"), 1000);
 
                 conn.socket.once("pong", () => {
-                    $logger.debug(`ws connection id: ${id} - pong!`);
+                    $logger.debug(`ws connection id: ${conn.id} - pong!`);
                     resolve();
                 });
 
@@ -32,7 +30,7 @@ function ping() {
                 `ws connection - ping timeout: ${err.message || err}`
             );
             await conn.close();
-            _clients.delete(id);
+            _clients.delete(conn);
         }
     });
 }
@@ -46,12 +44,11 @@ export default function createWsServer(httpServer: Server): $ws.Server {
     });
 
     _wss.on("connection", async (socket, request) => {
-        let query = $url.parse(request.url ?? "", true).query;
-        let id = typeof query.id === "string" ? query.id : $uuid.v4();
+        let conn = new WsConnection(request, socket);
 
-        _clients.set(id, await $connection({ id, socket, request }));
+        _clients.add(conn);
 
-        $logger.info(`ws - new connection - id: ${id}`);
+        $logger.info(`ws - new connection - id: ${conn.id}`);
     });
 
     setInterval(() => ping(), 10000);

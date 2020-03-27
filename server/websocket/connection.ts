@@ -5,17 +5,25 @@ import $error from "../services/error";
 import $json from "../services/json";
 import { IncomingMessage } from "http";
 import $nats from "../services/nats";
-
+import uuid from "uuid";
+import url from "url";
 export class WsConnection {
     private _subscriptions: Record<string, Subscription> = {};
-    // private _subscriptions: Map<string, Subscription> = new Map();
+    private dispatcher: Promise<Client>;
+    public readonly id: string;
 
     constructor(
-        public readonly id: string,
         public readonly request: IncomingMessage,
-        public readonly socket: ws,
-        private dispatcher: Client
+        public readonly socket: ws
     ) {
+        let query = url.parse(request.url ?? "", true).query;
+        this.id = typeof query.id === "string" ? query.id : uuid.v4();
+
+        this.setupSocket();
+        this.dispatcher = $nats.connect(`wsc_${this.id}`);
+    }
+
+    private setupSocket() {
         this.socket.on("message", data => {
             try {
                 let { action, topic } = $json.parse(data);
@@ -51,7 +59,7 @@ export class WsConnection {
         });
 
         this.socket.on("close", async () => {
-            $logger.warning(`ws connection closed - id: ${id}`);
+            $logger.warning(`ws connection closed - id: ${this.id}`);
             await this.close();
         });
 
@@ -74,7 +82,7 @@ export class WsConnection {
 
         $logger.debug(`ws connection - subscribing to ${topic}`);
 
-        this._subscriptions[topic] = await this.dispatcher.subscribe(
+        this._subscriptions[topic] = await (await this.dispatcher).subscribe(
             `topic.${topic}`,
             (err, msg) => {
                 $logger.debug(
@@ -108,23 +116,9 @@ export class WsConnection {
     public async close() {
         await this.socket.terminate();
 
-        if (!this.dispatcher.isClosed()) {
-            await this.dispatcher.drain();
-            await this.dispatcher.close();
+        if (!(await this.dispatcher).isClosed()) {
+            await (await this.dispatcher).drain();
+            await (await this.dispatcher).close();
         }
     }
-}
-
-export default async function $connection({
-    id,
-    socket,
-    request,
-}: {
-    id: string;
-    socket: ws;
-    request: IncomingMessage;
-}): Promise<WsConnection> {
-    let dispatcher = await $nats.connect(`ws_client_${id}`);
-
-    return new WsConnection(id, request, socket, dispatcher);
 }
