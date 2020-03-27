@@ -82,6 +82,10 @@ export class WsConnection {
 
         $logger.debug(`ws connection - subscribing to ${topic}`);
 
+        if (this._subscriptions[topic]) {
+            return;
+        }
+
         this._subscriptions[topic] = await (await this.dispatcher).subscribe(
             `topic.${topic}`,
             (err, msg) => {
