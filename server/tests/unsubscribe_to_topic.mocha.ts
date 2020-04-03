@@ -1,7 +1,7 @@
 import $ws from "ws";
 import $env from "@bahatron/env";
 import $logger from "@bahatron/logger";
-import { _publishEvent } from "../api/publish_event.mocha";
+import { publishEventEndpoint } from "../domain/publish_event.mocha";
 
 const TEST_URL = $env.get("TEST_URL");
 
@@ -13,8 +13,6 @@ describe("Feature: unsubscribe to topic", () => {
             _wsc = new $ws(TEST_URL);
 
             _wsc.on("open", async () => {
-                /** @todo: figure out why won't send messages even afer it's OPEN */
-                await new Promise(resolve => setTimeout(resolve, 10));
                 resolve();
             });
         });
@@ -40,7 +38,7 @@ describe("Feature: unsubscribe to topic", () => {
                         $logger.warning(`wsc error`, err);
                     }
 
-                    _publishEvent(_topic);
+                    publishEventEndpoint(_topic);
                 }
             );
         });
@@ -64,7 +62,7 @@ describe("Feature: unsubscribe to topic", () => {
 
                     setTimeout(resolve, 500);
 
-                    _publishEvent(_topic);
+                    publishEventEndpoint(_topic);
                 }
             );
         });

@@ -2,12 +2,12 @@ import $axios from "axios";
 import env from "@bahatron/env";
 import { expect } from "chai";
 import $logger from "@bahatron/logger";
-import $mysql from "../../services/mysql";
-import $nats from "../../services/nats";
+import $mysql from "../services/mysql";
+import $nats from "../services/nats";
 
 const MERCURIOS_TEST_URL = env.get("TEST_URL");
 
-export async function _publishEvent(
+export async function publishEventEndpoint(
     topic: string,
     data?: any,
     expectedSeq?: number
@@ -28,7 +28,7 @@ describe("Feature: publish event", () => {
                     foo: "bar",
                 };
 
-                let event = await _publishEvent(_topic, payload);
+                let event = await publishEventEndpoint(_topic, payload);
 
                 let result = await $mysql(`stream_${_topic}`)
                     .where({
@@ -51,7 +51,7 @@ describe("Feature: publish event", () => {
                     resolve(expect(msg.data).to.deep.eq(event.data));
                 });
 
-                event = await _publishEvent(_topic, "hello from test");
+                event = await publishEventEndpoint(_topic, "hello from test");
             });
         });
     });
@@ -60,19 +60,19 @@ describe("Feature: publish event", () => {
         const _stream = "publish_double_stringified_test";
 
         it("level 1", async () => {
-            await _publishEvent(_stream, {
+            await publishEventEndpoint(_stream, {
                 data: JSON.stringify({ foo: "sanchez" }),
             });
         });
 
         it("level 2", async () => {
-            await _publishEvent(_stream, {
+            await publishEventEndpoint(_stream, {
                 data: JSON.stringify(JSON.stringify({ foo: "sanchez" })),
             });
         });
 
         it("level 3", async () => {
-            await _publishEvent(
+            await publishEventEndpoint(
                 _stream,
                 JSON.stringify({
                     data: JSON.stringify(JSON.stringify({ foo: "sanchez" })),
@@ -90,11 +90,9 @@ describe("Feature: publish event", () => {
                     await $mysql(`stream_${_topic}`).truncate();
                 }
 
-                // await new Promise(resolve => setTimeout(resolve, 5));
-
                 await Promise.all(
                     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(val => {
-                        return _publishEvent(_topic, val);
+                        return publishEventEndpoint(_topic, val);
                     })
                 );
             } catch (err) {
@@ -107,7 +105,7 @@ describe("Feature: publish event", () => {
         it("responds with http status code 417 if seq number is already taken", async () => {
             return new Promise(async resolve => {
                 try {
-                    await _publishEvent(_topic, "another message", 5);
+                    await publishEventEndpoint(_topic, "another message", 5);
                 } catch (err) {
                     resolve(expect(err.response.status).to.eq(417));
                 }
@@ -117,7 +115,7 @@ describe("Feature: publish event", () => {
         it("responds with http status code 417 if expected sequence number is higher than actual", async () => {
             return new Promise(async resolve => {
                 try {
-                    await _publishEvent(_topic, "another message", 15);
+                    await publishEventEndpoint(_topic, "another message", 15);
                 } catch (err) {
                     resolve(expect(err.response.status).to.eq(417));
                 }
@@ -125,7 +123,11 @@ describe("Feature: publish event", () => {
         });
 
         it("publishes the event if 'next' sequence number matches the expected", async () => {
-            let response = await _publishEvent(_topic, "12 from test", 12);
+            let response = await publishEventEndpoint(
+                _topic,
+                "12 from test",
+                12
+            );
 
             expect(response.data.seq).to.eq(12);
         });

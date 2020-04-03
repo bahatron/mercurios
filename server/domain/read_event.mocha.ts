@@ -2,8 +2,8 @@ import $axios, { AxiosResponse } from "axios";
 import env from "@bahatron/env";
 import { expect } from "chai";
 import $logger from "@bahatron/logger";
-import { _publishEvent } from "./publish_event.mocha";
-import $mysql from "../../services/mysql";
+import { publishEventEndpoint } from "./publish_event.mocha";
+import $mysql from "../services/mysql";
 
 const MERCURIOS_TEST_URL = env.get("TEST_URL");
 describe("Feature: read event", () => {
@@ -31,7 +31,7 @@ describe("Feature: read event", () => {
                     await $mysql(`stream_${_topic}`).truncate();
                 }
 
-                await _publishEvent(_topic, "hello", 1);
+                await publishEventEndpoint(_topic, "hello", 1);
                 _response = await readEvent(_topic, 2);
             } catch (err) {
                 $logger.error(err);
@@ -54,8 +54,9 @@ describe("Feature: read event", () => {
 
         before(async () => {
             try {
-                _event = (await _publishEvent(_topic, { rick: "sanchez" }))
-                    .data;
+                _event = (
+                    await publishEventEndpoint(_topic, { rick: "sanchez" })
+                ).data;
             } catch (err) {
                 $logger.error(err);
                 throw err;

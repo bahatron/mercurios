@@ -1,7 +1,7 @@
 import $ws from "ws";
 import $env from "@bahatron/env";
 import $logger from "@bahatron/logger";
-import { _publishEvent } from "../api/publish_event.mocha";
+import { publishEventEndpoint } from "../domain/publish_event.mocha";
 
 const TEST_URL = $env.get("TEST_URL");
 
@@ -44,7 +44,7 @@ describe("Feature: subscribe to topic", () => {
                 }
             );
 
-            _publishEvent(_topic);
+            publishEventEndpoint(_topic);
         });
     });
 });

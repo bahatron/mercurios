@@ -10,7 +10,7 @@ function ping() {
         $logger.debug(`ws connection id: ${conn.id} - pinging...`);
         try {
             if (conn.socket.readyState !== 1) {
-                $logger.warning(`ws connection removed - id: ${conn.id}`);
+                $logger.debug(`ws connection removed - id: ${conn.id}`);
                 await conn.close();
                 return _clients.delete(conn);
             }

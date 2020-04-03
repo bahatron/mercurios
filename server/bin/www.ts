@@ -32,21 +32,6 @@ process.on("unhandledRejection", reason => {
     });
 });
 
-async function start() {
-    $logger.debug("Starting server in dev mode");
+$logger.debug("Starting server in dev mode");
 
-    await $mysql.migrate.latest().catch(err => {
-        switch (err.code) {
-            case "ER_TABLE_EXISTS_ERROR":
-                $logger.warning(`migration error - table already exists`);
-                return;
-            default:
-                $logger.error(err);
-                process.exit(-10);
-        }
-    });
-
-    HTTP_SERVER.listen(PORT);
-}
-
-start();
+HTTP_SERVER.listen(PORT);

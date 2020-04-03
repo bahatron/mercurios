@@ -7,8 +7,6 @@ import $moment from "moment";
 import $event, { MercuriosEvent } from "./event";
 import $validator from "../../services/validator";
 
-export const STREAM_DEFINITIONS = "mercurios_streams";
-
 export function streamTable(topic: string): string {
     return `stream_${topic}`;
 }
@@ -110,15 +108,14 @@ const Repository = () => {
                         return;
                     }
 
-                    await trx.schema.createTable(table_name, table => {
-                        table.increments("seq").primary();
-                        table.string("published_at");
-                        table.text("data", "longtext");
-                    });
-
-                    await trx
-                        .table(STREAM_DEFINITIONS)
-                        .insert({ topic, table_name });
+                    await trx.schema.createTableIfNotExists(
+                        table_name,
+                        table => {
+                            table.increments("seq").primary();
+                            table.string("published_at");
+                            table.text("data", "longtext");
+                        }
+                    );
                 });
 
                 await $nats.publish("mercurios_stream_created", topic);
@@ -126,7 +123,6 @@ const Repository = () => {
                 return new Stream({ topic, table_name });
             } catch (err) {
                 if (err.code === "ER_TABLE_EXISTS_ERROR") {
-                    $logger.debug("table already exists", err.message);
                     return new Stream({ topic, table_name });
                 }
                 $logger.error(err);
@@ -139,26 +135,18 @@ const Repository = () => {
                 return _streams.get(topic) as Stream;
             }
 
-            let result = await $mysql(STREAM_DEFINITIONS)
-                .where({ topic })
-                .first();
+            let table_name = streamTable(topic);
+            if (await $mysql.schema.hasTable(table_name)) {
+                let stream = new Stream({ topic, table_name });
+                _streams.set(topic, stream);
 
-            if (!result) {
-                return null;
+                return stream;
             }
 
-            let stream = new Stream(result);
-
-            _streams.set(topic, stream);
-
-            return stream;
+            return null;
         },
 
         async delete(topic: string): Promise<void> {
-            await $mysql(STREAM_DEFINITIONS)
-                .where({ topic })
-                .delete();
-
             await $mysql.schema.dropTableIfExists(streamTable(topic));
 
             _streams.delete(topic);
