@@ -27,7 +27,7 @@ export class MercuriosClient {
             return;
         }
 
-        this._listeners[topic].forEach(listener => listener(event));
+        this._listeners[topic].forEach((listener) => listener(event));
     }
 
     private on(event: string, handler: MercuriosEventHandler) {
@@ -151,7 +151,7 @@ export class MercuriosClient {
         }
     }
 
-    async subsribe<T = any>(
+    async subscribe<T = any>(
         topic: string,
         handler: MercuriosEventHandler<T>
     ): Promise<void> {
