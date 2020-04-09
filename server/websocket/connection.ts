@@ -24,7 +24,7 @@ export class WsConnection {
     }
 
     private setupSocket() {
-        this.socket.on("message", data => {
+        this.socket.on("message", (data) => {
             try {
                 let { action, topic } = $json.parse(data);
 
@@ -63,7 +63,7 @@ export class WsConnection {
             await this.close();
         });
 
-        this.socket.on("error", async err => {
+        this.socket.on("error", async (err) => {
             $logger.warning(`ws - coonection error`, {
                 msg: err.message,
                 name: err.name,
@@ -80,9 +80,15 @@ export class WsConnection {
             );
         }
 
-        $logger.debug(`ws connection - subscribing to ${topic}`);
+        $logger.debug(`ws connection - subscribing to ${topic}`, {
+            id: this.id,
+        });
 
         if (this._subscriptions[topic]) {
+            $logger.debug(
+                `ws connection - already subscribed to ${topic}, ignoring`,
+                { id: this.id }
+            );
             return;
         }
 
@@ -90,7 +96,7 @@ export class WsConnection {
             `topic.${topic}`,
             (err, msg) => {
                 $logger.debug(
-                    `ws connection - event on subscribed received: ${msg.data.topic}`
+                    `ws connection - recieved dispatched event - topic: ${msg.data.topic}`
                 );
                 if (err) {
                     $logger.warning(
