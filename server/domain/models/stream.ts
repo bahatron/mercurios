@@ -1,4 +1,4 @@
-import $mysql from "../../services/mysql";
+import $knex from "../../services/knex";
 import $logger from "../../services/logger";
 import $nats from "../../services/nats";
 import $error from "../../services/error";
@@ -25,26 +25,35 @@ export class Stream {
         published_at: string,
         data?: any
     ) {
-        return await $mysql.transaction(async _trx => {
-            let seq = (
-                await _trx(this.table).insert({
-                    published_at,
-                    data: $json.stringify(data),
-                })
-            ).shift();
+        try {
+            return await $knex.transaction(async (_trx) => {
+                let seq = (
+                    await _trx(this.table).insert({
+                        published_at,
+                        data: $json.stringify(data),
+                    })
+                ).shift();
 
-            if (!seq) {
-                throw $error.InternalError(`unexpected mysql response`);
+                if (!seq) {
+                    throw $error.InternalError(
+                        `unexpected response from store`
+                    );
+                }
+
+                if (expectedSeq !== seq) {
+                    throw $error.ExpectationFailed(
+                        `error writing to stream - expected seq ${expectedSeq} but got ${seq}`
+                    );
+                }
+
+                return seq;
+            });
+        } catch (err) {
+            if (err.name === "ExpectationFailed") {
+                await $knex.raw(`ALTER TABLE ${this.table} auto_increment = 1`);
             }
-
-            if (expectedSeq !== seq) {
-                throw $error.ExpectationFailed(
-                    `error writing to stream - expected seq ${expectedSeq} but got ${seq}`
-                );
-            }
-
-            return seq;
-        });
+            throw err;
+        }
     }
 
     public async append(
@@ -53,26 +62,18 @@ export class Stream {
     ): Promise<MercuriosEvent> {
         let published_at = $moment().toISOString();
 
-        try {
-            let seq: number = expectedSeq
-                ? await this.transaction(expectedSeq, published_at, data)
-                : await $mysql(this.table).insert({
-                      published_at,
-                      data: $json.stringify(data),
-                  });
+        let seq: number = expectedSeq
+            ? await this.transaction(expectedSeq, published_at, data)
+            : await $knex(this.table).insert({
+                  published_at,
+                  data: $json.stringify(data),
+              });
 
-            return $event({ topic: this.topic, seq, published_at, data });
-        } catch (err) {
-            await $mysql.raw(`ALTER TABLE ${this.table} auto_increment = 1`);
-
-            throw err;
-        }
+        return $event({ topic: this.topic, seq, published_at, data });
     }
 
     public async read(id: number): Promise<MercuriosEvent | undefined> {
-        let result = await $mysql(this.table)
-            .where({ seq: id })
-            .first();
+        let result = await $knex(this.table).where({ seq: id }).first();
 
         if (!result) {
             return undefined;
@@ -103,19 +104,16 @@ const Repository = () => {
         async create(topic: string): Promise<Stream> {
             let table_name = streamTable(topic);
             try {
-                await $mysql.transaction(async trx => {
+                await $knex.transaction(async (trx) => {
                     if (await trx.schema.hasTable(table_name)) {
                         return;
                     }
 
-                    await trx.schema.createTableIfNotExists(
-                        table_name,
-                        table => {
-                            table.increments("seq").primary();
-                            table.string("published_at");
-                            table.text("data", "longtext");
-                        }
-                    );
+                    await trx.schema.createTable(table_name, (table) => {
+                        table.increments("seq").primary();
+                        table.string("published_at");
+                        table.text("data", "longtext");
+                    });
                 });
 
                 await $nats.publish("mercurios_stream_created", topic);
@@ -136,7 +134,7 @@ const Repository = () => {
             }
 
             let table_name = streamTable(topic);
-            if (await $mysql.schema.hasTable(table_name)) {
+            if (await $knex.schema.hasTable(table_name)) {
                 let stream = new Stream({ topic, table_name });
                 _streams.set(topic, stream);
 
@@ -147,7 +145,7 @@ const Repository = () => {
         },
 
         async delete(topic: string): Promise<void> {
-            await $mysql.schema.dropTableIfExists(streamTable(topic));
+            await $knex.schema.dropTableIfExists(streamTable(topic));
 
             _streams.delete(topic);
 

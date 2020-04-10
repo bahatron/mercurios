@@ -2,7 +2,7 @@ import $axios from "axios";
 import env from "@bahatron/env";
 import { expect } from "chai";
 import $logger from "@bahatron/logger";
-import $mysql from "../services/mysql";
+import $mysql from "../services/knex";
 import $nats from "../services/nats";
 
 const MERCURIOS_TEST_URL = env.get("TEST_URL");

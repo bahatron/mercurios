@@ -9,7 +9,7 @@ interface PublishPayload {
     topic: string;
 }
 
-export default async function $publishEvent({
+export default async function ({
     data,
     expectedSeq,
     topic,
@@ -18,12 +18,10 @@ export default async function $publishEvent({
         (await $streams.fetch(topic)) ?? (await $streams.create(topic));
 
     let event = await stream.append(data, expectedSeq);
+    $logger.debug(`event persisted - topic: ${topic} - seq: ${event.seq}`);
 
     await $nats.publish(`topic.${stream.topic}`, event);
-
-    $logger.info(
-        `published event to stream - topic: ${event.topic} seq: ${event.seq}`
-    );
+    $logger.debug(`event published - topic: ${event.topic}`);
 
     return event;
 }

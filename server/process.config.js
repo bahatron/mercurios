@@ -1,5 +1,3 @@
-const $env = require("@bahatron/env").default;
-
 module.exports = {
     apps: [
         {
@@ -7,11 +5,8 @@ module.exports = {
             name: "mercurios",
             exec_mode: "cluster",
             restart_delay: "1000",
-            instances: parseInt($env.get("MERCURIOS_WORKERS", "0")) || "max",
-            watch:
-                $env.get("MERCURIOS_ENV", "production") === "production"
-                    ? false
-                    : ["dist"],
+            instances: process.env.MERCURIOS_WORKERS || 0,
+            watch: process.env.NODE_ENV === "production" ? false : ["dist"],
         },
     ],
 };

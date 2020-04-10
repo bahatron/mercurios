@@ -1,33 +1,34 @@
-import $ws from "ws";
+import ws from "ws";
 import { Server } from "http";
 import $logger from "../services/logger";
-import { WsConnection } from "./connection";
+import { WsConnection } from "./ws_connection";
 
 const _clients: Set<WsConnection> = new Set();
 
 function ping() {
-    _clients.forEach(async conn => {
-        $logger.debug(`ws connection id: ${conn.id} - pinging...`);
+    _clients.forEach(async (conn) => {
         try {
             if (conn.socket.readyState !== 1) {
-                $logger.debug(`ws connection removed - id: ${conn.id}`);
+                $logger.debug(`ws client: ${conn.id} - dropped`);
                 await conn.close();
                 return _clients.delete(conn);
             }
 
+            $logger.debug(`ws client: ${conn.id} - PING`);
+
             await new Promise((resolve, reject) => {
-                setTimeout(() => reject("connection timeout"), 1000);
+                setTimeout(() => reject(new Error("connection timeout")), 1000);
 
                 conn.socket.once("pong", () => {
-                    $logger.debug(`ws connection id: ${conn.id} - pong!`);
+                    $logger.debug(`ws client: ${conn.id} - PONG`);
                     resolve();
                 });
 
                 conn.socket.ping();
             });
         } catch (err) {
-            $logger.warning(
-                `ws connection - ping timeout: ${err.message || err}`
+            $logger.debug(
+                `ws client: ${conn.id} - PING ERROR - ${err.message}`
             );
             await conn.close();
             _clients.delete(conn);
@@ -35,10 +36,10 @@ function ping() {
     });
 }
 
-export default function createWsServer(httpServer: Server): $ws.Server {
-    const _wss = new $ws.Server({ server: httpServer });
+export default function createWsServer(httpServer: Server): ws.Server {
+    const _wss = new ws.Server({ server: httpServer });
 
-    _wss.on("error", err => {
+    _wss.on("error", (err) => {
         $logger.warning(`ws server error - ${err.message}`);
         $logger.error(err);
     });

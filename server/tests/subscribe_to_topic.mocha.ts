@@ -9,7 +9,7 @@ describe("Feature: subscribe to topic", () => {
     let _wsc: $ws;
 
     before(async () => {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             _wsc = new $ws(TEST_URL);
 
             _wsc.on("open", () => {
@@ -22,22 +22,22 @@ describe("Feature: subscribe to topic", () => {
     it("can subcribe to a topic", async () => {
         const _topic = "ws_subscribe_test";
 
-        return new Promise(async resolve => {
-            _wsc.on("message", data => {
+        return new Promise(async (resolve) => {
+            _wsc.on("message", (data) => {
                 let payload = JSON.parse(data.toString());
 
                 resolve(payload);
             });
 
             /** @todo: investigate why sometimes the message is sent before the server has stablished a connection */
-            await new Promise(resolve => setTimeout(resolve, 5));
+            await new Promise((resolve) => setTimeout(resolve, 5));
 
             _wsc.send(
                 JSON.stringify({
                     action: "subscribe",
                     topic: _topic,
                 }),
-                err => {
+                (err) => {
                     if (err) {
                         return $logger.error(err);
                     }

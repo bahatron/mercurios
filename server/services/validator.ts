@@ -1,21 +1,7 @@
-import { Validator, Schema } from "jsonschema";
 import $error from "./error";
-import $logger from "./logger";
 import moment = require("moment");
 
-const validator = new Validator();
-
 const $validator = {
-    validate(object: any, schema: Schema = {}): boolean {
-        let result = validator.validate(object, schema);
-
-        if (!result.valid) {
-            $logger.debug(`validation failed `, result);
-        }
-
-        return result.valid;
-    },
-
     string(val: any): string {
         if (!val) {
             throw $error.ValidationFailed(

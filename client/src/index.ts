@@ -12,6 +12,13 @@ export interface MercuriosEvent<T = any> {
     data: T;
 }
 
+export interface PublishOptions {
+    data?: any;
+    expectedSeq?: number;
+    /** @default true */
+    durable?: boolean;
+}
+
 export class MercuriosClient {
     private _wsc: ws | WebSocket | undefined;
     private _listeners: Record<string, MercuriosEventHandler[]> = {};
@@ -77,12 +84,14 @@ export class MercuriosClient {
         };
 
         this._wsc.onclose = () => {
-            this.close();
+            this._listeners = {};
+            this._queued = [];
         };
 
         this._wsc.onerror = (err: any) => {
-            console.log(err);
             this.close();
+
+            throw err;
         };
 
         this._wsc.onmessage = (msg: any) => {
@@ -97,20 +106,17 @@ export class MercuriosClient {
     }
 
     async close() {
-        this._listeners = {};
-        this._queued = [];
         this._wsc?.close();
-        this._wsc = undefined;
     }
 
     async publish<T = any>(
         topic: string,
-        data: any,
-        expectedSeq?: number
+        options?: PublishOptions
     ): Promise<MercuriosEvent<T>> {
+        let { data, expectedSeq, durable = true } = options ?? {};
         try {
             const response = await axios.post(
-                `${this._url}/stream/${topic}`,
+                `${this._url}/${durable ? "stream" : "emit"}/${topic}`,
                 {
                     data,
                     expectedSeq,
