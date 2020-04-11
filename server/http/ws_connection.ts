@@ -9,7 +9,6 @@ import uuid from "uuid";
 import url from "url";
 
 export class WsConnection {
-    // private _subscriptions: Record<string, Subscription> = {};
     private _subscriptions: Map<string, Subscription> = new Map();
     private dispatcher: Promise<Client>;
     public readonly id: string;
@@ -28,20 +27,17 @@ export class WsConnection {
     private setupSocket() {
         this.socket.on("message", (data) => {
             try {
-                let { action, topic } = $json.parse(data);
+                let { action, topic, queue } = $json.parse(data);
 
                 $logger.debug(
-                    `wsc_${this.id} - message received - ${$json.stringify({
-                        action,
-                        topic,
-                    })}`
+                    `wsc_${this.id} - message received - action: ${action} topic: ${topic} queue: ${queue}`
                 );
 
                 switch (action) {
                     case "subscribe":
-                        this._subscribe(topic);
+                        return this._subscribe(topic, queue);
                     case "unsubscribe":
-                        this._unsubscribe(topic);
+                        return this._unsubscribe(topic);
                     default:
                         return;
                 }
@@ -68,18 +64,17 @@ export class WsConnection {
         });
     }
 
-    private async _subscribe(topic: string) {
+    private async _subscribe(topic: string, queue?: string) {
         if (!topic) {
             return;
         }
 
-        /** @todo: why is this validation breaking the client??? */
-        // if (this._subscriptions.has(topic)) {
-        //     $logger.debug(
-        //         `wsc_${this.id} - already subscribed - topic: ${topic}`
-        //     );
-        //     return;
-        // }
+        if (this._subscriptions.has(topic)) {
+            $logger.debug(
+                `wsc_${this.id} - already subscribed - topic: ${topic}`
+            );
+            return;
+        }
 
         $logger.debug(`wsc_${this.id} - subscribing - topic: ${topic}`);
 
@@ -89,12 +84,14 @@ export class WsConnection {
                 `topic.${topic}`,
                 (err, msg) => {
                     return new Promise((resolve) => {
+                        if (err) {
+                            $logger.error(err);
+                            throw err;
+                        }
+
                         $logger.debug(
                             `wsc_${this.id} - event recieved - topic: ${msg.data.topic}`
                         );
-                        if (err) {
-                            $logger.error(err);
-                        }
 
                         let interval = setInterval(() => {
                             $logger.debug(
@@ -118,6 +115,9 @@ export class WsConnection {
                             `wsc_${this.id} - event sent - topic: ${msg.data.topic}`
                         );
                     });
+                },
+                {
+                    queue: queue || undefined,
                 }
             )
         );
@@ -133,16 +133,17 @@ export class WsConnection {
         }
 
         sub.unsubscribe();
-
         this._subscriptions.delete(topic);
+
+        $logger.debug(`wsc_${this.id} - unsubscribed - topic: ${topic}`);
     }
 
     public async close() {
-        await this.socket.terminate();
-
         if (!(await this.dispatcher).isClosed()) {
             await (await this.dispatcher).drain();
             await (await this.dispatcher).close();
         }
+
+        this.socket.terminate();
     }
 }

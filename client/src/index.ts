@@ -86,6 +86,7 @@ export class MercuriosClient {
         this._wsc.onclose = () => {
             this._listeners = {};
             this._queued = [];
+            this._wsc = undefined;
         };
 
         this._wsc.onerror = (err: any) => {
@@ -159,7 +160,8 @@ export class MercuriosClient {
 
     async subscribe<T = any>(
         topic: string,
-        handler: MercuriosEventHandler<T>
+        handler: MercuriosEventHandler<T>,
+        queue?: string
     ): Promise<void> {
         return new Promise(async (resolve, reject) => {
             try {
@@ -171,6 +173,7 @@ export class MercuriosClient {
                         JSON.stringify({
                             action: "subscribe",
                             topic,
+                            queue,
                         })
                     );
 
