@@ -88,32 +88,18 @@ export class WsConnection {
                             $logger.error(err);
                             throw err;
                         }
-
-                        $logger.debug(
-                            `wsc_${this.id} - event recieved - topic: ${msg.data.topic}`
-                        );
-
-                        let interval = setInterval(() => {
-                            $logger.debug(
-                                `wsc_${this.id} - waiting for buffer to be clear`
-                            );
-                            if (this.socket.bufferedAmount === 0) {
-                                this.socket.send(
-                                    $json.stringify(msg.data),
-                                    (err) => {
-                                        if (err) {
-                                            throw err;
-                                        }
-                                        clearInterval(interval);
-                                        resolve();
-                                    }
-                                );
+                        
+                        this.socket.send($json.stringify(msg.data), (err) => {
+                            if (err) {
+                                throw err;
                             }
-                        }, 50);
 
-                        $logger.debug(
-                            `wsc_${this.id} - event sent - topic: ${msg.data.topic}`
-                        );
+                            $logger.debug(
+                                `wsc_${this.id} - event sent - topic: ${msg.data.topic}`
+                            );
+
+                            resolve();
+                        });
                     });
                 },
                 {
