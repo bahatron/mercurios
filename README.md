@@ -1,6 +1,6 @@
 # Mercurious
 
-HTTP based event streaming
+HTTP based event sourcing
 
 ## Notes
 
