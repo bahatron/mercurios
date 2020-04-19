@@ -1,15 +1,15 @@
 import axios from "axios";
 import ws from "ws";
 
-export interface MercuriosEventHandler<T = any> {
-    (event: MercuriosEvent<T>): void;
+export interface MercuriosEventHandler {
+    (event: MercuriosEvent): void;
 }
 
-export interface MercuriosEvent<T = any> {
+export interface MercuriosEvent {
     topic: string;
     seq: number;
     published_at: string;
-    data: T;
+    data: any;
 }
 
 export interface PublishOptions {
@@ -110,10 +110,10 @@ export class MercuriosClient {
         this._wsc?.close();
     }
 
-    async publish<T = any>(
+    async publish(
         topic: string,
         options?: PublishOptions
-    ): Promise<MercuriosEvent<T>> {
+    ): Promise<MercuriosEvent> {
         let { data, expectedSeq, durable = true } = options ?? {};
         try {
             const response = await axios.post(
@@ -131,14 +131,11 @@ export class MercuriosClient {
 
             return response.data;
         } catch (err) {
-            throw err.response ? new Error(err.response.data) : err;
+            throw err;
         }
     }
 
-    async read<T = any>(
-        topic: string,
-        seq: number
-    ): Promise<MercuriosEvent<T> | null> {
+    async read(topic: string, seq: number): Promise<MercuriosEvent | null> {
         try {
             const response = await axios.get(
                 `${this._url}/stream/${topic}/${seq}`,
@@ -150,17 +147,22 @@ export class MercuriosClient {
             );
             return response.data;
         } catch (err) {
-            if (err.response?.status === 204) {
-                return null;
+            switch (err.response?.status) {
+                case 204:
+                    return null;
+                case 404:
+                    let error = new Error("stream does not exist");
+                    error.name = "NOSTREAM";
+                    throw error;
+                default:
+                    throw err;
             }
-
-            throw err.response ? new Error(err.response.data) : err;
         }
     }
 
     async subscribe<T = any>(
         topic: string,
-        handler: MercuriosEventHandler<T>,
+        handler: MercuriosEventHandler,
         queue?: string
     ): Promise<void> {
         return new Promise(async (resolve, reject) => {
