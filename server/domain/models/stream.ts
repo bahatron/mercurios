@@ -72,11 +72,11 @@ export class Stream {
         return $event({ topic: this.topic, seq, published_at, data });
     }
 
-    public async read(id: number): Promise<MercuriosEvent | undefined> {
+    public async read(id: number): Promise<MercuriosEvent | null> {
         let result = await $knex(this.table).where({ seq: id }).first();
 
         if (!result) {
-            return undefined;
+            return null;
         }
 
         let { seq, published_at, data } = result;
@@ -86,20 +86,6 @@ export class Stream {
 }
 
 const Repository = () => {
-    const _streams: Map<string, Stream> = new Map();
-
-    $nats.subscribe("mercurios_stream_deleted", (err, msg) => {
-        _streams.delete(msg.data);
-    });
-
-    $nats.subscribe("mercurios_stream_created", (err, msg) => {
-        let topic = msg.data;
-        _streams.set(
-            topic,
-            new Stream({ topic, table_name: streamTable(topic) })
-        );
-    });
-
     return {
         async create(topic: string): Promise<Stream> {
             let table_name = streamTable(topic);
@@ -129,14 +115,9 @@ const Repository = () => {
         },
 
         async fetch(topic: string): Promise<Stream | null> {
-            if (_streams.has(topic)) {
-                return _streams.get(topic) as Stream;
-            }
-
             let table_name = streamTable(topic);
             if (await $knex.schema.hasTable(table_name)) {
                 let stream = new Stream({ topic, table_name });
-                _streams.set(topic, stream);
 
                 return stream;
             }
@@ -146,8 +127,6 @@ const Repository = () => {
 
         async delete(topic: string): Promise<void> {
             await $knex.schema.dropTableIfExists(streamTable(topic));
-
-            _streams.delete(topic);
 
             await $nats.publish("mercurios_stream_deleted", topic);
         },

@@ -5,7 +5,7 @@ import $error from "../services/error";
 export default async function (
     topic: string,
     seq: number
-): Promise<MercuriosEvent | undefined> {
+): Promise<MercuriosEvent | null> {
     let stream = await $streams.fetch(topic);
 
     if (!stream) {
