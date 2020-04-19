@@ -1,4 +1,4 @@
-# Mercurious
+# Mercurios
 
 HTTP based event sourcing
 
