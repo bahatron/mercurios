@@ -1,8 +1,19 @@
-import express from "express";
-import asyncRoute from "./utils/async_route";
-import publish_event from "../domain/publish_event";
-import emit_event from "../domain/emit_event";
-import read_event from "../domain/read_event";
+import express, { Request, Response, RequestHandler } from "express";
+import publish_event from "../api/publish_event";
+import emit_event from "../api/emit_event";
+import read_event from "../api/read_event";
+
+function asyncRoute(
+    handler: (req: Request, res: Response) => void
+): RequestHandler {
+    return async (req, res, next) => {
+        try {
+            await handler(req, res);
+        } catch (err) {
+            next(err);
+        }
+    };
+}
 
 const router = express.Router();
 

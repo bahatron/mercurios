@@ -1,10 +1,10 @@
 import ws from "ws";
-import $logger from "../services/logger";
+import $logger from "../utils/logger";
 import { Client, Subscription } from "ts-nats";
-import $error from "../services/error";
-import $json from "../services/json";
+import $error from "../utils/error";
+import $json from "../utils/json";
 import { IncomingMessage } from "http";
-import $nats from "../services/nats";
+import $nats from "../utils/nats";
 import uuid from "uuid";
 import url from "url";
 

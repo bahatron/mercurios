@@ -29,6 +29,7 @@ notifications:
             - simonpiscitelli@gmail.com
         on_success: never # default: change
         on_failure: change # default: always
+
 env:
     global:
         - $BRANCH=${TRAVIS_BRANCH}

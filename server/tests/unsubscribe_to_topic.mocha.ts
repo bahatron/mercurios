@@ -1,7 +1,7 @@
 import $ws from "ws";
 import $env from "@bahatron/env";
 import $logger from "@bahatron/logger";
-import { publishEventEndpoint } from "../domain/publish_event.mocha";
+import { publishEventEndpoint } from "../api/publish_event.mocha";
 
 const TEST_URL = $env.get("TEST_URL");
 

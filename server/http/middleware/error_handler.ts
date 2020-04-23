@@ -1,7 +1,7 @@
 import { Response, Request, NextFunction } from "express";
-import { HttpError } from "../../services/error";
-import $logger from "../../services/logger";
-import $config from "../../services/config";
+import { HttpError } from "../../utils/error";
+import $logger from "../../utils/logger";
+import $config from "../../utils/config";
 
 export default function errorHandler(
     err: HttpError,

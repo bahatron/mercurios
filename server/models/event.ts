@@ -1,5 +1,5 @@
-import $json from "../../services/json";
-import $validator from "../../services/validator";
+import $json from "../utils/json";
+import $validator from "../utils/validator";
 
 export interface MercuriosEvent {
     seq?: number | null;

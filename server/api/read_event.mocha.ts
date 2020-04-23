@@ -3,7 +3,7 @@ import env from "@bahatron/env";
 import { expect } from "chai";
 import $logger from "@bahatron/logger";
 import { publishEventEndpoint } from "./publish_event.mocha";
-import $mysql from "../services/knex";
+import $mysql from "../utils/knex";
 
 const MERCURIOS_TEST_URL = env.get("TEST_URL");
 describe("Feature: read event", () => {

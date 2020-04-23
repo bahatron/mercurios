@@ -1,11 +1,11 @@
-import $knex from "../../services/knex";
-import $logger from "../../services/logger";
-import $nats from "../../services/nats";
-import $error from "../../services/error";
-import $json from "../../services/json";
+import $knex from "../utils/knex";
+import $logger from "../utils/logger";
+import $nats from "../utils/nats";
+import $error from "../utils/error";
+import $json from "../utils/json";
 import $moment from "moment";
 import $event, { MercuriosEvent } from "./event";
-import $validator from "../../services/validator";
+import $validator from "../utils/validator";
 
 export function streamTable(topic: string): string {
     return `stream_${topic}`;

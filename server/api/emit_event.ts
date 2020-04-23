@@ -1,7 +1,7 @@
-import $nats from "../services/nats";
-import $event from "./models/event";
+import $nats from "../utils/nats";
+import $event from "../models/event";
 import moment from "moment";
-import $logger from "../services/logger";
+import $logger from "../utils/logger";
 
 export default async function ({ topic, data }: { topic: string; data: any }) {
     await $nats.publish(

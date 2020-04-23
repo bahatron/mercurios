@@ -4,8 +4,8 @@
     "description": "an event stream server",
     "author": "simonpiscitelli@gmail.com",
     "scripts": {
-        "start": "wait-for-it ${MYSQL_HOST}:${MYSQL_PORT} -- pm2-runtime start process.config.js",
-        "dev": "NODE_ENV=dev npm run build:watch & npm start",
+        "start": "pm2-runtime start process.config.js",
+        "dev": "npm run build:watch & npm start",
         "test": "mocha 'dist/**/*.mocha.js' -t 5000",
         "test:benchmark": "node dist/tests/benchmark.js",
         "build": "tsc",

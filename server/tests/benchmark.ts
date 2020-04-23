@@ -1,7 +1,7 @@
 import autocannon, { Options, Result } from "autocannon";
 import $logger from "@bahatron/logger";
 import $env from "@bahatron/env";
-import $json from "../services/json";
+import $json from "../utils/json";
 import BIG_JSON from "./fixtures/big_json";
 
 const MERCURIOS_TEST_URL = $env.get("TEST_URL");

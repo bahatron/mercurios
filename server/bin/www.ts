@@ -1,9 +1,9 @@
 #!/usr/bin/node
 import http from "http";
 import expressApp from "../http/server";
-import $logger from "../services/logger";
+import $logger from "../utils/logger";
 import createWsServer from "../http/ws_server";
-import $config from "../services/config";
+import $config from "../utils/config";
 
 const PORT = parseInt($config.server_port);
 

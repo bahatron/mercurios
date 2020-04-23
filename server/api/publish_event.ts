@@ -1,7 +1,7 @@
-import $streams from "./models/stream";
-import $nats from "../services/nats";
-import $logger from "../services/logger";
-import { MercuriosEvent } from "./models/event";
+import $streams from "../models/stream";
+import $nats from "../utils/nats";
+import $logger from "../utils/logger";
+import { MercuriosEvent } from "../models/event";
 
 interface PublishPayload {
     data?: any;

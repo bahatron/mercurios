@@ -1,6 +1,6 @@
 import ws from "ws";
 import { Server } from "http";
-import $logger from "../services/logger";
+import $logger from "../utils/logger";
 import { WsConnection } from "./ws_connection";
 
 const _clients: Set<WsConnection> = new Set();

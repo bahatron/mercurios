@@ -1,8 +1,8 @@
 import $axios, { AxiosResponse } from "axios";
 import env from "@bahatron/env";
 import { expect } from "chai";
-import $event from "./models/event";
-import $nats from "../services/nats";
+import $event from "../models/event";
+import $nats from "../utils/nats";
 
 const MERCURIOS_TEST_URL = env.get("TEST_URL");
 

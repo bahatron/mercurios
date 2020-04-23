@@ -1,6 +1,6 @@
-import $streams from "./models/stream";
-import { MercuriosEvent } from "./models/event";
-import $error from "../services/error";
+import $streams from "../models/stream";
+import { MercuriosEvent } from "../models/event";
+import $error from "../utils/error";
 
 export default async function (
     topic: string,
