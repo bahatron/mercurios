@@ -2,11 +2,12 @@ version: "3.5"
 
 services:
     server:
-        image: bahatron/mercurios_http
+        image: mercurios_http
         depends_on:
             - mysql
             - nats
         env_file: .env.test
+        command: "wait-for-it mysql:3306 -- npm start"
 
     mysql:
         image: mysql:8

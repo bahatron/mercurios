@@ -20,7 +20,7 @@ services:
         build:
             context: .
             dockerfile: Dockerfile.server
-        image: bahatron/mercurios_http
+        image: mercurios_http
         volumes:
             - ./server:/app
         ports:
@@ -37,7 +37,7 @@ services:
         build:
             context: .
             dockerfile: Dockerfile.web
-        image: bahatron/mercurios_admin
+        image: mercurios_admin
         volumes:
             - ./web:/app
         command: npm run dev

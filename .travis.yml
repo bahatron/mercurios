@@ -32,4 +32,5 @@ notifications:
 
 env:
     global:
-        - $BRANCH=${TRAVIS_BRANCH}
+        - $_branch=${TRAVIS_BRANCH}
+        - $_tag=1

@@ -1,13 +1,15 @@
 #!/bin/sh
 
-docker-compose build || exit 1
-./test.sh || exit 1
+set -e
 
-if [ ${BRANCH:-local} = master ];
+docker-compose build
+./test.sh
+
+if [ ${_branch:-local} = master ];
 then
     echo "master branch, pushing to repo"
     docker login --username $DOCKER_USERNAME  --password $DOCKER_PASSWORD
-    docker push bahatron/mercurios_http
+    docker tag mercurios_http bahatron/mercurios_http:${_tag:-latest}
 else
     echo "no master, skipping push"
 fi
