@@ -15,9 +15,6 @@ HTTP based event sourcing
 # run server tests
 ./test.sh
 
-# setup dev environment
-./dev:setup.sh
-
 # start dev environment
 ./dev.sh
 ```
@@ -35,14 +32,11 @@ MYSQL_DATABASE=mercurios
 # nats config
 NATS_URL=nats://nats:4222
 
-# optional, production|any
-MERCURIOS_ENV=dev
+# optional, true|1|any
+MERCURIOS_DEBUG=1
 
 # optional, sets the amount of workers, default: "max"
 MERCURIOS_WORKERS=2
-
-# optional, sets the logger id
-MERCURIOS_LOGGER_ID=my_mercurios_instance
 
 # optional, server url for tests
 MERCURIOS_TEST_URL=http://localhost:3000
@@ -71,6 +65,10 @@ Publishes an event to the stream
         },
     });
     ```
+
+### `POST /emit/:topic`
+
+Emits an event without persisting it
 
 ### `GET /stream/:topic/:seq`
 
