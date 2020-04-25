@@ -4,9 +4,9 @@ import moment from "moment";
 import $logger from "../utils/logger";
 
 export default async function ({ topic, data }: { topic: string; data: any }) {
-    await $nats.publish(
-        `topic.${topic}`,
-        $event({ topic, published_at: moment().toISOString(), data })
-    );
+    let event = $event({ topic, published_at: moment().toISOString(), data });
+
+    await $nats.publish(`topic.${topic}`, event);
+
     $logger.debug(`event emitted - topic: ${topic}`);
 }

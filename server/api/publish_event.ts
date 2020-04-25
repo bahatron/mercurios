@@ -1,7 +1,8 @@
-import $streams from "../models/stream";
 import $nats from "../utils/nats";
 import $logger from "../utils/logger";
-import { MercuriosEvent } from "../models/event";
+import $event, { MercuriosEvent } from "../models/event";
+import moment from "moment";
+import $store from "../models/store";
 
 interface PublishPayload {
     data?: any;
@@ -14,13 +15,16 @@ export default async function ({
     expectedSeq,
     topic,
 }: PublishPayload): Promise<MercuriosEvent> {
-    let stream =
-        (await $streams.fetch(topic)) ?? (await $streams.create(topic));
+    /** @todo find a more elegant way than recreating or remapping the object */
+    let event = await $store.add(
+        $event({ topic, published_at: moment().toISOString(), data }),
+        expectedSeq
+    );
 
-    let event = await stream.append(data, expectedSeq);
     $logger.debug(`event persisted - topic: ${topic} - seq: ${event.seq}`);
 
-    await $nats.publish(`topic.${stream.topic}`, event);
+    await $nats.publish(`topic.${topic}`, event);
+
     $logger.debug(`event published - topic: ${event.topic}`);
 
     return event;
