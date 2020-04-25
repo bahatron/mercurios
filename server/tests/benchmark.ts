@@ -7,6 +7,8 @@ import BIG_JSON from "./fixtures/big_json";
 const MERCURIOS_TEST_URL = $env.get("TEST_URL");
 const _topic = "benchmark_test";
 
+let _duration = parseInt(process.argv[2]) ?? 30;
+
 function breakdown(result: Result) {
     let {
         requests,
@@ -22,16 +24,15 @@ function breakdown(result: Result) {
     } = result;
 
     $logger.info(result.title || "");
+
     $logger.inspect({
         connections,
         pipelining,
         requests: {
-            average: requests.average,
             mean: requests.mean,
             stddev: requests.stddev,
             min: requests.min,
             max: requests.max,
-            sent: requests.sent,
             total: requests.total,
             p99: requests.p99,
         },
@@ -45,7 +46,6 @@ function breakdown(result: Result) {
             p99: latency.p99,
         },
         throughput: {
-            average: throughput.average,
             mean: throughput.mean,
             stddev: throughput.stddev,
             max: throughput.max,
@@ -67,7 +67,7 @@ async function pingBench() {
             title: "ping benchmark",
             connections: 100,
             pipelining: 10,
-            duration: 30,
+            duration: _duration,
             url: `${MERCURIOS_TEST_URL}/ping`,
         })
     );
@@ -79,7 +79,7 @@ async function writeBench() {
             title: `no data write benchmark`,
             connections: 100,
             pipelining: 10,
-            duration: 30,
+            duration: _duration,
             url: `${MERCURIOS_TEST_URL}/stream/${_topic}`,
             method: "POST",
         })
@@ -94,7 +94,7 @@ async function dataWriteBench() {
             title: `big json write benchmark`,
             connections: 100,
             pipelining: 10,
-            duration: 30,
+            duration: _duration,
             url: `${MERCURIOS_TEST_URL}/stream/${_topic}`,
             method: "POST",
             body: bigJson,
@@ -108,7 +108,7 @@ async function readBench() {
             title: "read benchmark",
             connections: 100,
             pipelining: 10,
-            duration: 30,
+            duration: _duration,
             url: `${MERCURIOS_TEST_URL}/stream/${_topic}/1`,
         })
     );
