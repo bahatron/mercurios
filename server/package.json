@@ -4,7 +4,8 @@
     "description": "an event stream server",
     "author": "simonpiscitelli@gmail.com",
     "scripts": {
-        "start": "pm2-runtime start process.config.js",
+        "start": "npm run migrate && pm2-runtime start process.config.js",
+        "migrate": "node dist/bin/migrate",
         "dev": "npm run build:watch & npm start",
         "test": "mocha 'dist/**/*.mocha.js' -t 5000",
         "test:benchmark": "node dist/tests/benchmark.js",

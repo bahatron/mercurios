@@ -1,5 +1,6 @@
 import knex, { Config } from "knex";
 import $config from "./config";
+import $path from "path";
 
 const config: Config = {
     client: "mysql2",
@@ -12,6 +13,8 @@ const config: Config = {
     },
     migrations: {
         tableName: "mercurios_migrations",
+        directory: $path.resolve(__dirname, "../migrations"),
+        extension: "ts",
     },
 };
 
