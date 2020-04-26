@@ -3,7 +3,7 @@ import env from "@bahatron/env";
 import { expect } from "chai";
 import $logger from "@bahatron/logger";
 import { publishEventEndpoint } from "./publish_event.mocha";
-import $mysql from "../utils/knex";
+import $store from "../services/store";
 
 const MERCURIOS_TEST_URL = env.get("TEST_URL");
 describe("Feature: read event", () => {
@@ -13,8 +13,8 @@ describe("Feature: read event", () => {
 
     describe("Scenario: topic does not exist", () => {
         it("responds with http 404", async () => {
-            return new Promise(async resolve => {
-                readEvent(`non_existant_topic`, 2).catch(err => {
+            return new Promise(async (resolve) => {
+                readEvent(`non_existant_topic`, 2).catch((err) => {
                     resolve(expect(err.response.status).to.eq(404));
                 });
             });
@@ -27,9 +27,7 @@ describe("Feature: read event", () => {
 
         before(async () => {
             try {
-                if (await $mysql.schema.hasTable(`stream_${_topic}`)) {
-                    await $mysql(`stream_${_topic}`).truncate();
-                }
+                await $store.deleteStream(_topic);
 
                 await publishEventEndpoint(_topic, "hello", 1);
                 _response = await readEvent(_topic, 2);

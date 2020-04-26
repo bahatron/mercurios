@@ -2,8 +2,8 @@ import $axios from "axios";
 import env from "@bahatron/env";
 import { expect } from "chai";
 import $logger from "@bahatron/logger";
-import $mysql from "../utils/knex";
 import $nats from "../utils/nats";
+import $store from "../services/store";
 
 const MERCURIOS_TEST_URL = env.get("TEST_URL");
 
@@ -22,7 +22,7 @@ describe("Feature: publish event", () => {
     describe("Scenario: publish to unexistant stream", () => {
         const _topic = `publish_event_test`;
 
-        it("creates a record on the stream table", async () => {
+        it("creates a record on the store", async () => {
             try {
                 let payload = {
                     foo: "bar",
@@ -30,13 +30,9 @@ describe("Feature: publish event", () => {
 
                 let event = await publishEventEndpoint(_topic, payload);
 
-                let result = await $mysql(`stream_${_topic}`)
-                    .where({
-                        seq: event.data.seq,
-                    })
-                    .first();
+                let result = await $store.fetch(_topic, event.data.seq);
 
-                expect(result).not.to.be.undefined;
+                expect(result).to.exist;
             } catch (err) {
                 $logger.error(err);
                 throw err;
@@ -61,9 +57,7 @@ describe("Feature: publish event", () => {
 
         before(async () => {
             try {
-                if (await $mysql.schema.hasTable(`stream_${_topic}`)) {
-                    await $mysql(`stream_${_topic}`).truncate();
-                }
+                await $store.deleteStream(_topic);
 
                 await Promise.all(
                     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((val) => {

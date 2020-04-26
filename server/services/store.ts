@@ -1,16 +1,17 @@
-import $event, { MercuriosEvent } from "./event";
+import $event, { MercuriosEvent } from "../models/event";
 import $knex from "../utils/knex";
 import $logger from "../utils/logger";
 import $json from "../utils/json";
 import $error from "../utils/error";
+import $nats from "../utils/nats";
 
 const TOPIC_COLLECTION = "mercurios_topics";
+const TABLE = (topic: string): string => `stream_${topic}`;
 
 const _topics: Set<string> = new Set();
-
-function tableName(topic: string): string {
-    return `stream_${topic}`;
-}
+$nats.subscribe("mercurios_stream_deleted", (err, msg) => {
+    _topics.delete(msg.data.toString());
+});
 
 async function transaction({
     expectedSeq,
@@ -23,7 +24,7 @@ async function transaction({
     published_at: string;
     data: any;
 }): Promise<MercuriosEvent> {
-    let table = tableName(topic);
+    let table = TABLE(topic);
     try {
         return await $knex.transaction(async (_trx) => {
             let seq = (
@@ -58,7 +59,7 @@ async function insert({
     published_at,
     data,
 }: MercuriosEvent): Promise<MercuriosEvent> {
-    let table = tableName(topic);
+    let table = TABLE(topic);
 
     let seq = (
         await $knex(table).insert({
@@ -89,7 +90,6 @@ async function initTopic(topic: string): Promise<void> {
 
         return;
     } catch (err) {
-        $logger.warning(`${err.message} - ${err.code}`);
         if (err.code === "ER_DUP_ENTRY") {
             return;
         }
@@ -112,14 +112,24 @@ const $store = {
     }): Promise<MercuriosEvent> {
         await initTopic(topic);
 
-        return expectedSeq
-            ? await transaction({ expectedSeq, topic, published_at, data })
-            : await insert({ topic, published_at, data });
+        try {
+            return expectedSeq
+                ? await transaction({ expectedSeq, topic, published_at, data })
+                : await insert({ topic, published_at, data });
+        } catch (err) {
+            if (err.code === "ER_NO_SUCH_TABLE") {
+                _topics.delete(topic);
+
+                return $store.add({ topic, published_at, data, expectedSeq });
+            }
+
+            throw err;
+        }
     },
 
     async fetch(topic: string, seq: number): Promise<MercuriosEvent | null> {
         try {
-            let result = await $knex(tableName(topic))
+            let result = await $knex(TABLE(topic))
                 .where({
                     seq,
                 })
@@ -143,6 +153,17 @@ const $store = {
             }
 
             throw err;
+        }
+    },
+
+    async deleteStream(topic: string) {
+        if (await $knex(TOPIC_COLLECTION).where({ topic }).first()) {
+            await $knex(TOPIC_COLLECTION).where({ topic }).delete();
+            await $knex.schema.dropTable(TABLE(topic));
+
+            await $nats.publish(`mercurios_stream_deleted`, topic);
+
+            _topics.delete(topic);
         }
     },
 };

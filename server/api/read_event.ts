@@ -1,5 +1,5 @@
 import { MercuriosEvent } from "../models/event";
-import $store from "../models/store";
+import $store from "../services/store";
 import $logger from "../utils/logger";
 
 export default async function (
