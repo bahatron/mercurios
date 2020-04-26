@@ -11,10 +11,10 @@ export default function errorHandler(
 ) {
     let code = err.httpCode || 500;
 
-    $logger.debug(`http server - ${err.message}`, err.context);
-
     if (code >= 500) {
         $logger.error(err);
+    } else {
+        $logger.debug(err.message);
     }
 
     return res.status(code).json($config.dev_mode ? err : err.message);

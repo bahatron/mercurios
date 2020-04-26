@@ -2,23 +2,23 @@ import $error from "./error";
 import moment = require("moment");
 
 const $validator = {
-    string(val: any): string {
-        if (!val) {
-            throw $error.ValidationFailed(
-                `validation failed - not valid string: ${val}`
+    string(val: any, message?: string): string {
+        if (typeof val !== "string") {
+            throw new Error(
+                message || `validation failed - not valid string: ${val}`
             );
         }
-        return val.toString();
+        return val;
     },
 
     nullableString(val: any): string | null {
-        return val.toString() || null;
+        return typeof val === "string" ? val : null;
     },
 
-    int(val: any): number {
+    int(val: any, message?: string): number {
         if (isNaN(parseInt(val))) {
-            throw $error.ValidationFailed(
-                `validation failed - not a number: ${val}`
+            throw new Error(
+                message || `validation failed - not a number: ${val}`
             );
         }
 
@@ -33,10 +33,10 @@ const $validator = {
         return parseInt(val);
     },
 
-    float(val: any): number {
+    float(val: any, message?: string): number {
         if (isNaN(parseFloat(val))) {
-            throw $error.ValidationFailed(
-                `validation failed - not a number: ${val}`
+            throw new Error(
+                message || `validation failed - not a number: ${val}`
             );
         }
 
@@ -51,9 +51,9 @@ const $validator = {
         return parseFloat(val);
     },
 
-    isoDate(val: any, format?: string): string {
-        if (!val || !moment(val, format).isValid()) {
-            throw $error.ValidationFailed(`${val} not a valid date string`);
+    isoDate(val: any, message?: string): string {
+        if (!val || !moment(val).isValid()) {
+            throw new Error(message || `${val} not a valid date string`);
         }
 
         return moment(val).toISOString();

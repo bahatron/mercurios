@@ -21,6 +21,7 @@ function breakdown(result: Result) {
         finish,
         connections,
         pipelining,
+        non2xx,
     } = result;
 
     $logger.info(result.title || "");
@@ -57,6 +58,7 @@ function breakdown(result: Result) {
         finish,
         duration,
         errors,
+        non2xx,
         timeouts,
     });
 }
@@ -115,7 +117,7 @@ async function readBench() {
 }
 
 async function main() {
-    await pingBench();
+    // await pingBench();
     await writeBench();
     await dataWriteBench();
     await readBench();

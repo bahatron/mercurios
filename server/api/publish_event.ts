@@ -3,6 +3,7 @@ import $logger from "../utils/logger";
 import $event, { MercuriosEvent } from "../models/event";
 import moment from "moment";
 import $store from "../models/store";
+import $validator from "../utils/validator";
 
 interface PublishPayload {
     data?: any;
@@ -15,11 +16,12 @@ export default async function ({
     expectedSeq,
     topic,
 }: PublishPayload): Promise<MercuriosEvent> {
-    /** @todo find a more elegant way than recreating or remapping the object */
-    let event = await $store.add(
-        $event({ topic, published_at: moment().toISOString(), data }),
-        expectedSeq
-    );
+    let event = await $store.add({
+        published_at: moment().toISOString(),
+        expectedSeq,
+        topic,
+        data,
+    });
 
     $logger.debug(`event persisted - topic: ${topic} - seq: ${event.seq}`);
 

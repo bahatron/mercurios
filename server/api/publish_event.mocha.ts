@@ -56,31 +56,6 @@ describe("Feature: publish event", () => {
         });
     });
 
-    describe(`Scenario: stringified request payload`, () => {
-        const _stream = "publish_double_stringified_test";
-
-        it("level 1", async () => {
-            await publishEventEndpoint(_stream, {
-                data: JSON.stringify({ foo: "sanchez" }),
-            });
-        });
-
-        it("level 2", async () => {
-            await publishEventEndpoint(_stream, {
-                data: JSON.stringify(JSON.stringify({ foo: "sanchez" })),
-            });
-        });
-
-        it("level 3", async () => {
-            await publishEventEndpoint(
-                _stream,
-                JSON.stringify({
-                    data: JSON.stringify(JSON.stringify({ foo: "sanchez" })),
-                })
-            );
-        });
-    });
-
     describe(`Scenario: using expected seq`, () => {
         let _topic = `publish_with_expected_seq_test`;
 

@@ -35,7 +35,7 @@ describe("Feature: emit event", () => {
 
         it("emits a MercuriosEvent", async () => {
             expect(_message).to.exist;
-            expect($event(_message)).to.deep.eq(_message);
+            expect(() => $event(_message)).not.to.throw();
         });
     });
 });

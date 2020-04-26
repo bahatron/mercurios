@@ -6,7 +6,7 @@
     "scripts": {
         "start": "npm run migrate && pm2-runtime start process.config.js",
         "migrate": "node dist/bin/migrate",
-        "dev": "npm run build:watch & npm start",
+        "dev": "npm run build:watch & npm start -- --no-auto-exit",
         "test": "mocha 'dist/**/*.mocha.js' -t 5000",
         "test:benchmark": "node dist/tests/benchmark.js",
         "build": "tsc",

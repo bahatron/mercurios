@@ -11,11 +11,18 @@ const _topics: Set<string> = new Set();
 function tableName(topic: string): string {
     return `stream_${topic}`;
 }
-async function transaction(
-    event: MercuriosEvent,
-    expectedSeq: number
-): Promise<number> {
-    let { published_at, data, topic } = event;
+
+async function transaction({
+    expectedSeq,
+    topic,
+    published_at,
+    data,
+}: {
+    expectedSeq: number;
+    topic: string;
+    published_at: string;
+    data: any;
+}): Promise<MercuriosEvent> {
     let table = tableName(topic);
     try {
         return await $knex.transaction(async (_trx) => {
@@ -36,7 +43,7 @@ async function transaction(
                 );
             }
 
-            return seq;
+            return $event({ topic, published_at, seq, data });
         });
     } catch (err) {
         if (err.name === "ExpectationFailed") {
@@ -46,52 +53,68 @@ async function transaction(
     }
 }
 
-async function insert(event: MercuriosEvent): Promise<number> {
-    let { topic, published_at, data } = event;
+async function insert({
+    topic,
+    published_at,
+    data,
+}: MercuriosEvent): Promise<MercuriosEvent> {
     let table = tableName(topic);
 
-    return await $knex(table).insert({
-        published_at,
-        data: $json.stringify(data),
-    });
+    let seq = (
+        await $knex(table).insert({
+            published_at,
+            data: $json.stringify(data),
+        })
+    ).shift();
+
+    return $event({ topic, seq, published_at, data });
 }
 
-async function fetchOrCreateTopic(topic: string): Promise<void> {
-    if (_topics.has(topic)) {
+async function initTopic(topic: string): Promise<void> {
+    try {
+        if (_topics.has(topic)) {
+            return;
+        }
+
+        let record = await $knex(TOPIC_COLLECTION).where({ topic }).first();
+
+        if (!record) {
+            await $knex(TOPIC_COLLECTION).insert({ topic });
+            await $knex.schema.createTable(`stream_${topic}`, (table) => {
+                table.increments("seq").primary();
+                table.string("published_at");
+                table.text("data", "longtext");
+            });
+        }
+
         return;
+    } catch (err) {
+        $logger.warning(`${err.message} - ${err.code}`);
+        if (err.code === "ER_DUP_ENTRY") {
+            return;
+        }
+
+        throw err;
     }
-
-    let record = await $knex(TOPIC_COLLECTION).where({ topic }).first();
-
-    if (!record) {
-        await $knex(TOPIC_COLLECTION).insert({ topic });
-        await $knex.schema.createTable(`stream_${topic}`, (table) => {
-            table.increments("seq").primary();
-            table.string("published_at");
-            table.text("data", "longtext");
-        });
-    }
-
-    return;
 }
 
 const $store = {
-    async add(
-        event: MercuriosEvent,
-        expectedSeq?: number
-    ): Promise<MercuriosEvent> {
-        await fetchOrCreateTopic(event.topic);
+    async add({
+        topic,
+        published_at,
+        data,
+        expectedSeq,
+    }: {
+        topic: string;
+        published_at: string;
+        data: any;
+        expectedSeq?: number;
+    }): Promise<MercuriosEvent> {
+        await initTopic(topic);
 
-        let seq = expectedSeq
-            ? await transaction(event, expectedSeq)
-            : await insert(event);
-
-        return $event({
-            seq,
-            data: event.data,
-            topic: event.topic,
-            published_at: event.published_at,
-        });
+        return expectedSeq
+            ? await transaction({ expectedSeq, topic, published_at, data })
+            : await insert({ topic, published_at, data });
     },
 
     async fetch(topic: string, seq: number): Promise<MercuriosEvent | null> {
