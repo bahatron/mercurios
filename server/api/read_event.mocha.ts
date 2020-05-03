@@ -3,21 +3,30 @@ import env from "@bahatron/env";
 import { expect } from "chai";
 import $logger from "@bahatron/logger";
 import { publishEventEndpoint } from "./publish_event.mocha";
-import $store from "../services/store";
+import $store from "../models/store";
 
 const MERCURIOS_TEST_URL = env.get("TEST_URL");
+
 describe("Feature: read event", () => {
-    async function readEvent(topic: string, id: number) {
-        return $axios.get(`${MERCURIOS_TEST_URL}/publish/${topic}/${id}`);
+    async function readEvent(
+        topic: string,
+        id: number
+    ): Promise<AxiosResponse> {
+        return $axios
+            .get(`${MERCURIOS_TEST_URL}/read/${topic}/${id}`)
+            .catch((err) => err.response);
     }
 
     describe("Scenario: topic does not exist", () => {
+        const _topic = `non_existent_topic`;
+        before(async () => {
+            await $store.deleteStream(_topic);
+        });
+
         it("responds with http 404", async () => {
-            return new Promise(async (resolve) => {
-                readEvent(`non_existant_topic`, 2).catch((err) => {
-                    resolve(expect(err.response.status).to.eq(404));
-                });
-            });
+            let response = await readEvent(_topic, 2);
+
+            expect(response.status).to.eq(404);
         });
     });
 

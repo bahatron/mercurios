@@ -1,4 +1,6 @@
-type HttpCode = 400 | 401 | 403 | 404 | 409 | 417 | 500;
+import { ErrorCode } from "ts-nats";
+
+type HttpCode = 400 | 401 | 403 | 404 | 409 | 417 | 500 | 501;
 type Context = Record<string, any>;
 
 class HttpError extends Error {
@@ -14,7 +16,7 @@ class HttpError extends Error {
 
 const $error = {
     InternalError(
-        message: string = "Interal Error",
+        message: string = "Internal Error",
         context?: Context
     ): HttpError {
         return new HttpError("InternalError", message, 500, context);
@@ -54,6 +56,13 @@ const $error = {
         context?: Context
     ): HttpError {
         return new HttpError("ExpectationFailed", message, 417, context);
+    },
+
+    NotImplemented(
+        message: string = "Not Implemented",
+        context?: Context
+    ): HttpError {
+        return new HttpError("NotImplemented", message, 501, context);
     },
 
     Error(message: string, httpCode: HttpCode, context?: Context): HttpError {

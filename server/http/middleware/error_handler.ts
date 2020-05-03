@@ -1,7 +1,6 @@
 import { Response, Request, NextFunction } from "express";
 import { HttpError } from "../../utils/error";
 import $logger from "../../utils/logger";
-import $config from "../../utils/config";
 
 export default function errorHandler(
     err: HttpError,
@@ -14,8 +13,10 @@ export default function errorHandler(
     if (code >= 500) {
         $logger.error(err);
     } else {
-        $logger.debug(err.message);
+        $logger.warning(err.message, err);
     }
 
-    return res.status(code).json($config.dev_mode ? err : err.message);
+    return res
+        .status(code)
+        .json({ message: err.message, context: err.context });
 }

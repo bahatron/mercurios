@@ -2,6 +2,7 @@ import express, { Request, Response, RequestHandler } from "express";
 import publish_event from "../api/publish_event";
 import emit_event from "../api/emit_event";
 import read_event from "../api/read_event";
+import $logger from "../utils/logger";
 
 function asyncRoute(
     handler: (req: Request, res: Response) => void
@@ -47,6 +48,8 @@ router.get(
             req.params.topic,
             parseInt(req.params.seq)
         );
+
+        $logger.debug(`got event from store`, event);
 
         if (!event) {
             return res.status(204).json();
