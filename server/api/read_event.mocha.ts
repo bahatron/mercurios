@@ -8,7 +8,7 @@ import $store from "../models/store";
 const MERCURIOS_TEST_URL = env.get("TEST_URL");
 describe("Feature: read event", () => {
     async function readEvent(topic: string, id: number) {
-        return $axios.get(`${MERCURIOS_TEST_URL}/stream/${topic}/${id}`);
+        return $axios.get(`${MERCURIOS_TEST_URL}/publish/${topic}/${id}`);
     }
 
     describe("Scenario: topic does not exist", () => {

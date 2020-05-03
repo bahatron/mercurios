@@ -20,7 +20,7 @@ const router = express.Router();
 router.get("/ping", (req, res) => res.json("pong"));
 
 router.post(
-    "/stream/:topic",
+    "/publish/:topic",
     asyncRoute(async (req, res) => {
         return res.status(201).json(
             await publish_event({
@@ -41,7 +41,7 @@ router.post(
 );
 
 router.get(
-    "/stream/:topic/:seq",
+    "/publish/:topic/:seq",
     asyncRoute(async (req, res) => {
         let event = await read_event(
             req.params.topic,

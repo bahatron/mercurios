@@ -78,7 +78,7 @@ async function writeBench() {
             connections: 100,
             pipelining: 10,
             duration: _duration,
-            url: `${MERCURIOS_TEST_URL}/stream/${_topic}`,
+            url: `${MERCURIOS_TEST_URL}/publish/${_topic}`,
             method: "POST",
         })
     );
@@ -93,7 +93,7 @@ async function dataWriteBench() {
             connections: 100,
             pipelining: 10,
             duration: _duration,
-            url: `${MERCURIOS_TEST_URL}/stream/${_topic}`,
+            url: `${MERCURIOS_TEST_URL}/publish/${_topic}`,
             headers: {
                 "Content-Type": "application/json",
             },
@@ -110,7 +110,7 @@ async function readBench() {
             connections: 100,
             pipelining: 10,
             duration: _duration,
-            url: `${MERCURIOS_TEST_URL}/stream/${_topic}/1`,
+            url: `${MERCURIOS_TEST_URL}/publish/${_topic}/1`,
         })
     );
 }
@@ -120,7 +120,7 @@ async function competingWrites() {
         autocannon({
             duration: _duration,
             title: "competing expected",
-            url: `${MERCURIOS_TEST_URL}/stream/${_topic}`,
+            url: `${MERCURIOS_TEST_URL}/publish/${_topic}`,
             method: "POST",
             connections: 100,
             pipelining: 10,
@@ -132,7 +132,7 @@ async function competingWrites() {
         autocannon({
             duration: _duration,
             title: "competing expected without expected seq",
-            url: `${MERCURIOS_TEST_URL}/stream/${_topic}`,
+            url: `${MERCURIOS_TEST_URL}/publish/${_topic}`,
             method: "POST",
             connections: 100,
             pipelining: 10,

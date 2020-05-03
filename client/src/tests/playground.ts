@@ -1,4 +1,4 @@
-import mercurios, { PublishOptions } from "./index";
+import mercurios, { PublishOptions } from "../index";
 
 let client = mercurios.connect({ url: "http://server:4254", id: "playground" });
 

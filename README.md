@@ -44,7 +44,7 @@ MERCURIOS_TEST_URL=http://localhost:3000
 
 ## API
 
-### `POST /stream/:topic`
+### `POST /publish/:topic`
 
 Publishes an event to the stream
 
@@ -59,7 +59,7 @@ Publishes an event to the stream
 
 -   **Example**:
     ```ts
-    axios.post<Event>(`${API_URL}/stream/my_topic`, {
+    axios.post<Event>(`${API_URL}/publish/my_topic`, {
         data: {
             foo: "bar",
         },
@@ -70,7 +70,7 @@ Publishes an event to the stream
 
 Emits an event without persisting it
 
-### `GET /stream/:topic/:seq`
+### `GET /publish/:topic/:seq`
 
 Read event
 
@@ -81,7 +81,7 @@ Read event
 
 -   **Example**:
     ```ts
-    axios.get<Event>(`${API_URL}/stream/my_topic/2`);
+    axios.get<Event>(`${API_URL}/publish/my_topic/2`);
     ```
 
 ### `GET /ping`

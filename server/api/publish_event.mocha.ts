@@ -12,7 +12,7 @@ export async function publishEventEndpoint(
     data?: any,
     expectedSeq?: number
 ) {
-    return $axios.post(`${MERCURIOS_TEST_URL}/stream/${topic}`, {
+    return $axios.post(`${MERCURIOS_TEST_URL}/publish/${topic}`, {
         data,
         expectedSeq,
     });
