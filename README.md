@@ -70,7 +70,7 @@ Publishes an event to the stream
 
 Emits an event without persisting it
 
-### `GET /publish/:topic/:seq`
+### `GET /read/:topic/:seq`
 
 Read event
 
@@ -81,7 +81,7 @@ Read event
 
 -   **Example**:
     ```ts
-    axios.get<Event>(`${API_URL}/publish/my_topic/2`);
+    axios.get<Event>(`${API_URL}/read/my_topic/2`);
     ```
 
 ### `GET /ping`
