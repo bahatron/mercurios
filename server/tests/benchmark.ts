@@ -1,4 +1,5 @@
 import autocannon, { Options, Result } from "autocannon";
+import yargs from "yargs";
 import $logger from "@bahatron/logger";
 import $env from "@bahatron/env";
 import $json from "../utils/json";
@@ -7,10 +8,12 @@ import BIG_JSON from "./fixtures/big_json";
 const MERCURIOS_TEST_URL = $env.get("TEST_URL");
 const _topic = "benchmark_test";
 
-let _duration = parseInt(process.argv[2]) ?? 30;
+$logger.inspect(yargs.argv);
+let _duration = parseInt(yargs.argv.d as string) || 30;
 
 function breakdown(result: Result) {
     let {
+        title,
         requests,
         latency,
         throughput,
@@ -24,35 +27,28 @@ function breakdown(result: Result) {
         non2xx,
     } = result;
 
-    $logger.info(result.title || "");
+    $logger.info(`${title}`);
 
     $logger.inspect({
         connections,
         pipelining,
+        title,
         requests: {
             mean: requests.mean,
             stddev: requests.stddev,
-            min: requests.min,
-            max: requests.max,
             total: requests.total,
             p99: requests.p99,
         },
 
         latency: {
-            average: latency.average,
             mean: latency.mean,
             stddev: latency.stddev,
-            min: latency.min,
             max: latency.max,
             p99: latency.p99,
         },
         throughput: {
             mean: throughput.mean,
             stddev: throughput.stddev,
-            max: throughput.max,
-            min: throughput.min,
-            total: throughput.total,
-            p99: throughput.p99,
         },
         start,
         finish,
@@ -93,11 +89,14 @@ async function dataWriteBench() {
 
     breakdown(
         await autocannon({
-            title: `big json write benchmark`,
+            title: "big json write benchmark",
             connections: 100,
             pipelining: 10,
             duration: _duration,
             url: `${MERCURIOS_TEST_URL}/stream/${_topic}`,
+            headers: {
+                "Content-Type": "application/json",
+            },
             method: "POST",
             body: bigJson,
         })
@@ -116,11 +115,51 @@ async function readBench() {
     );
 }
 
+async function competingWrites() {
+    await Promise.all([
+        autocannon({
+            duration: _duration,
+            title: "competing expected",
+            url: `${MERCURIOS_TEST_URL}/stream/${_topic}`,
+            method: "POST",
+            connections: 100,
+            pipelining: 10,
+            body: $json.stringify({ expectedSeq: 1 }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }),
+        autocannon({
+            duration: _duration,
+            title: "competing expected without expected seq",
+            url: `${MERCURIOS_TEST_URL}/stream/${_topic}`,
+            method: "POST",
+            connections: 100,
+            pipelining: 10,
+        }),
+    ]).then((results) => results.map(breakdown));
+}
+
 async function main() {
-    // await pingBench();
-    await writeBench();
-    await dataWriteBench();
-    await readBench();
+    if (yargs.argv.write === true) {
+        await writeBench();
+    }
+
+    if (yargs.argv.json === true) {
+        await dataWriteBench();
+    }
+
+    if (yargs.argv.read === true) {
+        await readBench();
+    }
+
+    if (yargs.argv.ping === true) {
+        await pingBench();
+    }
+
+    if (yargs.argv.competing === true) {
+        await competingWrites();
+    }
 }
 
 main()
