@@ -10,6 +10,9 @@ services:
             MYSQL_ROOT_PASSWORD: secret
             MYSQL_DATABASE: mercurios
 
+    redis:
+        image: redis:5
+
     nats:
         image: nats
         command: ["-V"]
