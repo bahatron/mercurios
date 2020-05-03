@@ -2,7 +2,7 @@ import $nats from "../utils/nats";
 import $logger from "../utils/logger";
 import $event, { MercuriosEvent } from "../models/event";
 import moment from "moment";
-import $store from "../services/store";
+import $store from "../models/store";
 import $validator from "../utils/validator";
 
 interface PublishPayload {

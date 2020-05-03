@@ -3,7 +3,7 @@ import env from "@bahatron/env";
 import { expect } from "chai";
 import $logger from "@bahatron/logger";
 import $nats from "../utils/nats";
-import $store from "../services/store";
+import $store from "../models/store";
 
 const MERCURIOS_TEST_URL = env.get("TEST_URL");
 
@@ -18,9 +18,13 @@ export async function publishEventEndpoint(
     });
 }
 
-describe("Feature: publish event", () => {
-    describe("Scenario: publish to unexistant stream", () => {
+describe.only("Feature: publish event", () => {
+    describe("Scenario: publish to non existent stream", () => {
         const _topic = `publish_event_test`;
+
+        before(async () => {
+            await $store.deleteStream(_topic);
+        });
 
         it("creates a record on the store", async () => {
             try {
@@ -28,9 +32,9 @@ describe("Feature: publish event", () => {
                     foo: "bar",
                 };
 
-                let event = await publishEventEndpoint(_topic, payload);
+                let response = await publishEventEndpoint(_topic, payload);
 
-                let result = await $store.fetch(_topic, event.data.seq);
+                let result = await $store.fetch(_topic, response.data.seq);
 
                 expect(result).to.exist;
             } catch (err) {

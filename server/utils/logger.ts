@@ -11,4 +11,11 @@ const $logger: Logger = createLogger({
         : (params) => $json.stringify(params),
 });
 
+$logger.on("debug", (payload) => {
+    if ($config.dev_mode && payload.context !== undefined) {
+        // $logger.inspect(payload);
+        $logger.inspect(payload.context);
+    }
+});
+
 export default $logger;
