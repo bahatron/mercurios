@@ -8,7 +8,7 @@
         "prepublishOnly": "npm run build && npm run test",
         "dev": "npm run build -- --watch",
         "build": "rm -rf dist && tsc",
-        "playground": "node dist/playground.js",
+        "playground": "node dist/tests/playground.js",
         "test": "echo \"Error: no test specified\""
     },
     "author": "simonpiscitelli@gmail.com",

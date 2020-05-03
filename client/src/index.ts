@@ -15,8 +15,6 @@ export interface MercuriosEvent {
 export interface PublishOptions {
     data?: any;
     expectedSeq?: number;
-    /** @default true */
-    durable?: boolean;
 }
 
 export class MercuriosClient {
@@ -29,7 +27,7 @@ export class MercuriosClient {
         private readonly _id?: string
     ) {}
 
-    private emit(topic: string, event: MercuriosEvent) {
+    private _emit(topic: string, event: MercuriosEvent) {
         if (!this._listeners[topic]) {
             return;
         }
@@ -100,7 +98,7 @@ export class MercuriosClient {
                 (msg.data ?? msg).toString()
             );
 
-            this.emit(event.topic, event);
+            this._emit(event.topic, event);
         };
 
         return this._wsc;
@@ -114,10 +112,10 @@ export class MercuriosClient {
         topic: string,
         options?: PublishOptions
     ): Promise<MercuriosEvent> {
-        let { data, expectedSeq, durable = true } = options ?? {};
+        let { data, expectedSeq } = options ?? {};
         try {
             const response = await axios.post(
-                `${this._url}/${durable ? "stream" : "emit"}/${topic}`,
+                `${this._url}/publish/${topic}`,
                 {
                     data,
                     expectedSeq,
@@ -135,10 +133,34 @@ export class MercuriosClient {
         }
     }
 
+    async emit(
+        topic: string,
+        options?: PublishOptions
+    ): Promise<MercuriosEvent> {
+        let { data } = options ?? {};
+        try {
+            const response = await axios.post(
+                `${this._url}/emit/${topic}`,
+                {
+                    data,
+                },
+                {
+                    headers: {
+                        "Access-Control-Allow-Origin": "*",
+                    },
+                }
+            );
+
+            return response.data;
+        } catch (err) {
+            throw err;
+        }
+    }
+
     async read(topic: string, seq: number): Promise<MercuriosEvent | null> {
         try {
             const response = await axios.get(
-                `${this._url}/stream/${topic}/${seq}`,
+                `${this._url}/publish/${topic}/${seq}`,
                 {
                     headers: {
                         "Access-Control-Allow-Origin": "*",
