@@ -15,6 +15,7 @@ const $config = new Proxy(
         mysql_user: $env.get("MYSQL_USER"),
         mysql_password: $env.get("MYSQL_PASSWORD"),
         mysql_database: $env.get("MYSQL_DATABASE"),
+        store_driver: $env.get("MERCURIOS_DRIVER", "mysql_multitable"),
     },
     {
         get<T>(_object: T, attribute: keyof T) {

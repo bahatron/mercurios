@@ -2,8 +2,8 @@ import $nats from "../utils/nats";
 import $logger from "../utils/logger";
 import $event, { MercuriosEvent } from "../models/event";
 import moment from "moment";
-import $store from "../models/store";
 import $validator from "../utils/validator";
+import $store from "../models/store";
 
 interface PublishPayload {
     data?: any;
@@ -23,11 +23,11 @@ export default async function ({
         data,
     });
 
-    $logger.debug(`event persisted - topic: ${topic} - seq: ${event.seq}`);
-
     await $nats.publish(`topic.${topic}`, event);
 
-    $logger.debug(`event published - topic: ${event.topic}`);
+    $logger.debug(
+        `event published - topic: ${event.topic} - seq: ${event.seq}`
+    );
 
     return event;
 }

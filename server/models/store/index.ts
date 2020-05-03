@@ -1,8 +1,8 @@
 import $event, { MercuriosEvent } from "../event";
-import mysql from "./drivers/mysql";
-import { EventStore } from "./interfaces";
+import { EventStore, EventStoreFactory } from "./interfaces";
+import $config from "../../utils/config";
 
-const _driver = mysql();
+const _driver: Promise<EventStore> = require(`./drivers/${$config.store_driver}`).default();
 
 const $store: EventStore = {
     async add(params) {
