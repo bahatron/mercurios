@@ -65,6 +65,34 @@
                 </v-div>
 
                 <v-div>
+                    <v-dialog v-model="readModal" width="500">
+                        <template v-slot:activator="{ on }">
+                            <v-btn color="error" v-on="on">
+                                read
+                            </v-btn>
+                        </template>
+
+                        <v-card class="pa-4">
+                            <v-text-field
+                                v-model="topic"
+                                type="text"
+                                label="topic name"
+                            >
+                            </v-text-field>
+
+                            <v-text-field v-model="seq" type="text" label="seq">
+                            </v-text-field>
+
+                            <v-card-actions>
+                                <v-btn @click="read({ topic, seq })">
+                                    read
+                                </v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+                </v-div>
+
+                <v-div>
                     <v-dialog v-model="automaticPublishModal" width="500">
                         <template v-slot:activator="{ on }">
                             <v-btn color="warning" v-on="on">
@@ -162,24 +190,23 @@
     </v-container>
 </template>
 
-<script lang="js">
-import Vue from "vue";
+<script>
 import divider from "../components/divider.vue";
-// import mercurios, { MercuriosClient } from "../../lib/index";
 import mercurios from "@bahatron/mercurios";
 
-export default Vue.extend({
+export default {
     components: {
         "v-div": divider,
     },
 
     data() {
         return {
-            ws: mercurios.connect({
+            mercurios: mercurios.connect({
                 url: "http://localhost:4254",
                 id: "client_test",
             }),
             workers: [],
+            readModal: false,
             publishModal: false,
             subscribeModal: false,
             unSubscribeModal: false,
@@ -187,15 +214,16 @@ export default Vue.extend({
             topic: null,
             publishData: null,
             interval: null,
+            seq: null,
         };
     },
 
     destroyed() {
-        if (!this.ws) {
+        if (!this.mercurios) {
             return;
         }
 
-        let client = this.ws;
+        let client = this.mercurios;
 
         client.close();
     },
@@ -207,10 +235,16 @@ export default Vue.extend({
     },
 
     methods: {
-        async subscribe() {
-            let client = this.ws;
+        async read({ topic, seq }) {
+            let event = await this.mercurios.read(topic, seq);
 
-            await client.subsribe(this.topic, event => {
+            alert(JSON.stringify(event));
+        },
+
+        async subscribe() {
+            let client = this.mercurios;
+
+            await client.subscribe(this.topic, event => {
                 this.$store.commit("mercurios/addMessage", { message: event });
             });
 
@@ -218,7 +252,7 @@ export default Vue.extend({
         },
 
         async publish({ topic, data }) {
-            let client = this.ws;
+            let client = this.mercurios;
 
             let event = await client.publish(topic, data);
 
@@ -226,7 +260,7 @@ export default Vue.extend({
         },
 
         async unsubscribe() {
-            let client = this.ws;
+            let client = this.mercurios;
 
             client.unsubscribe(this.topic);
 
@@ -258,5 +292,5 @@ export default Vue.extend({
             });
         },
     },
-});
+};
 </script>

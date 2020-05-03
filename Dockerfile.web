@@ -2,4 +2,13 @@ FROM node:lts
 
 WORKDIR /app
 
-COPY ./web .
+COPY ./client ./client
+COPY ./web ./web
+
+WORKDIR /app/client
+RUN npm ci
+RUN npm run build
+
+WORKDIR /app/web
+RUN npm ci
+RUN npm run build

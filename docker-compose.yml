@@ -39,7 +39,7 @@ services:
             dockerfile: Dockerfile.web
         image: mercurios_admin
         volumes:
-            - ./web:/app
+            - ./web:/app/web
         command: npm run dev
         ports:
             - 3100:3000
