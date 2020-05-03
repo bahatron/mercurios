@@ -160,7 +160,7 @@ export class MercuriosClient {
     async read(topic: string, seq: number): Promise<MercuriosEvent | null> {
         try {
             const response = await axios.get(
-                `${this._url}/publish/${topic}/${seq}`,
+                `${this._url}/read/${topic}/${seq}`,
                 {
                     headers: {
                         "Access-Control-Allow-Origin": "*",

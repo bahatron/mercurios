@@ -41,7 +41,7 @@ router.post(
 );
 
 router.get(
-    "/publish/:topic/:seq",
+    "/read/:topic/:seq",
     asyncRoute(async (req, res) => {
         let event = await read_event(
             req.params.topic,
