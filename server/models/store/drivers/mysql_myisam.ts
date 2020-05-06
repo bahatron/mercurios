@@ -6,7 +6,7 @@ import $error from "../../../utils/error";
 import $event from "../../event";
 
 export default <EventStoreFactory>async function () {
-    const TABLE_NAME = "mercurios_event_store";
+    const EVENT_STORE = "mercurios_event_store";
     let mysql = await init();
 
     async function insert({
@@ -14,7 +14,7 @@ export default <EventStoreFactory>async function () {
         published_at,
         data,
     }: CreateParams): Promise<number> {
-        let seq = await mysql(TABLE_NAME).insert({
+        let seq = await mysql(EVENT_STORE).insert({
             topic,
             published_at,
             data: $json.stringify(data),
@@ -42,7 +42,7 @@ export default <EventStoreFactory>async function () {
         },
 
         async fetch(topic, seq) {
-            let result = await mysql(TABLE_NAME)
+            let result = await mysql(EVENT_STORE)
                 .where({
                     topic,
                     seq,
@@ -66,8 +66,8 @@ export default <EventStoreFactory>async function () {
         },
 
         async deleteStream(topic) {
-            await mysql(TABLE_NAME).where({ topic }).delete();
-            await mysql.raw(`ALTER TABLE ${TABLE_NAME} AUTO_INCREMENT = 1`);
+            await mysql(EVENT_STORE).where({ topic }).delete();
+            await mysql.raw(`ALTER TABLE ${EVENT_STORE} AUTO_INCREMENT = 1`);
         },
     };
 };
@@ -84,9 +84,9 @@ async function init() {
         },
     };
 
-    const driver = knex(config);
+    const mysql = knex(config);
 
-    await driver.raw(
+    await mysql.raw(
         `CREATE TABLE IF NOT EXISTS mercurios_event_store
         (
             topic VARCHAR(200) NOT NULL,
@@ -97,5 +97,5 @@ async function init() {
         ) ENGINE=MyISAM;`
     );
 
-    return driver;
+    return mysql;
 }

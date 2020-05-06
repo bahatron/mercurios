@@ -38,6 +38,12 @@ MERCURIOS_DEBUG=1
 # optional, sets the amount of workers, default: "max"
 MERCURIOS_WORKERS=2
 
+# needed for redis_lock driver
+REDIS_URL=redis://redis:6379
+
+# chose the storage option, ooptions: mysql_myisam(does not support expectedSeq checks), mysql_multitable, redis_lock
+MERCURIOS_DRIVER=mysql_multitable
+
 # optional, server url for tests
 MERCURIOS_TEST_URL=http://localhost:3000
 ```
@@ -59,7 +65,7 @@ Publishes an event to the stream
 
 -   **Example**:
     ```ts
-    axios.post<Event>(`${API_URL}/publish/my_topic`, {
+    axios.post<MercuriosEvent>(`${API_URL}/publish/my_topic`, {
         data: {
             foo: "bar",
         },
@@ -69,6 +75,15 @@ Publishes an event to the stream
 ### `POST /emit/:topic`
 
 Emits an event without persisting it
+
+-   **Example**:
+    ```ts
+    axios.post<MercuriosEvent>(`${API_URL}/emit/my_topic`, {
+        data: {
+            foo: "bar",
+        },
+    });
+    ```
 
 ### `GET /read/:topic/:seq`
 
@@ -81,7 +96,7 @@ Read event
 
 -   **Example**:
     ```ts
-    axios.get<Event>(`${API_URL}/read/my_topic/2`);
+    axios.get<MercuriosEvent>(`${API_URL}/read/my_topic/2`);
     ```
 
 ### `GET /ping`

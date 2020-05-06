@@ -9,13 +9,13 @@ import $error from "../../../utils/error";
 import $json from "../../../utils/json";
 
 export default <EventStoreFactory>async function () {
-    let { mysql, cache, locker } = await initDriver();
+    let { mysql, cache } = await initDriver();
 
     async function getNextSeq(
         topic: string,
         expectedSeq?: number
     ): Promise<number> {
-        let lock = await locker.lock(`lock:${topic}`, 1000);
+        let lock = await cache.lock(`lock:${topic}`, 1000);
 
         let next = (parseInt(await cache.get(topic)) || 0) + 1;
 
@@ -38,7 +38,7 @@ export default <EventStoreFactory>async function () {
         async add({ expectedSeq, topic, published_at, data }) {
             let seq = await getNextSeq(topic, expectedSeq);
 
-            $logger.debug(`got a seq`);
+            $logger.debug(`got a seq`, { topic, seq });
 
             let event = $event({ seq, topic, published_at, data });
 
@@ -73,7 +73,7 @@ export default <EventStoreFactory>async function () {
 
         async deleteStream(topic: string) {
             await mysql("mercurios_event_store")
-                .where("key", "like", `%${topic}%`)
+                .where("key", "like", `${topic}%`)
                 .delete();
 
             await cache.delete(topic);
@@ -88,7 +88,7 @@ async function initDriver() {
     _redis.on("error", (err) => {
         throw err;
     });
-    const locker = new Redlock([_redis], {
+    const _lock = new Redlock([_redis], {
         retryCount: 200,
         retryDelay: 10,
     });
@@ -129,6 +129,8 @@ async function initDriver() {
                 });
             });
         },
+
+        lock: _lock.lock.bind(_lock),
     };
 
     const config: Config = {
@@ -175,6 +177,5 @@ async function initDriver() {
     return {
         mysql,
         cache,
-        locker,
     };
 }

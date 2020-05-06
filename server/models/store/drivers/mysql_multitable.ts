@@ -6,11 +6,9 @@ import $error from "../../../utils/error";
 import $nats from "../../../utils/nats";
 import $event from "../../event";
 import $logger from "../../../utils/logger";
-import { read } from "fs";
 
 export default <EventStoreFactory>async function () {
-    // export default async function () {
-    let driver = await connection();
+    let mysql = await connection();
 
     let _streams: Record<string, ReturnType<typeof Stream>> = {};
 
@@ -22,7 +20,7 @@ export default <EventStoreFactory>async function () {
 
     $nats.subscribe("mercurios_stream_created", (err, msg) => {
         if (!_streams[msg.data]) {
-            _streams[msg.data] = Stream({ topic: msg.data, driver });
+            _streams[msg.data] = Stream({ topic: msg.data, mysql });
             $logger.debug(`stream cached`, { topic: msg.data });
         }
     });
@@ -32,15 +30,15 @@ export default <EventStoreFactory>async function () {
             return _streams[topic];
         }
 
-        if (await driver.schema.hasTable(tableName(topic))) {
-            _streams[topic] = Stream({ topic, driver });
+        if (await mysql.schema.hasTable(tableName(topic))) {
+            _streams[topic] = Stream({ topic, mysql });
 
             return _streams[topic];
         }
     }
 
     async function createStream(topic: string) {
-        _streams[topic] = Stream({ topic, driver });
+        _streams[topic] = Stream({ topic, mysql });
 
         return _streams[topic];
     }
@@ -99,7 +97,6 @@ export default <EventStoreFactory>async function () {
                 let result = await stream.read(seq);
 
                 if (!result) {
-                    $logger.debug("NO RESULT");
                     return null;
                 }
 
@@ -117,8 +114,8 @@ export default <EventStoreFactory>async function () {
 
         async deleteStream(topic: string) {
             await Promise.all([
-                driver.schema.dropTableIfExists(tableName(topic)),
-                driver("mercurios_topics").where({ topic }).delete(),
+                mysql.schema.dropTableIfExists(tableName(topic)),
+                mysql("mercurios_topics").where({ topic }).delete(),
             ]);
 
             delete _streams[topic];
@@ -128,17 +125,17 @@ export default <EventStoreFactory>async function () {
     };
 };
 
-async function Stream({ driver, topic }: { topic: string; driver: knex }) {
+async function Stream({ mysql, topic }: { topic: string; mysql: knex }) {
     let table = tableName(topic);
 
     try {
         await Promise.all([
-            await driver.schema.createTable(table, (dbTable) => {
+            await mysql.schema.createTable(table, (dbTable) => {
                 dbTable.increments("seq").primary();
                 dbTable.string("published_at");
                 dbTable.text("data", "longtext");
             }),
-            await driver("mercurios_topics").insert({ topic }),
+            await mysql("mercurios_topics").insert({ topic }),
         ]);
 
         await $nats.publish("mercurios_stream_created", topic);
@@ -154,7 +151,7 @@ async function Stream({ driver, topic }: { topic: string; driver: knex }) {
     return {
         async append({ data, published_at }: CreateParams) {
             return (
-                await driver(table).insert({
+                await mysql(table).insert({
                     published_at,
                     data: $json.stringify(data),
                 })
@@ -167,7 +164,7 @@ async function Stream({ driver, topic }: { topic: string; driver: knex }) {
             expectedSeq,
         }: CreateParams) {
             try {
-                return await driver.transaction(async (_trx) => {
+                return await mysql.transaction(async (_trx) => {
                     let seq = (
                         await _trx(table).insert({
                             published_at,
@@ -188,14 +185,14 @@ async function Stream({ driver, topic }: { topic: string; driver: knex }) {
                 });
             } catch (err) {
                 if (err.name === "ExpectationFailed") {
-                    await driver.raw(`ALTER TABLE ${table} auto_increment = 1`);
+                    await mysql.raw(`ALTER TABLE ${table} auto_increment = 1`);
                 }
                 throw err;
             }
         },
 
         async read(seq: number) {
-            return driver(table).where({ seq }).first();
+            return mysql(table).where({ seq }).first();
         },
     };
 }
@@ -214,14 +211,14 @@ async function connection() {
         },
     };
 
-    const driver = knex(config);
+    const mysql = knex(config);
 
-    if (!(await driver.schema.hasTable("mercurios_topics"))) {
+    if (!(await mysql.schema.hasTable("mercurios_topics"))) {
         try {
-            await driver.schema.createTable("mercurios_topics", (table) => {
+            await mysql.schema.createTable("mercurios_topics", (table) => {
                 table.string("topic").unique();
             });
-            $logger.debug("multitable driver initialized");
+            $logger.debug("multitable mysql initialized");
         } catch (err) {
             switch (err.code) {
                 case "ER_TABLE_EXISTS_ERROR":
@@ -232,5 +229,5 @@ async function connection() {
         }
     }
 
-    return driver;
+    return mysql;
 }
