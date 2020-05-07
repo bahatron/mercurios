@@ -2,7 +2,7 @@ import { EventStoreFactory, CreateParams, EventStore } from "../interfaces";
 import knex, { Config } from "knex";
 import $config from "../../../utils/config";
 import $json from "../../../utils/json";
-import $error from "../../../utils/error";
+import $error, { ERROR_CODES } from "../../../utils/error";
 import $nats from "../../../utils/nats";
 import $event from "../../event";
 import $logger from "../../../utils/logger";
@@ -67,7 +67,7 @@ export default <EventStoreFactory>async function () {
                     throw $error.InternalError(
                         `Unexpected response from MySQL`,
                         {
-                            code: "NO_SEQ_RETURNED",
+                            code: ERROR_CODES.UNEXPECTED_ERROR,
                             seq,
                         }
                     );
@@ -88,8 +88,7 @@ export default <EventStoreFactory>async function () {
                     throw $error.NotFound(
                         `Stream for topic: ${topic} not found`,
                         {
-                            // todo: standarise this codes
-                            code: "ERR_NOSTREAM",
+                            code: ERROR_CODES.STREAM_NOT_FOUND,
                         }
                     );
                 }

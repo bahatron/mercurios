@@ -1,17 +1,22 @@
 import { ErrorCode } from "ts-nats";
 
-type HttpCode = 400 | 401 | 403 | 404 | 409 | 417 | 500 | 501;
 type Context = Record<string, any>;
 
-class HttpError extends Error {
+export class HttpError extends Error {
     constructor(
         public readonly name: string,
         public readonly message: string,
-        public readonly httpCode: HttpCode,
+        public readonly httpCode: number,
         public readonly context: Context = {}
     ) {
         super();
     }
+}
+
+export enum ERROR_CODES {
+    STREAM_NOT_FOUND = "ERR_NOSTREAM",
+    EVENT_NOT_FOUND = "ERR_NOEVENT",
+    UNEXPECTED_ERROR = "ERR_UNEXPECTED",
 }
 
 const $error = {
@@ -31,17 +36,6 @@ const $error = {
 
     BadRequest(message: string = "Bad Request", context?: Context): HttpError {
         return new HttpError("BadRequest", message, 400, context);
-    },
-
-    Conflict(message: string = "Conflict", context?: Context): HttpError {
-        return new HttpError("Conflict", message, 409, context);
-    },
-
-    Unauthorized(
-        message: string = "Unauthorized Request",
-        context?: Context
-    ): HttpError {
-        return new HttpError("Unauthorized", message, 401, context);
     },
 
     NotFound(
@@ -64,13 +58,6 @@ const $error = {
     ): HttpError {
         return new HttpError("NotImplemented", message, 501, context);
     },
-
-    Error(message: string, httpCode: HttpCode, context?: Context): HttpError {
-        return new HttpError("Error", message, httpCode, context);
-    },
 };
-
-type ErrorType = HttpError;
-export { ErrorType as HttpError };
 
 export default $error;

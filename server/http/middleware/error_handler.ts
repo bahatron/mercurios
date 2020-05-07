@@ -16,7 +16,5 @@ export default function errorHandler(
         $logger.warning(err.message, err);
     }
 
-    return res
-        .status(code)
-        .json({ message: err.message, context: err.context });
+    return res.status(code).json({ message: err.message, ...err.context });
 }

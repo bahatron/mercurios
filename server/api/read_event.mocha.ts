@@ -38,7 +38,7 @@ describe("Feature: read event", () => {
             try {
                 await $store.deleteStream(_topic);
 
-                await publishEventEndpoint(_topic, "hello", 1);
+                await publishEventEndpoint(_topic, "hello");
                 _response = await readEvent(_topic, 2);
             } catch (err) {
                 $logger.error(err);

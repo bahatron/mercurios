@@ -37,7 +37,12 @@ router.post(
     asyncRoute(async (req, res) => {
         return res
             .status(200)
-            .json(emit_event({ topic: req.params.topic, data: req.body.data }));
+            .json(
+                await emit_event({
+                    topic: req.params.topic,
+                    data: req.body.data,
+                })
+            );
     })
 );
 
@@ -48,8 +53,6 @@ router.get(
             req.params.topic,
             parseInt(req.params.seq)
         );
-
-        $logger.debug(`got event from store`, event);
 
         if (!event) {
             return res.status(204).json();

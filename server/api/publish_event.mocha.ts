@@ -1,4 +1,4 @@
-import $axios from "axios";
+import $axios, { AxiosResponse } from "axios";
 import env from "@bahatron/env";
 import { expect } from "chai";
 import $logger from "@bahatron/logger";
@@ -11,11 +11,13 @@ export async function publishEventEndpoint(
     topic: string,
     data?: any,
     expectedSeq?: number
-) {
-    return $axios.post(`${MERCURIOS_TEST_URL}/publish/${topic}`, {
-        data,
-        expectedSeq,
-    });
+): Promise<AxiosResponse> {
+    return $axios
+        .post(`${MERCURIOS_TEST_URL}/publish/${topic}`, {
+            data,
+            expectedSeq,
+        })
+        .catch((err) => err.response);
 }
 
 describe("Feature: publish event", () => {
@@ -76,23 +78,21 @@ describe("Feature: publish event", () => {
         });
 
         it("responds with http status code 417 if seq number is already taken", async () => {
-            return new Promise(async (resolve) => {
-                try {
-                    await publishEventEndpoint(_topic, "another message", 5);
-                } catch (err) {
-                    resolve(expect(err.response.status).to.eq(417));
-                }
-            });
+            let response = await publishEventEndpoint(
+                _topic,
+                "another message",
+                15
+            );
+            expect(response.status).to.eq(417);
         });
 
         it("responds with http status code 417 if expected sequence number is higher than actual", async () => {
-            return new Promise(async (resolve) => {
-                try {
-                    await publishEventEndpoint(_topic, "another message", 15);
-                } catch (err) {
-                    resolve(expect(err.response.status).to.eq(417));
-                }
-            });
+            let response = await publishEventEndpoint(
+                _topic,
+                "another message",
+                15
+            );
+            expect(response.status).to.eq(417);
         });
 
         it("publishes the event if 'next' sequence number matches the expected", async () => {
