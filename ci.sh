@@ -2,7 +2,7 @@
 
 set -e
 
-docker-compose build
+docker-compose build server
 ./test.sh
 
 if [ ${_branch:-local} = master ]; then
