@@ -43,7 +43,7 @@ export default <EventStoreFactory>async function () {
         return _streams[topic];
     }
 
-    return {
+    return <EventStore>{
         async add({ expectedSeq, topic, data, published_at }: CreateParams) {
             try {
                 let stream =
@@ -115,11 +115,14 @@ export default <EventStoreFactory>async function () {
             await Promise.all([
                 mysql.schema.dropTableIfExists(tableName(topic)),
                 mysql("mercurios_topics").where({ topic }).delete(),
+                $nats.publish("mercurios_stream_deleted", topic),
             ]);
 
             delete _streams[topic];
+        },
 
-            await $nats.publish("mercurios_stream_deleted", topic);
+        async streamExists(_topic: string) {
+            return Boolean(await fetchStream(_topic));
         },
     };
 };

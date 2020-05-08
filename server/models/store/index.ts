@@ -13,6 +13,18 @@ if (!driver) {
 }
 const _driver: Promise<EventStore> = driver();
 
+// const $store = new Proxy(
+//     {},
+//     {
+//         get(target, attribute: any) {
+//             return async function (...args: any[]) {
+//                 let driver: any = await _driver;
+//                 return driver[attribute](...args);
+//             };
+//         },
+//     }
+// ) as EventStore;
+
 const $store: EventStore = {
     async add(params) {
         return (await _driver).add(params);
@@ -28,6 +40,10 @@ const $store: EventStore = {
 
     async deleteStream(topic: string) {
         return (await _driver).deleteStream(topic);
+    },
+
+    async streamExists(topic: string) {
+        return (await _driver).streamExists(topic);
     },
 };
 

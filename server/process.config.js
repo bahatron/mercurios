@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
         {
-            script: "dist/bin/www.js",
+            script: "dist/bin/http_server.js",
             name: "mercurios",
             exec_mode: "cluster",
             restart_delay: "1000",

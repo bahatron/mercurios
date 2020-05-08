@@ -8,6 +8,10 @@ import $nats from "../utils/nats";
 import uuid from "uuid";
 import url from "url";
 
+/**
+ * @todo: refactor subscribe and unsubscribe out the the connection
+ * @todo: convert it out of a class and into normal object
+ */
 export class WsConnection {
     private _subscriptions: Map<string, Subscription> = new Map();
     private dispatcher: Promise<Client>;
@@ -88,7 +92,7 @@ export class WsConnection {
                             $logger.error(err);
                             throw err;
                         }
-                        
+
                         this.socket.send($json.stringify(msg.data), (err) => {
                             if (err) {
                                 throw err;

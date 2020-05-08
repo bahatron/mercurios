@@ -34,7 +34,7 @@ export default <EventStoreFactory>async function () {
         return next;
     }
 
-    return {
+    return <EventStore>{
         async add({ expectedSeq, topic, published_at, data }) {
             let seq = await getNextSeq(topic, expectedSeq);
 
@@ -77,6 +77,12 @@ export default <EventStoreFactory>async function () {
                 .delete();
 
             await cache.delete(topic);
+        },
+
+        async streamExists(topic: string) {
+            let seq = await cache.get(topic);
+
+            return Boolean(isNaN(parseInt(seq)));
         },
     };
 };

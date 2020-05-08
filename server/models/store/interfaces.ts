@@ -15,4 +15,5 @@ export interface EventStore {
     add(data: CreateParams): Promise<MercuriosEvent>;
     fetch(topic: string, seq: number): Promise<MercuriosEvent | null>;
     deleteStream(topic: string): Promise<void>;
+    streamExists(topic: string): Promise<boolean>;
 }
