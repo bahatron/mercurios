@@ -18,3 +18,6 @@ services:
 
     nats:
         image: nats
+
+    redis:
+        image: redis:5
