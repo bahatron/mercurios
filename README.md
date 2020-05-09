@@ -39,7 +39,7 @@ MERCURIOS_DEBUG=1
 MERCURIOS_WORKERS=2
 
 # needed for redis_lock driver
-REDIS_URL=redis://redis:6379
+REDIS_HOST=redis
 
 # chose the storage option, ooptions: mysql_myisam(does not support expectedSeq checks), mysql_multitable, redis_lock
 MERCURIOS_DRIVER=mysql_multitable
