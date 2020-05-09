@@ -13,38 +13,19 @@ if (!driver) {
 }
 const _driver: Promise<EventStore> = driver();
 
-// const $store = new Proxy(
-//     {},
-//     {
-//         get(target, attribute: any) {
-//             return async function (...args: any[]) {
-//                 let driver: any = await _driver;
-//                 return driver[attribute](...args);
-//             };
-//         },
-//     }
-// ) as EventStore;
-
-const $store: EventStore = {
-    async add(params) {
-        return (await _driver).add(params);
-    },
-
-    async fetch(topic: string, seq: number) {
-        if (!seq) {
-            throw $error.BadRequest(`seq is mandatory`);
-        }
-
-        return (await _driver).fetch(topic, seq);
-    },
-
-    async deleteStream(topic: string) {
-        return (await _driver).deleteStream(topic);
-    },
-
-    async streamExists(topic: string) {
-        return (await _driver).streamExists(topic);
-    },
-};
+/**
+ * This only works because the driver only provides functions without any sort of chaining
+ */
+const $store = new Proxy(
+    {},
+    {
+        get(target, attribute: any) {
+            return async function (...args: any[]) {
+                let driver: any = await _driver;
+                return driver[attribute](...args);
+            };
+        },
+    }
+) as EventStore;
 
 export default $store;

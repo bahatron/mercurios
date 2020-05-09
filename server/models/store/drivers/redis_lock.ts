@@ -8,6 +8,9 @@ import knex, { Config } from "knex";
 import $error from "../../../utils/error";
 import $json from "../../../utils/json";
 
+const TOPIC_COLLECTION = "mercurios_topics";
+const EVENT_COLLECTION = "mercurios_event_store";
+
 export default <EventStoreFactory>async function () {
     let { mysql, cache } = await initDriver();
 
@@ -43,12 +46,12 @@ export default <EventStoreFactory>async function () {
             let event = $event({ seq, topic, published_at, data });
 
             await Promise.all([
-                mysql("mercurios_event_store").insert({
+                mysql(EVENT_COLLECTION).insert({
                     key: `${topic}_${seq}`,
                     event: $json.stringify(event),
                 }),
 
-                mysql.raw(`INSERT INTO mercurios_topics(topic, seq)
+                mysql.raw(`INSERT INTO ${TOPIC_COLLECTION}(topic, seq)
                 VALUES("${topic}", "${seq}")
                 ON DUPLICATE KEY UPDATE seq = "${seq}"`),
             ]);
@@ -64,7 +67,7 @@ export default <EventStoreFactory>async function () {
                 throw $error.NotFound(`topic not found`);
             }
 
-            let record = await mysql("mercurios_event_store")
+            let record = await mysql(EVENT_COLLECTION)
                 .where({ key: `${topic}_${seq}` })
                 .first();
 
@@ -72,17 +75,21 @@ export default <EventStoreFactory>async function () {
         },
 
         async deleteStream(topic: string) {
-            await mysql("mercurios_event_store")
-                .where("key", "like", `${topic}%`)
-                .delete();
+            await Promise.all([
+                mysql(EVENT_COLLECTION)
+                    .where("key", "like", `${topic}%`)
+                    .delete(),
 
-            await cache.delete(topic);
+                mysql(TOPIC_COLLECTION).where({ topic }).delete(),
+
+                cache.delete(topic),
+            ]);
         },
 
         async streamExists(topic: string) {
             let seq = await cache.get(topic);
 
-            return Boolean(isNaN(parseInt(seq)));
+            return !isNaN(parseInt(seq));
         },
     };
 };
@@ -154,11 +161,11 @@ async function initDriver() {
 
     try {
         await Promise.all([
-            mysql.schema.createTable("mercurios_topics", (table) => {
+            mysql.schema.createTable(TOPIC_COLLECTION, (table) => {
                 table.string("topic").unique();
                 table.integer("seq");
             }),
-            mysql.schema.createTable("mercurios_event_store", (table) => {
+            mysql.schema.createTable(EVENT_COLLECTION, (table) => {
                 table.string("key").primary().unique();
                 table.json("event");
             }),
@@ -172,7 +179,7 @@ async function initDriver() {
         }
     }
 
-    let topics = await mysql("mercurios_topics").select("topic", "seq");
+    let topics = await mysql(TOPIC_COLLECTION).select("topic", "seq");
 
     await Promise.all(
         topics.map((record) => {
