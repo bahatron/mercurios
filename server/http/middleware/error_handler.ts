@@ -13,7 +13,7 @@ export default function errorHandler(
     if (code >= 500) {
         $logger.error(err);
     } else {
-        $logger.warning(err.message, err);
+        $logger.debug(err.message, err);
     }
 
     return res.status(code).json({ message: err.message, ...err.context });
