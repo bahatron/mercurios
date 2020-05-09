@@ -9,7 +9,7 @@ const MERCURIOS_TEST_URL = $env.get("TEST_URL");
 const _topic = "benchmark_test";
 
 $logger.inspect(yargs.argv);
-let _duration = parseInt(yargs.argv.d as string) || 30;
+let _duration = parseInt(yargs.argv.d as string) || 10;
 
 function breakdown(result: Result) {
     let {
@@ -110,7 +110,7 @@ async function readBench() {
             connections: 100,
             pipelining: 10,
             duration: _duration,
-            url: `${MERCURIOS_TEST_URL}/publish/${_topic}/1`,
+            url: `${MERCURIOS_TEST_URL}/read/${_topic}/1`,
         })
     );
 }
