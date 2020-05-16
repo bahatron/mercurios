@@ -220,7 +220,7 @@ async function connection() {
             await mysql.schema.createTable("mercurios_topics", (table) => {
                 table.string("topic").unique();
             });
-            $logger.debug("multitable mysql initialized");
+            $logger.info("multitable mysql initialized");
         } catch (err) {
             switch (err.code) {
                 case "ER_TABLE_EXISTS_ERROR":

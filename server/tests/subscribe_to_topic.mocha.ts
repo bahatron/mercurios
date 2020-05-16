@@ -39,7 +39,7 @@ describe("Feature: subscribe to topic", () => {
                 }),
                 (err) => {
                     if (err) {
-                        return $logger.error(err);
+                        return $logger.error(err.message, err)
                     }
                 }
             );

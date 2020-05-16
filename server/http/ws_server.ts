@@ -41,7 +41,7 @@ export default function createWsServer(httpServer: Server): ws.Server {
 
     _wss.on("error", (err) => {
         $logger.warning(`ws server error - ${err.message}`);
-        $logger.error(err);
+        $logger.error(err.message, err)
     });
 
     _wss.on("connection", async (socket, request) => {

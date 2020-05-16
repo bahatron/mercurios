@@ -63,7 +63,7 @@ export class WsConnection {
         });
 
         this.socket.on("error", async (err) => {
-            $logger.error(err);
+            $logger.error(err.message, err)
             await this.close();
         });
     }
@@ -89,7 +89,7 @@ export class WsConnection {
                 (err, msg) => {
                     return new Promise((resolve) => {
                         if (err) {
-                            $logger.error(err);
+                            $logger.error(err.message, err)
                             throw err;
                         }
 

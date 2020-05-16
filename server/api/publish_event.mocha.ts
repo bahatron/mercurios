@@ -79,7 +79,7 @@ describe("Feature: publish event", () => {
                 );
             } catch (err) {
                 $logger.warning("error loading fixtures");
-                $logger.error(err);
+                $logger.error(err.message, err);
                 throw err;
             }
         });

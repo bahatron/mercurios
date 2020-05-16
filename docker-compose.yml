@@ -32,6 +32,7 @@ services:
             - mysql
             - nats
         command: sh -c "wait-for-it mysql:3306 -s -t 30 -- npm run build:clean && npm run dev"
+        # command: npm run dev
         environment:
             - NODE_ENV=dev
         env_file: .env.test

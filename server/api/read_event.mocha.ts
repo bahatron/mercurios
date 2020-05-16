@@ -41,7 +41,7 @@ describe("Feature: read event", () => {
                 await publishEventEndpoint(_topic, "hello");
                 _response = await readEvent(_topic, 2);
             } catch (err) {
-                $logger.error(err);
+                $logger.error(err.message, err);
                 throw err;
             }
         });
@@ -65,7 +65,7 @@ describe("Feature: read event", () => {
                     await publishEventEndpoint(_topic, { rick: "sanchez" })
                 ).data;
             } catch (err) {
-                $logger.error(err);
+                $logger.error(err.message, err);
                 throw err;
             }
         });

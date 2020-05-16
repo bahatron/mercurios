@@ -14,7 +14,7 @@
     },
     "dependencies": {
         "@bahatron/env": "^0.1.13",
-        "@bahatron/logger": "^2.0.3",
+        "@bahatron/logger": "^3.0.0",
         "@types/autocannon": "^4.1.0",
         "@types/chai": "^4.2.11",
         "@types/cors": "^2.8.6",
@@ -23,6 +23,9 @@
         "@types/lodash": "^4.14.150",
         "@types/mocha": "^5.2.7",
         "@types/node": "^12.12.37",
+        "@types/pino": "^6.0.1",
+        "@types/redis": "^2.8.18",
+        "@types/redlock": "^4.0.1",
         "@types/uuid": "^3.4.9",
         "@types/ws": "^6.0.4",
         "@types/yargs": "^15.0.4",
@@ -37,14 +40,13 @@
         "mocha": "^6.2.3",
         "moment": "^2.25.1",
         "mysql2": "^1.7.0",
+        "pino": "^6.2.1",
+        "redis": "^3.0.2",
+        "redlock": "^4.1.0",
         "ts-nats": "^1.2.14",
         "typescript": "^3.8.3",
         "uuid": "^3.4.0",
         "ws": "^7.2.5",
-        "yargs": "^15.3.1",
-        "@types/redis": "^2.8.18",
-        "@types/redlock": "^4.0.1",
-        "redis": "^3.0.2",
-        "redlock": "^4.1.0"
+        "yargs": "^15.3.1"
     }
 }
