@@ -7,7 +7,7 @@ services:
             - mysql
             - nats
         env_file: .env.test
-        command: "wait-for-it mysql:3306 -- npm start"
+        command: "wait-for-it pg:5432 -- npm start"
 
     mysql:
         image: mysql:8
@@ -15,6 +15,10 @@ services:
         environment:
             MYSQL_ROOT_PASSWORD: secret
             MYSQL_DATABASE: mercurios
+
+    postgres:
+        image: postgres:11
+        env_file: .env.test
 
     nats:
         image: nats

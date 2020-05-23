@@ -6,7 +6,7 @@ import errorHandler from "./middleware/error_handler";
 
 const SERVER = express();
 
-SERVER.use(express.json());
+SERVER.use(express.json({ limit: "2mb" }));
 SERVER.use(helmet());
 SERVER.use(cors());
 

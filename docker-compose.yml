@@ -35,7 +35,6 @@ services:
         ports:
             - ${MERCURIOS_PORT:-4254}:${MERCURIOS_PORT:-4254}
         depends_on:
-            - mysql
             - nats
         # command: sh -c "wait-for-it mysql:3306 -s -t 30 -- npm run build:clean && npm run dev"
         command: sh -c "wait-for-it postgres:5432 -s -t 30 -- npm run build:clean && npm run dev"
