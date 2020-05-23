@@ -1,4 +1,4 @@
-import { createLogger, Logger } from "@bahatron/logger";
+import { createLogger, Logger, LogEntry } from "@bahatron/logger";
 import $config from "./config";
 import $json from "./json";
 
@@ -11,11 +11,13 @@ const $logger: Logger = createLogger({
         : (params) => $json.stringify(params),
 });
 
-$logger.on("debug", (payload) => {
-    if ($config.dev_mode && payload.context !== undefined) {
-        // $logger.inspect(payload);
-        $logger.inspect(payload.context);
+function inspectEntry(entry: LogEntry) {
+    if ($config.dev_mode && entry.context !== undefined) {
+        $logger.inspect(entry.context);
     }
-});
+}
+
+$logger.on("debug", inspectEntry);
+$logger.on("error", inspectEntry);
 
 export default $logger;

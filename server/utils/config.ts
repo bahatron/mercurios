@@ -16,7 +16,12 @@ const $config = new Proxy(
         mysql_password: $env.get("MYSQL_PASSWORD"),
         mysql_database: $env.get("MYSQL_DATABASE"),
         store_driver: $env.get("MERCURIOS_DRIVER", "mysql_multitable"),
-        redis_host: $env.get("REDIS_HOST", "")
+        redis_host: $env.get("REDIS_HOST", ""),
+        postgre_host: $env.get("POSTGRES_HOST", ""),
+        postgre_port: $env.get("POSTGRES_PORT", ""),
+        postgre_database: $env.get("POSTGRES_DB", ""),
+        postgre_user: $env.get("POSTGRES_USER", ""),
+        postgre_password: $env.get("POSTGRES_PASSWORD"),
     },
     {
         get<T>(_object: T, attribute: keyof T) {

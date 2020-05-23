@@ -13,11 +13,11 @@ export class HttpError extends Error {
     }
 }
 
-export enum ERROR_CODES {
-    STREAM_NOT_FOUND = "ERR_NOSTREAM",
-    EVENT_NOT_FOUND = "ERR_NOEVENT",
-    UNEXPECTED_ERROR = "ERR_UNEXPECTED",
-}
+export const ERROR_CODES = {
+    STREAM_NOT_FOUND: "ERR_NOSTREAM",
+    EVENT_NOT_FOUND: "ERR_NOEVENT",
+    UNEXPECTED_ERROR: "ERR_UNEXPECTED",
+};
 
 const $error = {
     InternalError(

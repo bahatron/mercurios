@@ -13,6 +13,12 @@ services:
     redis:
         image: redis:5
 
+    postgres:
+        image: postgres:11
+        ports:
+            - 5432:5432
+        env_file: .env.test
+
     nats:
         image: nats
         command: ["-V"]
@@ -31,10 +37,11 @@ services:
         depends_on:
             - mysql
             - nats
-        command: sh -c "wait-for-it mysql:3306 -s -t 30 -- npm run build:clean && npm run dev"
+        # command: sh -c "wait-for-it mysql:3306 -s -t 30 -- npm run build:clean && npm run dev"
+        command: sh -c "wait-for-it postgres:5432 -s -t 30 -- npm run build:clean && npm run dev"
         # command: npm run dev
         environment:
-            - NODE_ENV=dev
+            NODE_ENV: dev
         env_file: .env.test
 
     web:
