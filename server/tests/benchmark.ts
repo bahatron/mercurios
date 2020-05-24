@@ -10,6 +10,8 @@ const MERCURIOS_TEST_URL = $env.get("TEST_URL");
 
 $logger.inspect(yargs.argv);
 let _duration = parseInt(yargs.argv.d as string) || 10;
+let _connections = parseInt(yargs.argv.c as string) || 100;
+let _pipelining = parseInt(yargs.argv.p as string) || 1;
 
 function breakdown(result: Result | Result[]) {
     function logResult(result: Result) {
@@ -71,7 +73,8 @@ async function pingBench() {
     breakdown(
         await autocannon({
             title: "ping benchmark",
-            connections: 100,
+            connections: _connections,
+            pipelining: _pipelining,
             duration: _duration,
             url: `${MERCURIOS_TEST_URL}/ping`,
         })
@@ -84,7 +87,8 @@ async function writeBench() {
     breakdown(
         await autocannon({
             title: `single with no data write benchmark`,
-            connections: 100,
+            connections: _connections,
+            pipelining: _pipelining,
             duration: _duration,
             url: `${MERCURIOS_TEST_URL}/publish/singleTopicBench`,
             method: "POST",
@@ -99,7 +103,8 @@ async function dataWriteBench() {
     breakdown(
         await autocannon({
             title: "big json write benchmark",
-            connections: 100,
+            connections: _connections,
+            pipelining: _pipelining,
             duration: _duration,
             url: `${MERCURIOS_TEST_URL}/publish/bigJsonBench`,
             headers: {
@@ -125,8 +130,8 @@ async function readBench() {
     breakdown(
         await autocannon({
             title: "read benchmark",
-            connections: 100,
-
+            connections: _connections,
+            pipelining: _pipelining,
             duration: _duration,
             url: `${MERCURIOS_TEST_URL}/read/${topic}/1`,
         })
@@ -140,40 +145,40 @@ async function competingWrites() {
     await Promise.all([
         autocannon({
             duration: _duration,
+            connections: _connections,
+            pipelining: _pipelining,
             title: "competing expected without expected seq",
             url: `${MERCURIOS_TEST_URL}/publish/${topic}`,
             method: "POST",
-            connections: 100,
         }),
         autocannon({
             duration: _duration,
+            connections: _connections,
+            pipelining: _pipelining,
             title: "competing expected without expected seq",
             url: `${MERCURIOS_TEST_URL}/publish/${topic}`,
             method: "POST",
-            connections: 100,
         }),
     ]).then(breakdown);
 }
 
-async function doubleStreams() {
-    $logger.info("writes to two streams benchmark");
+async function multiStream(amount = 10) {
+    $logger.info("multiple streams wrtie benchmark");
 
-    await Promise.all([
-        autocannon({
-            duration: _duration,
-            title: "competing expected without expected seq",
-            url: `${MERCURIOS_TEST_URL}/publish/multiBench1`,
-            method: "POST",
-            connections: 100,
-        }),
-        autocannon({
-            duration: _duration,
-            title: "competing expected without expected seq",
-            url: `${MERCURIOS_TEST_URL}/publish/multiBench2`,
-            method: "POST",
-            connections: 100,
-        }),
-    ]).then(breakdown);
+    await Promise.all(
+        Array(amount)
+            .fill(null)
+            .map((val, index) => {
+                return autocannon({
+                    duration: _duration,
+                    connections: _connections,
+                    pipelining: _pipelining,
+                    title: `multiple streams write benchmark - stream ${index}`,
+                    url: `${MERCURIOS_TEST_URL}/publish/multiBench${index}`,
+                    method: "POST",
+                });
+            })
+    ).then(breakdown);
 }
 
 async function main() {
@@ -198,7 +203,7 @@ async function main() {
     }
 
     if (yargs.argv.multi === true) {
-        await doubleStreams();
+        await multiStream();
     }
 }
 

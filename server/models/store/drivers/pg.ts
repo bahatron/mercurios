@@ -21,15 +21,28 @@ export default async () => {
     });
 
     $nats.subscribe("mercurios_streams_created", (err, msg) => {
-        let _topic = msg.data;
-        if (!_streams[_topic]) {
-            _streams[_topic] = Stream(_pg, _topic);
+        let topic = msg.data;
+        if (!_streams[topic]) {
+            _streams[topic] = Stream(_pg, topic);
         }
     });
 
     async function createStream(topic: string) {
-        await $nats.publish("mercurios_stream_created", topic);
-        return Stream(_pg, topic);
+        try {
+            await _pg.raw(
+                `INSERT INTO ${TOPIC_TABLE}(topic, seq) VALUES('${topic}', 0)`
+            );
+
+            await $nats.publish("mercurios_stream_created", topic);
+
+            return Stream(_pg, topic);
+        } catch (err) {
+            if ((err.message as string).includes("duplicate key value")) {
+                return Stream(_pg, topic);
+            }
+
+            throw err;
+        }
     }
 
     async function fetchStream(topic: string): Promise<Stream | null> {
@@ -112,16 +125,17 @@ function Stream(_pg: Knex, _topic: string) {
                     data: resultData.v_data,
                 });
             } catch (err) {
-                ["ERR_CANT_INIT", "ERR_CONFLICT"].forEach((errorCode) => {
-                    if ((err.message as string).includes(errorCode)) {
-                        throw $error.ExpectationFailed(
-                            "Conflict with expected sequence",
-                            {
-                                code: errorCode,
-                            }
-                        );
-                    }
-                });
+                if ((err.message as string).includes("ERR_CONFLICT")) {
+                    throw $error.ExpectationFailed(
+                        "Conflict with expected sequence",
+                        {
+                            code: "ERR_CONFLICT",
+                        }
+                    );
+                } else if ((err.message as string).includes("ERR_NO_STREAM")) {
+                    await $nats.publish("mercurios_stream_deleted", _topic);
+                    throw $error.NotFound(`Stream for ${_topic} not found`);
+                }
 
                 throw err;
             }
@@ -168,7 +182,7 @@ async function connect() {
         CREATE TABLE IF NOT EXISTS ${EVENT_TABLE} (
             topic varchar(255),
             seq integer,
-            published_at varchar(24),
+            published_at varchar(30),
             data text,
             PRIMARY KEY (topic, seq)
           );
@@ -179,7 +193,7 @@ async function connect() {
         CREATE OR REPLACE PROCEDURE ${PROCEDURE} (
             inout v_topic varchar(255), 
             inout v_seq integer, 
-            inout v_published_at varchar(24), 
+            inout v_published_at varchar(30), 
             inout v_data text
         )
         LANGUAGE plpgsql
@@ -196,26 +210,22 @@ async function connect() {
                 WHERE
                     topic = v_topic
                 FOR UPDATE) + 1;
+
+            IF (next_seq IS NULL) THEN
+                RAISE 'ERR_NO_STREAM';
+            END IF;
+
             IF v_seq IS NOT NULL AND next_seq != v_seq THEN
                 RAISE 'ERR_CONFLICT';
             END IF;
-            IF (next_seq IS NULL AND v_seq > 1) THEN
-                RAISE 'ERR_CANT_INIT';
-            ELSIF next_seq IS NULL AND (v_seq = 1 OR v_seq IS NULL) THEN
-                INSERT INTO mercurios_topics (topic, seq)
-                    VALUES (v_topic, 1)
-                ON CONFLICT (topic) 
-                    DO UPDATE SET seq = mercurios_topics.seq + 1
-                RETURNING
-                    seq INTO next_seq;
-            ELSE
-                UPDATE
+
+            UPDATE
                     mercurios_topics
                 SET
                     seq = next_seq
                 WHERE
                     topic = v_topic;
-            END IF;
+
             INSERT INTO mercurios_events (topic, seq, published_at, data)
                 VALUES (v_topic, next_seq, v_published_at, v_data) 
                 returning seq into v_seq;
