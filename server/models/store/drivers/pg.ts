@@ -4,7 +4,6 @@ import $logger from "../../../utils/logger";
 import { EventStore, CreateParams } from "../interfaces";
 import $event, { MercuriosEvent } from "../../event";
 import $json from "../../../utils/json";
-import { read } from "fs";
 import $nats from "../../../utils/nats";
 import $error, { ERROR_CODES } from "../../../utils/error";
 
@@ -29,9 +28,10 @@ export default async () => {
 
     async function createStream(topic: string) {
         try {
-            await _pg.raw(
-                `INSERT INTO ${TOPIC_TABLE}(topic, seq) VALUES('${topic}', 0)`
-            );
+            // await _pg.raw(
+            //     `INSERT INTO ${TOPIC_TABLE}(topic, seq) VALUES('${topic}', 0)`
+            // );
+            await _pg.table(TOPIC_TABLE).insert({ topic, seq: 0 });
 
             await $nats.publish("mercurios_stream_created", topic);
 
@@ -51,7 +51,7 @@ export default async () => {
         }
 
         if (await _pg(TOPIC_TABLE).where({ topic }).first()) {
-            _streams[topic] = await createStream(topic);
+            _streams[topic] = Stream(_pg, topic);
             return _streams[topic];
         }
 
@@ -99,12 +99,43 @@ export default async () => {
 
 type Stream = ReturnType<typeof Stream>;
 function Stream(_pg: Knex, _topic: string) {
+    async function transaction(params: CreateParams) {
+        let { topic, published_at, data, expectedSeq } = params;
+
+        return await _pg.transaction(async (trx) => {
+            let nextSeq =
+                (
+                    await trx(TOPIC_TABLE)
+                        .select("seq")
+                        .where({ topic })
+                        .forUpdate()
+                ).shift().seq + 1;
+
+            if (nextSeq === null) {
+                throw new Error("ERR_NO_STREAM");
+            } else if (expectedSeq && expectedSeq !== nextSeq) {
+                throw new Error("ERR_CONFLICT");
+            }
+
+            let [update, insert] = await Promise.all([
+                trx(TOPIC_TABLE).update({ seq: nextSeq }).where({ topic }),
+                trx(EVENT_TABLE)
+                    .insert({
+                        topic,
+                        seq: nextSeq,
+                        published_at,
+                        data: $json.stringify(data),
+                    })
+                    .returning("*"),
+            ]);
+
+            return insert.shift();
+        });
+    }
+
     return {
-        async store({
-            published_at,
-            data,
-            expectedSeq,
-        }: CreateParams): Promise<MercuriosEvent> {
+        async store(params: CreateParams): Promise<MercuriosEvent> {
+            let { published_at, data, expectedSeq } = params;
             try {
                 let parsedData = $json.stringify(data) || "{}";
 
@@ -114,8 +145,6 @@ function Stream(_pg: Knex, _topic: string) {
                     }, '${published_at}', '${parsedData}')`
                 );
 
-                $logger.debug(`result from pg procedure`, result.rows);
-
                 let resultData = result.rows.shift();
 
                 return $event({
@@ -124,6 +153,8 @@ function Stream(_pg: Knex, _topic: string) {
                     published_at: resultData.v_published_at,
                     data: resultData.v_data,
                 });
+
+                // return $event(await testTransaction(params));
             } catch (err) {
                 if ((err.message as string).includes("ERR_CONFLICT")) {
                     throw $error.ExpectationFailed(
@@ -200,7 +231,6 @@ async function connect() {
         AS $$
         DECLARE
             next_seq integer;
-            record mercurios_events;
         BEGIN
             next_seq := (
                 SELECT
@@ -213,9 +243,7 @@ async function connect() {
 
             IF (next_seq IS NULL) THEN
                 RAISE 'ERR_NO_STREAM';
-            END IF;
-
-            IF v_seq IS NOT NULL AND next_seq != v_seq THEN
+            ELSIF v_seq IS NOT NULL AND next_seq != v_seq THEN
                 RAISE 'ERR_CONFLICT';
             END IF;
 
