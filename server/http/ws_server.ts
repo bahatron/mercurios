@@ -1,9 +1,40 @@
 import ws from "ws";
 import { Server } from "http";
 import $logger from "../utils/logger";
-import { WsConnection } from "./ws_connection";
+import { Connection } from "./ws_connection";
+import url from "url";
+import uuid from "uuid";
 
-const _clients: Set<WsConnection> = new Set();
+const _clients: Map<string, Connection> = new Map();
+
+export default function createWsServer(httpServer: Server): ws.Server {
+    const wss = new ws.Server({ server: httpServer });
+
+    wss.on("error", (err) => {
+        $logger.warning(`ws server error - ${err.message}`);
+        $logger.error(err.message, err);
+    });
+
+    wss.on("connection", async (socket, request) => {
+        let query = url.parse(request.url ?? "", true).query;
+
+        let id = typeof query.id === "string" ? query.id : uuid.v4();
+
+        if (_clients.has(id)) {
+            socket.close();
+            return;
+        }
+
+        let conn = Connection(id, socket);
+        _clients.set(id, conn);
+
+        $logger.info(`ws - new connection - id: ${conn.id}`);
+    });
+
+    setInterval(() => ping(), 10000);
+
+    return wss;
+}
 
 function ping() {
     _clients.forEach(async (conn) => {
@@ -11,7 +42,7 @@ function ping() {
             if (conn.socket.readyState !== 1) {
                 $logger.debug(`ws client: ${conn.id} - dropped`);
                 await conn.close();
-                return _clients.delete(conn);
+                _clients.delete(conn.id);
             }
 
             $logger.debug(`ws client: ${conn.id} - PING`);
@@ -31,28 +62,7 @@ function ping() {
                 `ws client: ${conn.id} - PING ERROR - ${err.message}`
             );
             await conn.close();
-            _clients.delete(conn);
+            _clients.delete(conn.id);
         }
     });
-}
-
-export default function createWsServer(httpServer: Server): ws.Server {
-    const _wss = new ws.Server({ server: httpServer });
-
-    _wss.on("error", (err) => {
-        $logger.warning(`ws server error - ${err.message}`);
-        $logger.error(err.message, err)
-    });
-
-    _wss.on("connection", async (socket, request) => {
-        let conn = new WsConnection(request, socket);
-
-        _clients.add(conn);
-
-        $logger.info(`ws - new connection - id: ${conn.id}`);
-    });
-
-    setInterval(() => ping(), 10000);
-
-    return _wss;
 }

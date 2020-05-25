@@ -1,11 +1,12 @@
 import Knex, { Config } from "knex";
-import $config from "../../../utils/config";
-import $logger from "../../../utils/logger";
-import { EventStore, CreateParams } from "../interfaces";
-import $event, { MercuriosEvent } from "../../event";
-import $json from "../../../utils/json";
-import $nats from "../../../utils/nats";
-import $error, { ERROR_CODES } from "../../../utils/error";
+import $config from "../../../../utils/config";
+import $logger from "../../../../utils/logger";
+import { EventStore, CreateParams } from "../../interfaces";
+import $event, { MercuriosEvent } from "../../../event";
+import $json from "../../../../utils/json";
+import $nats from "../../../../utils/nats";
+import $error, { ERROR_CODES } from "../../../../utils/error";
+import { resolve } from "path";
 
 const EVENT_TABLE = "mercurios_events";
 const TOPIC_TABLE = "mercurios_topics";
@@ -139,11 +140,12 @@ function Stream(_pg: Knex, _topic: string) {
             try {
                 let parsedData = $json.stringify(data) || "{}";
 
-                let result = await _pg.raw(
-                    `call ${PROCEDURE}('${_topic}', ${
-                        expectedSeq || null
-                    }, '${published_at}', '${parsedData}')`
-                );
+                let result = await _pg.raw(`call ${PROCEDURE}(?, ?, ?, ?)`, [
+                    _topic,
+                    (expectedSeq || null) as any,
+                    published_at,
+                    parsedData,
+                ]);
 
                 let resultData = result.rows.shift();
 
@@ -196,29 +198,15 @@ async function connect() {
             password: $config.postgre_password,
             database: $config.postgre_database,
         },
+        migrations: {
+            tableName: "mercurios_migrations",
+            directory: resolve(__dirname, "./migrations"),
+        },
     };
 
     let pg = Knex(config);
 
-    await Promise.all([
-        pg.raw(`
-        CREATE TABLE IF NOT EXISTS ${TOPIC_TABLE} (
-            topic varchar(255),
-            seq integer,
-            PRIMARY KEY (topic)
-          );
-        `),
-
-        pg.raw(`
-        CREATE TABLE IF NOT EXISTS ${EVENT_TABLE} (
-            topic varchar(255),
-            seq integer,
-            published_at varchar(30),
-            data text,
-            PRIMARY KEY (topic, seq)
-          );
-        `),
-    ]);
+    await pg.migrate.latest();
 
     await pg.raw(`
         CREATE OR REPLACE PROCEDURE ${PROCEDURE} (

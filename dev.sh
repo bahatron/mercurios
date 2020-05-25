@@ -8,4 +8,4 @@ if [ "${1}" = "setup" ]; then
 fi
 
 docker-compose down --remove-orphans
-docker-compose up
+docker-compose up --abort-on-container-exit

@@ -1,139 +1,77 @@
 import ws from "ws";
 import $logger from "../utils/logger";
 import { Client, Subscription } from "ts-nats";
-import $error from "../utils/error";
 import $json from "../utils/json";
-import { IncomingMessage } from "http";
 import $nats from "../utils/nats";
-import uuid from "uuid";
-import url from "url";
+import subscribe_to_topic from "../api/subscribe_to_topic";
+import unsubscribe_to_topic from "../api/unsubscribe_to_topic";
 
-/**
- * @todo: refactor subscribe and unsubscribe out the the connection
- * @todo: convert it out of a class and into normal object
- */
-export class WsConnection {
-    private _subscriptions: Map<string, Subscription> = new Map();
-    private dispatcher: Promise<Client>;
-    public readonly id: string;
+export type Connection = ReturnType<typeof Connection>;
+export function Connection(_id: string, _socket: ws) {
+    let _dispatcher = $nats.connect(`mc_${_id}`);
+    let _logger = $logger.id(`mc_${_id}`);
+    let _subscriptions: Map<string, Subscription> = new Map();
 
-    constructor(
-        public readonly request: IncomingMessage,
-        public readonly socket: ws
-    ) {
-        let query = url.parse(request.url ?? "", true).query;
-        this.id = typeof query.id === "string" ? query.id : uuid.v4();
+    _socket.on("message", (data) => {
+        try {
+            let { action, topic, queue } = $json.parse(data);
 
-        this.setupSocket();
-        this.dispatcher = $nats.connect(`wsc_${this.id}`);
-    }
-
-    private setupSocket() {
-        this.socket.on("message", (data) => {
-            try {
-                let { action, topic, queue } = $json.parse(data);
-
-                $logger.debug(
-                    `wsc_${this.id} - message received - action: ${action} topic: ${topic} queue: ${queue}`
-                );
-
-                switch (action) {
-                    case "subscribe":
-                        return this._subscribe(topic, queue);
-                    case "unsubscribe":
-                        return this._unsubscribe(topic);
-                    default:
-                        return;
-                }
-            } catch (err) {
-                $logger.warning(
-                    `wsc_${this.id} - message error: ${err.message}`,
-                    err
-                );
-            }
-        });
-
-        this.socket.on("unexpected-response", (req, res) => {
-            $logger.warning(`ws_${this.id} - unexpected respose`, req);
-        });
-
-        this.socket.on("close", async () => {
-            $logger.debug(`wsc_${this.id} - closed`);
-            await this.close();
-        });
-
-        this.socket.on("error", async (err) => {
-            $logger.error(err.message, err)
-            await this.close();
-        });
-    }
-
-    private async _subscribe(topic: string, queue?: string) {
-        if (!topic) {
-            return;
-        }
-
-        if (this._subscriptions.has(topic)) {
-            $logger.debug(
-                `wsc_${this.id} - already subscribed - topic: ${topic}`
+            _logger.debug(
+                `message received - action: ${action} topic: ${topic} queue: ${queue}`
             );
-            return;
+
+            switch (action) {
+                case "subscribe":
+                    return subscribe_to_topic(conn, topic, queue);
+                case "unsubscribe":
+                    return unsubscribe_to_topic(conn, topic);
+                default:
+                    return;
+            }
+        } catch (err) {
+            _logger.warning(`message error: ${err.message}`, err);
         }
+    });
 
-        $logger.debug(`wsc_${this.id} - subscribing - topic: ${topic}`);
+    _socket.on("unexpected-response", (req, res) => {
+        _logger.warning(`unexpected response`, req);
+    });
 
-        this._subscriptions.set(
-            topic,
-            await (await this.dispatcher).subscribe(
-                `topic.${topic}`,
-                (err, msg) => {
-                    return new Promise((resolve) => {
-                        if (err) {
-                            $logger.error(err.message, err)
-                            throw err;
-                        }
+    _socket.on("close", async () => {
+        _logger.debug(`closed`);
+    });
 
-                        this.socket.send($json.stringify(msg.data), (err) => {
-                            if (err) {
-                                throw err;
-                            }
+    _socket.on("error", async (err) => {
+        _logger.error("socket error", err);
+        await conn.close();
+    });
 
-                            $logger.debug(
-                                `wsc_${this.id} - event sent - topic: ${msg.data.topic}`
-                            );
+    const conn = {
+        get id() {
+            return _id;
+        },
+        get socket() {
+            return _socket;
+        },
+        get dispatcher() {
+            return _dispatcher;
+        },
+        get subscriptions() {
+            return _subscriptions;
+        },
+        get logger() {
+            return _logger;
+        },
 
-                            resolve();
-                        });
-                    });
-                },
-                {
-                    queue: queue || undefined,
-                }
-            )
-        );
+        async close() {
+            if (!(await _dispatcher).isClosed()) {
+                await (await _dispatcher).drain();
+                await (await _dispatcher).close();
+            }
 
-        $logger.debug(`wsc_${this.id} - subscribed - topic: ${topic}`);
-    }
+            _socket.terminate();
+        },
+    };
 
-    private _unsubscribe(topic: string) {
-        let sub = this._subscriptions.get(topic);
-
-        if (!sub) {
-            return;
-        }
-
-        sub.unsubscribe();
-        this._subscriptions.delete(topic);
-
-        $logger.debug(`wsc_${this.id} - unsubscribed - topic: ${topic}`);
-    }
-
-    public async close() {
-        if (!(await this.dispatcher).isClosed()) {
-            await (await this.dispatcher).drain();
-            await (await this.dispatcher).close();
-        }
-
-        this.socket.terminate();
-    }
+    return conn;
 }
