@@ -6,8 +6,9 @@ module.exports = {
             exec_mode: "cluster",
             restart_delay: "1000",
             instances: process.env.MERCURIOS_WORKERS || 0,
-            watch: process.env.NODE_ENV === "production" ? false : ["dist"],
-            autorestart: process.env.NODE_ENV === "production",
+            watch:
+                process.env.MERCURIOS_ENV === "production" ? false : ["dist"],
+            autorestart: process.env.MERCURIOS_ENV === "production",
         },
     ],
 };
