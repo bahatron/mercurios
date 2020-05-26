@@ -1,11 +1,11 @@
 import Knex, { Config } from "knex";
-import $config from "../../../../utils/config";
-import $logger from "../../../../utils/logger";
-import { EventStore, CreateParams } from "../../interfaces";
-import $event, { MercuriosEvent } from "../../../event";
-import $json from "../../../../utils/json";
-import $nats from "../../../../utils/nats";
-import $error, { ERROR_CODES } from "../../../../utils/error";
+import $config from "../../../utils/config";
+import $logger from "../../../utils/logger";
+import { EventStore, CreateParams } from "../interfaces";
+import $event, { MercuriosEvent } from "../../event";
+import $json from "../../../utils/json";
+import $nats from "../../../utils/nats";
+import $error, { ERROR_CODES } from "../../../utils/error";
 import { resolve } from "path";
 
 const EVENT_TABLE = "mercurios_events";
@@ -206,7 +206,25 @@ async function connect() {
 
     let pg = Knex(config);
 
-    await pg.migrate.latest();
+    await Promise.all([
+        pg.raw(`
+        CREATE TABLE IF NOT EXISTS ${TOPIC_TABLE} (
+            topic varchar(255),
+            seq integer,
+            PRIMARY KEY (topic)
+          );
+        `),
+
+        pg.raw(`
+        CREATE TABLE IF NOT EXISTS ${EVENT_TABLE} (
+            topic varchar(255),
+            seq integer,
+            published_at varchar(30),
+            data text,
+            PRIMARY KEY (topic, seq)
+          );
+        `),
+    ]);
 
     await pg.raw(`
         CREATE OR REPLACE PROCEDURE ${PROCEDURE} (
