@@ -1,0 +1,19 @@
+image: docker/compose
+
+services:
+    - docker:dind
+
+before_script:
+    - apk add git
+
+stages:
+    - build
+    - test
+    - deploy
+
+build_:
+    stage: build
+    script:
+        - docker-compose build server
+        - ./scripts/test.sh
+        - BRANCH_NAME=${CI_COMMIT_BRANCH} ./scripts/push.sh

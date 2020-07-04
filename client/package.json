@@ -1,25 +1,28 @@
 {
     "name": "@bahatron/mercurios",
-    "version": "1.1.1",
+    "version": "1.2.1",
     "description": "mercurios client",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
         "prepublishOnly": "npm run build && npm run test",
-        "dev": "npm run build -- --watch",
-        "build": "rm -rf dist && tsc",
-        "playground": "node dist/tests/playground.js",
+        "dev": "npm run build -- --watch & npm run playground",
+        "build:clean": "rm -rf dist && npm run build",
+        "build": "tsc",
+        "playground": "pm2-runtime process.config.js --no-auto-exit",
         "test": "echo \"Error: no test specified\""
     },
     "author": "simonpiscitelli@gmail.com",
     "license": "Apache-2.0",
     "dependencies": {
+        "@bahatron/logger": "^3.0.0",
         "axios": "^0.19.2",
         "ws": "^7.2.1"
     },
     "devDependencies": {
-        "typescript": "^3.8.3",
         "@types/ws": "^7.2.2",
-        "karma": "^4.4.1"
+        "fastify": "^2.14.1",
+        "karma": "^5.0.9",
+        "typescript": "^3.8.3"
     }
 }

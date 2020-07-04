@@ -1,14 +1,14 @@
-FROM node:lts
+FROM node:lts-alpine
+RUN apk add --no-cache python make g++
 
 WORKDIR /app
-
 COPY ./client ./client
 COPY ./web ./web
 
 WORKDIR /app/client
-RUN npm ci
+RUN npm i
 RUN npm run build
 
 WORKDIR /app/web
-RUN npm ci
+RUN npm i
 RUN npm run build

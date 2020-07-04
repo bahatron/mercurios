@@ -213,7 +213,7 @@ export default {
             automaticPublishModal: false,
             topic: null,
             publishData: null,
-            interval: null,
+            interval: 500,
             seq: null,
         };
     },
@@ -278,6 +278,7 @@ export default {
                 let wat = setInterval(() => {
                     this.publish({ topic, data });
                 }, _interval);
+                // yep
                 this.workers.push(wat);
             } else {
                 alert("no interval");

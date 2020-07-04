@@ -28,7 +28,5 @@ export const mutations: MutationTree<MercuriosState> = {
                 count: state.topics[topic] ? state.topics[topic].count + 1 : 1,
             },
         };
-
-        console.log("mercurios state mutated", state);
     },
 };

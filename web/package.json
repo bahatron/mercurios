@@ -1,9 +1,8 @@
 {
-    "name": "nuxt_app",
+    "name": "mercurios_web",
     "version": "1.0.0",
     "description": "",
     "author": "simonpiscitelli@gmail.com",
-    "private": true,
     "scripts": {
         "dev": "nuxt",
         "build": "nuxt build",
@@ -12,7 +11,7 @@
         "test": "jest"
     },
     "dependencies": {
-        "@bahatron/mercurios": "file://../client/",
+        "@bahatron/mercurios": "file:../client",
         "@nuxt/types": "^0.6.4",
         "@nuxt/typescript-build": "^0.5.8",
         "@nuxtjs/pwa": "^3.0.0-beta.20",

@@ -1,22 +1,17 @@
-FROM node:lts-slim as dependencies
-RUN apt-get update && apt-get install wait-for-it -y
-
-FROM node:lts-alpine as server
-COPY --from=dependencies /usr/bin/wait-for-it /usr/bin/wait-for-it
+FROM node:lts-alpine
+RUN npm install -g pm2
 RUN apk add bash
 
-ENV MERCURIOS_ENV=production
 ARG MERCURIOS_PORT
-
 EXPOSE ${MERCURIOS_PORT:-4254}
+ENV MERCURIOS_ENV=production
 
-RUN npm install -g pm2
+COPY ./scripts/wait-for-it.sh /usr/bin/wait-for-it
 
-WORKDIR /app
+WORKDIR /app/server
 COPY ./server/package.json .
 COPY ./server/package-lock.json .
-
-RUN npm ci
+RUN npm install
 
 COPY ./server .
 RUN npm run build:clean

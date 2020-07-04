@@ -1,0 +1,17 @@
+# FROM docker/compose
+FROM docker:stable-dind
+RUN apk add --no-cache py-pip python-dev libffi-dev openssl-dev gcc libc-dev make
+RUN pip install docker-compose
+
+WORKDIR /app
+
+COPY . .
+
+# RUN dockerd
+
+# RUN ./ci.sh
+
+# ENTRYPOINT [ "docker-compose", "-f", "docker-compose.bundle.yml", "up", "--abort-on-container-exit", "server" ]
+
+# ENTRYPOINT [ "dockerd" ]
+# CMD ["./run.sh"]

@@ -1,6 +1,10 @@
 FROM node:lts-alpine
-WORKDIR /app
+RUN apk add bash
+
+COPY ./scripts/wait-for-it.sh /usr/bin/wait-for-it
+
+WORKDIR /app/client
 COPY ./client .
 
-RUN npm install -g typescript ts-node
+RUN npm install -g pm2
 RUN npm ci

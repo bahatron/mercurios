@@ -4,17 +4,17 @@ services:
     server:
         image: mercurios_http
         depends_on:
-            - mysql
+            - postgres
             - nats
         env_file: .env.test
-        command: "wait-for-it pg:5432 -- npm start"
+        command: "wait-for-it postgres:5432 -- npm start"
 
-    mysql:
-        image: mysql:8
-        command: --default-authentication-plugin=mysql_native_password
-        environment:
-            MYSQL_ROOT_PASSWORD: secret
-            MYSQL_DATABASE: mercurios
+    # mysql:
+    #     image: mysql:8
+    #     command: --default-authentication-plugin=mysql_native_password
+    #     environment:
+    #         MYSQL_ROOT_PASSWORD: secret
+    #         MYSQL_DATABASE: mercurios
 
     postgres:
         image: postgres:11
@@ -22,6 +22,5 @@ services:
 
     nats:
         image: nats
-
-    redis:
-        image: redis:5
+    # redis:
+    #     image: redis:5

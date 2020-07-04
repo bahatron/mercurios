@@ -1,65 +1,90 @@
 version: "3.5"
 
+x-mercurios-config: &mercurios-config
+    MERCURIOS_DEBUG: 1
+    MERCURIOS_PORT: 4254
+    MERCURIOS_WORKERS: 2
+    MERCURIOS_ENV: dev
+    TEST_URL: http://server:4254
+    NATS_URL: nats://nats:4222
+    # MERCURIOS_DRIVER: pg
+
+x-postgres-config: &postgres-config
+    POSTGRES_PASSWORD: secret
+    POSTGRES_DB: mercurios
+    POSTGRES_USER: admin
+    POSTGRES_PORT: 5432
+    POSTGRES_HOST: postgres
+
+x-mysql-config: &mysql-config
+    MYSQL_USER: admin
+    MYSQL_DATABASE: mercurios
+    MYSQL_PASSWORD: secret
+    MYSQL_ROOT_PASSWORD: secret
+    MYSQL_HOST: mysql
+    MYSQL_PORT: 3306
+
 services:
-    # mysql:
-    #     image: mysql:8
-    #     command: --default-authentication-plugin=mysql_native_password
-    #     ports:
-    #         - 3306:3306
-    #     environment:
-    #         MYSQL_ROOT_PASSWORD: secret
-    #         MYSQL_DATABASE: mercurios
-
-    # redis:
-    #     image: redis:5
-
     postgres:
-        image: postgres:11
+        image: postgres
+        container_name: mercurios_postgres
         ports:
             - 5432:5432
-        env_file: .env.test
+        environment:
+            <<: *postgres-config
         command: -c 'max_connections=500'
 
     nats:
         image: nats
-        command: ["-V"]
+        container_name: mercurios_nats
+        # command: ["-V"]
         ports:
+            - 4222:4222
             - 8222:8222
+
+    mysql:
+        image: mysql:5.6
+        container_name: mercurios_mysql
+        environment:
+            <<: *mysql-config
 
     server:
         build:
             context: .
             dockerfile: Dockerfile.server
         image: mercurios_http
-        volumes:
-            - ./server:/app
+        container_name: mercurios_http
         ports:
             - ${MERCURIOS_PORT:-4254}:${MERCURIOS_PORT:-4254}
         depends_on:
             - nats
-        # command: sh -c "wait-for-it mysql:3306 -s -t 30 -- npm run build:clean && npm run dev"
-        command: sh -c "wait-for-it postgres:5432 -s -t 30 -- npm run build:clean && npm run dev"
+            - postgres
+        command: sh -c "wait-for-it mysql:3306 -s -t 30 -- npm run build:clean && npm run dev"
+        # command: sh -c "wait-for-it postgres:5432 -s -t 30 -- npm run build && npm run migrate:pg && npm run dev"
         # command: npm run dev
         environment:
-            NODE_ENV: dev
-        env_file: .env.test
+            <<: *postgres-config
+            <<: *mysql-config
+            <<: *mercurios-config
 
     web:
         build:
             context: .
             dockerfile: Dockerfile.web
-        image: mercurios_admin
-        volumes:
-            - ./web:/app/web
+        container_name: mercurios_web
+        image: mercurios_web
         command: npm run dev
         ports:
-            - 3100:3000
+            - 3120:3000
 
     client:
         build:
             context: .
             dockerfile: Dockerfile.client
-        env_file: .env.test
-        volumes:
-            - ./client:/app
-        command: npm run dev
+        image: mercurios_client
+        container_name: mercurios_client
+        ports:
+            - 3130:3000
+        command: sh -c "wait-for-it server:4254 -t 30 -s -- npm run build:clean && npm run dev"
+        environment:
+            NODE_ENV: dev

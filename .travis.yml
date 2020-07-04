@@ -18,7 +18,9 @@ before_install:
 #     - my_script
 
 script:
-    - ./ci.sh
+    - docker-compose build server
+    - ./scripts/test.sh
+    - ./scripts/push.sh
 
 # after_script:
 #     - my_script
@@ -32,5 +34,4 @@ notifications:
 
 env:
     global:
-        - $_branch=${TRAVIS_BRANCH}
-        - $_tag=1
+        - $BRANCH_NAME=${TRAVISBRANCH_NAME}
