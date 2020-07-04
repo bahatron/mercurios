@@ -9,20 +9,21 @@
         "dev": "npm run build -- --watch & npm run playground",
         "build:clean": "rm -rf dist && npm run build",
         "build": "tsc",
-        "playground": "pm2-runtime process.config.js --no-auto-exit",
+        "playground": "pm2-runtime process.config.js",
         "test": "echo \"Error: no test specified\""
     },
     "author": "simonpiscitelli@gmail.com",
     "license": "Apache-2.0",
     "dependencies": {
-        "@bahatron/logger": "^3.0.0",
+        "@bahatron/logger": "^3.0.3",
         "axios": "^0.19.2",
-        "ws": "^7.2.1"
+        "typescript": "^3.9.6",
+        "ws": "^7.3.0"
     },
     "devDependencies": {
-        "@types/ws": "^7.2.2",
-        "fastify": "^2.14.1",
-        "karma": "^5.0.9",
-        "typescript": "^3.8.3"
+        "@types/node": "^14.0.14",
+        "@types/ws": "^7.2.6",
+        "fastify": "^2.15.1",
+        "karma": "^5.1.0"
     }
 }

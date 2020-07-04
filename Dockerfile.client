@@ -7,4 +7,4 @@ WORKDIR /app/client
 COPY ./client .
 
 RUN npm install -g pm2
-RUN npm ci
+RUN npm install

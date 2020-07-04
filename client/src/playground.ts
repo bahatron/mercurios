@@ -15,7 +15,6 @@ setInterval(async () => {
     await $mercurios.publish("heartbeat");
 }, 30000);
 
-/** @todo: add swagger */
 const server = fastify({});
 
 server.get("/ping", async (request, reply) => {

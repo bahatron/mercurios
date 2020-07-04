@@ -6,10 +6,10 @@ let _topic = "example topic";
 
 async function main() {
     async function subscribe() {
-        await client.subscribe(_topic, (event) => {
+        await client.subscribe(_topic, ({ event }) => {
             console.log(`sub: 1, topic: ${event.topic}, seq: ${event.seq}`);
         });
-        await client.subscribe(_topic, (event) => {
+        await client.subscribe(_topic, ({ event }) => {
             console.log(`sub: 2, topic: ${event.topic}, seq: ${event.seq}`);
         });
     }
