@@ -82,7 +82,7 @@ async function pingBench() {
 }
 
 async function writeBench() {
-    $logger.info("single topic with no data write benchmark");
+    $logger.info("write single topic with no data write benchmark");
 
     breakdown(
         await autocannon({
@@ -107,10 +107,10 @@ async function dataWriteBench() {
             pipelining: _pipelining,
             duration: _duration,
             url: `${MERCURIOS_TEST_URL}/publish/bigJsonBench`,
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            method: "POST",
             body: bigJson,
         })
     );
@@ -150,6 +150,12 @@ async function competingWrites() {
             title: "competing expected without expected seq",
             url: `${MERCURIOS_TEST_URL}/publish/${topic}`,
             method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: $json.stringify({
+                expectedSeq: 1,
+            }),
         }),
         autocannon({
             duration: _duration,

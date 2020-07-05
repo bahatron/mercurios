@@ -1,26 +1,50 @@
 version: "3.5"
 
+x-mercurios-config: &mercurios-config
+    MERCURIOS_PORT: 4254
+    # MERCURIOS_DEBUG: 1
+    TEST_URL: http://server:4254
+    NATS_URL: nats://nats:4222
+    # MERCURIOS_DRIVER: pg
+
+x-postgres-config: &postgres-config
+    POSTGRES_PASSWORD: secret
+    POSTGRES_DB: mercurios
+    POSTGRES_USER: admin
+    POSTGRES_PORT: 5432
+    POSTGRES_HOST: postgres
+
+x-mysql-config: &mysql-config
+    MYSQL_USER: admin
+    MYSQL_DATABASE: mercurios
+    MYSQL_PASSWORD: secret
+    MYSQL_ROOT_PASSWORD: secret
+    MYSQL_HOST: mysql
+    MYSQL_PORT: 3306
+
 services:
     server:
         image: mercurios_http
-        depends_on:
-            - postgres
-            - nats
-        env_file: .env.test
-        command: "wait-for-it postgres:5432 -- npm start"
+        container_name: mercurios_http
+        # command: "wait-for-it postgres:5432 -- npm start"
+        command: "wait-for-it mysql:3306 -- npm start"
+        environment:
+            <<: *postgres-config
+            <<: *mysql-config
+            <<: *mercurios-config
 
-    # mysql:
-    #     image: mysql:8
-    #     command: --default-authentication-plugin=mysql_native_password
-    #     environment:
-    #         MYSQL_ROOT_PASSWORD: secret
-    #         MYSQL_DATABASE: mercurios
+    mysql:
+        image: mysql:5.6
+        container_name: mercurios_mysql
+        environment:
+            <<: *mysql-config
 
     postgres:
         image: postgres:11
-        env_file: .env.test
+        container_name: mercurios_postgres
+        environment:
+            <<: *postgres-config
 
     nats:
         image: nats
-    # redis:
-    #     image: redis:5
+        container_name: mercurios_nats

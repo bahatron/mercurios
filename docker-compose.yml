@@ -26,7 +26,7 @@ x-mysql-config: &mysql-config
 
 services:
     postgres:
-        image: postgres
+        image: postgres:11
         container_name: mercurios_postgres
         ports:
             - 5432:5432
@@ -56,14 +56,9 @@ services:
         container_name: mercurios_http
         ports:
             - ${MERCURIOS_PORT:-4254}:${MERCURIOS_PORT:-4254}
-        depends_on:
-            - nats
-            - postgres
         command: sh -c "wait-for-it mysql:3306 -s -t 30 -- npm run build:clean && npm run dev"
         # command: sh -c "wait-for-it postgres:5432 -s -t 30 -- npm run build && npm run migrate:pg && npm run dev"
         # command: npm run dev
-        volumes:
-            - /app/server/node_modules
         environment:
             <<: *postgres-config
             <<: *mysql-config

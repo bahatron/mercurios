@@ -4,7 +4,6 @@ import { Connection } from "./ws_connection";
 import url from "url";
 import uuid from "uuid";
 import $logger from "../utils/logger";
-import $validator from "../utils/validator";
 
 const _clients: Map<string, Connection> = new Map();
 export default function createWsServer(httpServer: Server): ws.Server {

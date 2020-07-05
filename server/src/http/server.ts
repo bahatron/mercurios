@@ -5,15 +5,15 @@ import cors from "cors";
 import errorHandler from "./middleware/error_handler";
 import { requestLogger } from "./middleware/request_logger";
 
-const SERVER = express();
+const app = express();
 
-SERVER.use(express.json({ limit: "2mb" }));
-SERVER.use(helmet());
-SERVER.use(cors());
+app.use(express.json({ limit: "2mb" }));
+app.use(helmet());
+app.use(cors());
 
-SERVER.use(requestLogger);
-SERVER.use(router);
+app.use(requestLogger);
+app.use(router);
 
-SERVER.use(errorHandler);
+app.use(errorHandler);
 
-export default SERVER;
+export default app;

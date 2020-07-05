@@ -1,4 +1,3 @@
-import $event, { MercuriosEvent } from "../event";
 import { EventStore, EventStoreFactory } from "./interfaces";
 import $config from "../../utils/config";
 import $error, { ERROR_CODES } from "../../utils/error";
