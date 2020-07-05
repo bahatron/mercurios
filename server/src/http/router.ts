@@ -1,7 +1,7 @@
 import express, { Request, Response, RequestHandler } from "express";
-import publish_event from "../domain/publish_event";
-import emit_event from "../domain/emit_event";
-import read_event from "../domain/read_event";
+import publish_event from "../handlers/publish_event";
+import emit_event from "../handlers/emit_event";
+import read_event from "../handlers/read_event";
 
 function asyncRoute(
     handler: (req: Request, res: Response) => void

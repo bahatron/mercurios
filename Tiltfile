@@ -26,7 +26,7 @@ docker_build('mercurios_web', '.', dockerfile = 'Dockerfile.web',
 docker_build('mercurios_client', '.', dockerfile = 'Dockerfile.client',
     live_update=[
         sync('./client', '/app/client'),
-        restart_container(), # docker-compose only
+        # restart_container(), # docker-compose only
     ],
     only=[
         "./client",
