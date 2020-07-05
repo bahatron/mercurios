@@ -45,6 +45,8 @@ services:
     mysql:
         image: mysql:5.6
         container_name: mercurios_mysql
+        ports:
+            - 3306:3306
         environment:
             <<: *mysql-config
 
@@ -56,9 +58,8 @@ services:
         container_name: mercurios_http
         ports:
             - ${MERCURIOS_PORT:-4254}:${MERCURIOS_PORT:-4254}
-        command: sh -c "wait-for-it mysql:3306 -s -t 30 -- npm run build:clean && npm run dev"
-        # command: sh -c "wait-for-it postgres:5432 -s -t 30 -- npm run build && npm run migrate:pg && npm run dev"
-        # command: npm run dev
+        command: sh -c "wait-for-it mysql:3306 -s -t 30 -- npm run dev"
+        # command: sh -c "wait-for-it postgres:5432 -s -t 30 -- npm run migrate:pg && npm run dev"
         environment:
             <<: *postgres-config
             <<: *mysql-config
@@ -82,6 +83,6 @@ services:
         container_name: mercurios_client
         ports:
             - 3130:3000
-        command: sh -c "wait-for-it server:4254 -t 30 -s -- npm run build:clean && npm run dev"
+        command: sh -c "wait-for-it server:4254 -t 30 -s -- npm run dev"
         environment:
             NODE_ENV: dev

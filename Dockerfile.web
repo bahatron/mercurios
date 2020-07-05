@@ -1,14 +1,15 @@
 FROM node:lts-alpine
 RUN apk add --no-cache python make g++
 
-WORKDIR /app
-COPY ./client ./client
-COPY ./web ./web
-
 WORKDIR /app/client
+COPY ./client .
 RUN npm i
 RUN npm run build
 
 WORKDIR /app/web
-RUN npm i
+COPY ./web/package.json .
+COPY ./web/package-lock.json .
+RUN npm install
+
+COPY ./web .
 RUN npm run build
