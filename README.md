@@ -6,9 +6,9 @@ HTTP based event bus
 
 -   Event ordering is not guaranteed. However, it's possible to use `expectedSeq` when publishing to control the order of events in a stream
 
-## Dev mode
+## dev mode
 
-### tilt
+### using tilt:
 
 > https://docs.tilt.dev/install.html
 
@@ -28,9 +28,10 @@ HTTP based event bus
     tilt down
 ```
 
-### docker-compose
+### using docker-compose:
 
 ```sh
+    # no volume mapping
     docker-compose up
 ```
 
@@ -60,10 +61,16 @@ MERCURIOS_DEBUG=1
 # optional, sets the amount of workers, default: "max"
 MERCURIOS_WORKERS=2
 
-
 # chose the storage option, ooptions: pg|mysql_multitable
 MERCURIOS_DRIVER=mysql_multitable
 
 # optional, server url for tests
 MERCURIOS_TEST_URL=http://localhost:3000
+```
+
+## testing
+
+```sh
+# ci testing using docker-compose
+scripts/test.sh
 ```
