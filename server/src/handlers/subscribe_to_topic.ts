@@ -37,7 +37,7 @@ export default <WsRequestHandler>(
                     connection.socket.send(
                         $json.stringify({
                             subscription,
-                            topic,
+                            subject: topic,
                             event: msg.data,
                         }),
                         (err) => {

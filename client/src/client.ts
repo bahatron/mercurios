@@ -19,7 +19,7 @@ export interface PublishOptions {
 
 export interface MercuriosMessage {
     subscription: string;
-    topic: string;
+    subject: string;
     event: MercuriosEvent;
 }
 
@@ -106,12 +106,11 @@ export class MercuriosClient {
         };
 
         this._wsc.onmessage = (msg: any) => {
-            let { subscription, topic, event } = JSON.parse(
+            let { subscription, subject, event } = JSON.parse(
                 (msg.data ?? msg).toString()
             );
 
-            this._emit(subscription, event);
-            this._emit(topic, event);
+            this._emit(subscription, { subscription, subject, event });
         };
 
         return this._wsc;
