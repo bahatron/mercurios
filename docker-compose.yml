@@ -1,28 +1,27 @@
 version: "3.5"
 
 x-mercurios-config: &mercurios-config
-    MERCURIOS_DEBUG: 1
-    MERCURIOS_PORT: 4254
-    MERCURIOS_WORKERS: 2
-    MERCURIOS_ENV: dev
-    TEST_URL: http://server:4254
-    NATS_URL: nats://nats:4222
+    MERCURIOS_PORT: ${MERCURIOS_PORT:-4254}
+    TEST_URL: ${TEST_URL:-http://server:4254}
+    NATS_URL: ${NATS_URL:-nats://nats:4222}
     # MERCURIOS_DRIVER: pg
+    MERCURIOS_WORKERS: 2
+    MERCURIOS_DEBUG: 1
 
 x-postgres-config: &postgres-config
-    POSTGRES_PASSWORD: secret
-    POSTGRES_DB: mercurios
-    POSTGRES_USER: admin
-    POSTGRES_PORT: 5432
-    POSTGRES_HOST: postgres
+    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
+    POSTGRES_DB: ${POSTGRES_DB:-mercurios}
+    POSTGRES_USER: ${POSTGRES_USER:-admin}
+    POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+    POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
 
 x-mysql-config: &mysql-config
-    MYSQL_USER: admin
-    MYSQL_DATABASE: mercurios
-    MYSQL_PASSWORD: secret
-    MYSQL_ROOT_PASSWORD: secret
-    MYSQL_HOST: mysql
-    MYSQL_PORT: 3306
+    MYSQL_USER: ${MYSQL_USER:-admin}
+    MYSQL_DATABASE: ${MYSQL_DATABASE:-mercurios}
+    MYSQL_PASSWORD: ${MYSQL_PASSWORD:-secret}
+    MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-secret}
+    MYSQL_HOST: ${MYSQL_HOST:-mysql}
+    MYSQL_PORT: ${MYSQL_PORT:-3306}
 
 services:
     postgres:

@@ -6,6 +6,7 @@ import $error, { ERROR_CODES } from "../../../../utils/error";
 import $nats from "../../../../utils/nats";
 import $event from "../../../event";
 import $logger from "../../../../utils/logger";
+import $mysql from "../../../../utils/mysql";
 
 export default <EventStoreFactory>async function () {
     let mysql = await connection();
@@ -202,22 +203,9 @@ async function Stream({ mysql, topic }: { topic: string; mysql: knex }) {
 const tableName = (topic: string) => `stream_${topic}`;
 
 async function connection() {
-    const config: Config = {
-        client: "mysql2",
-        connection: {
-            host: $config.mysql_host,
-            port: $config.mysql_port,
-            user: $config.mysql_user,
-            password: $config.mysql_password,
-            database: $config.mysql_database,
-        },
-    };
-
-    const mysql = knex(config);
-
-    if (!(await mysql.schema.hasTable("mercurios_topics"))) {
+    if (!(await $mysql.schema.hasTable("mercurios_topics"))) {
         try {
-            await mysql.schema.createTable("mercurios_topics", (table) => {
+            await $mysql.schema.createTable("mercurios_topics", (table) => {
                 table.string("topic").unique();
             });
             $logger.info("multitable mysql initialized");
@@ -231,5 +219,5 @@ async function connection() {
         }
     }
 
-    return mysql;
+    return $mysql;
 }
