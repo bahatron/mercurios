@@ -2,7 +2,7 @@ import Knex from "knex";
 
 export const up = async function (knex: Knex) {
     await knex.schema.createTableIfNotExists("mercurios_topics", (table) => {
-        table.string("topic").unique();
+        table.string("topic").primary();
         table.integer("seq");
     });
 
