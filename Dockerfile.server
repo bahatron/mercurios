@@ -1,5 +1,4 @@
 FROM node:lts-alpine
-RUN npm install -g pm2
 RUN apk add bash
 
 ARG MERCURIOS_PORT

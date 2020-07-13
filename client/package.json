@@ -6,10 +6,9 @@
     "types": "dist/index.d.ts",
     "scripts": {
         "prepublishOnly": "npm run build && npm run test",
-        "dev": "npm run build -- --watch & npm run playground",
+        "dev": "npm run build -- --watch & nodemon dist/playground.js",
         "build:clean": "rm -rf dist && npm run build",
         "build": "tsc",
-        "playground": "pm2-runtime process.config.js",
         "test": "echo \"Error: no test specified\""
     },
     "author": "simonpiscitelli@gmail.com",
@@ -17,6 +16,7 @@
     "dependencies": {
         "@bahatron/logger": "^3.0.3",
         "axios": "^0.19.2",
+        "nodemon": "^2.0.4",
         "typescript": "^3.9.6",
         "ws": "^7.3.0"
     },

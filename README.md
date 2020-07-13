@@ -58,9 +58,6 @@ NATS_URL=nats://nats:4222
 # optional, true|1|any
 MERCURIOS_DEBUG=1
 
-# optional, sets the amount of workers, default: "max"
-MERCURIOS_WORKERS=2
-
 # chose the storage option, ooptions: pg|mysql_multitable
 MERCURIOS_DRIVER=mysql_multitable
 
@@ -74,4 +71,3 @@ MERCURIOS_TEST_URL=http://localhost:3000
 # ci testing using docker-compose
 scripts/test.sh
 ```
-

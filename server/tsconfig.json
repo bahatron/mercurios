@@ -5,7 +5,6 @@
         "module": "CommonJS",
         "esModuleInterop": true,
         "removeComments": true,
-        "diagnostics": true,
         "incremental": true,
         "sourceMap": true,
         "outDir": "dist",

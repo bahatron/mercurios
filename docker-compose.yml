@@ -5,8 +5,8 @@ x-mercurios-config: &mercurios-config
     TEST_URL: ${TEST_URL:-http://server:4254}
     NATS_URL: ${NATS_URL:-nats://nats:4222}
     # MERCURIOS_DRIVER: pg
-    MERCURIOS_WORKERS: 2
     MERCURIOS_DEBUG: 1
+    MERCURIOS_ENV: dev
 
 x-postgres-config: &postgres-config
     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}

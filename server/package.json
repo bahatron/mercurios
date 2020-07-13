@@ -5,7 +5,7 @@
     "author": "simonpiscitelli@gmail.com",
     "scripts": {
         "start": "node dist/bin/http_server.js",
-        "dev": "npm run build:watch & pm2-runtime start process.config.js",
+        "dev": "npm run build:watch & nodemon dist/bin/http_server.js",
         "test": "mocha 'dist/**/*.mocha.js' -t 5000",
         "benchmark": "node dist/bin/benchmark.js",
         "migrate:pg": "node dist/bin/migrate_pg",
@@ -38,6 +38,7 @@
         "mocha": "^6.2.3",
         "moment": "^2.27.0",
         "mysql2": "^1.7.0",
+        "nodemon": "^2.0.4",
         "pg": "^8.2.1",
         "ts-nats": "^1.2.15",
         "typescript": "^3.9.6",

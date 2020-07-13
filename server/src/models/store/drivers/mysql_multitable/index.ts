@@ -206,7 +206,7 @@ async function connection() {
     if (!(await $mysql.schema.hasTable("mercurios_topics"))) {
         try {
             await $mysql.schema.createTable("mercurios_topics", (table) => {
-                table.string("topic").unique();
+                table.string("topic").primary();
             });
             $logger.info("multitable mysql initialized");
         } catch (err) {
