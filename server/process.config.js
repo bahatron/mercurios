@@ -9,6 +9,8 @@ module.exports = {
             watch:
                 process.env.MERCURIOS_ENV === "production" ? false : ["dist"],
             autorestart: process.env.MERCURIOS_ENV === "production",
+            out_file: "/dev/null",
+            error_file: "/dev/null",
         },
     ],
 };
