@@ -34,4 +34,4 @@ notifications:
 
 env:
     global:
-        - $BRANCH_NAME=${TRAVISBRANCH_NAME}
+        - $BRANCH_NAME=${TRAVIS_BRANCH}
