@@ -74,3 +74,4 @@ MERCURIOS_TEST_URL=http://localhost:3000
 # ci testing using docker-compose
 scripts/test.sh
 ```
+
