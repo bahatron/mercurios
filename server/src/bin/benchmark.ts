@@ -147,7 +147,7 @@ async function competingWrites() {
             duration: _duration,
             connections: _connections,
             pipelining: _pipelining,
-            title: "competing expected without expected seq",
+            title: "competing expected with expected seq",
             url: `${MERCURIOS_TEST_URL}/publish/${topic}`,
             method: "POST",
             headers: {
@@ -169,7 +169,7 @@ async function competingWrites() {
 }
 
 async function multiStream(amount = 10) {
-    $logger.info("multiple streams wrtie benchmark");
+    $logger.info("multiple streams write benchmark");
 
     await Promise.all(
         Array(amount)

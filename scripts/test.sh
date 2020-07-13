@@ -11,4 +11,4 @@ docker-compose -f ${GITROOT}/docker-compose.test.yml exec -T server \
     
 # run benchmark
 docker-compose -f ${GITROOT}/docker-compose.test.yml exec -T server \
-    sh -c "npm run benchmark -- -d 30 --ping --write --read --competing --bigJson"
+    sh -c "npm run benchmark -- -d 30 --ping --write --read --competing --json"

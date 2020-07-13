@@ -58,7 +58,7 @@ NATS_URL=nats://nats:4222
 # optional, true|1|any
 MERCURIOS_DEBUG=1
 
-# chose the storage option, ooptions: pg|mysql_multitable
+# chose the storage option, options: pg|mysql_multitable
 MERCURIOS_DRIVER=mysql_multitable
 
 # optional, server url for tests
