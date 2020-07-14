@@ -25,9 +25,9 @@ export default async function publishEvent({
 
     await $nats.publish(`topic.${topic}`, event);
 
-    $logger.debug(
-        `event published - topic: ${event.topic} - seq: ${event.seq}`
-    );
+    $logger.debug(`event published`, {
+        topic,
+    });
 
     return event;
 }

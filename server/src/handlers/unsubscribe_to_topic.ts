@@ -1,9 +1,11 @@
-import { Connection, WsRequestHandler } from "../http/ws_connection";
-import $logger from "../utils/logger";
+import { WsRequestHandler } from "../http/ws_connection";
 
 export default <WsRequestHandler>(
     async function unsubscribeToTopic({ subscription, connection, topic }) {
-        $logger.debug("unsubscribing to topic", { subscription, topic });
+        connection.logger.debug("unsubscribing to topic", {
+            subscription,
+            topic,
+        });
 
         let sub = connection.subscriptions.get(topic);
 
@@ -14,5 +16,10 @@ export default <WsRequestHandler>(
         sub.unsubscribe();
 
         connection.subscriptions.delete(topic);
+
+        connection.logger.debug("unsubscribed to topic successfully", {
+            subscription,
+            topic,
+        });
     }
 );
