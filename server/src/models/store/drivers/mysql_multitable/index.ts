@@ -135,7 +135,7 @@ async function Stream({ mysql, topic }: { topic: string; mysql: knex }) {
         await Promise.all([
             await mysql.schema.createTable(table, (dbTable) => {
                 dbTable.increments("seq").primary();
-                dbTable.string("published_at");
+                dbTable.string("published_at", 30);
                 dbTable.text("data", "text");
             }),
             await mysql("mercurios_topics").insert({ topic }),
