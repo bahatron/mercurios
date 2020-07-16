@@ -244,7 +244,7 @@ export default {
         async subscribe() {
             let client = this.mercurios;
 
-            await client.subscribe(this.topic, event => {
+            await client.subscribe(this.topic, ({event}) => {
                 this.$store.commit("mercurios/addMessage", { message: event });
             });
 
@@ -254,7 +254,7 @@ export default {
         async publish({ topic, data }) {
             let client = this.mercurios;
 
-            let event = await client.publish(topic, data);
+            let event = await client.publish(topic, { data });
 
             this.publishModal = false;
         },

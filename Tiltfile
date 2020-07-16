@@ -20,7 +20,8 @@ docker_build('mercurios_web', '.', dockerfile = 'Dockerfile.web',
         "./web",
         "./client",
         "./scripts",
-    ]
+    ],
+    target="src"
 )
 
 docker_build('mercurios_client', '.', dockerfile = 'Dockerfile.client',

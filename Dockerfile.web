@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM node:lts-alpine as src
 RUN apk add --no-cache python make g++
 
 WORKDIR /app/client
@@ -10,6 +10,7 @@ WORKDIR /app/web
 COPY ./web/package.json .
 COPY ./web/package-lock.json .
 RUN npm install
-
 COPY ./web .
+
+FROM src as prod
 RUN npm run build
