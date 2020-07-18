@@ -12,5 +12,5 @@ COPY ./web/package-lock.json .
 RUN npm install
 COPY ./web .
 
-FROM src as prod
+FROM src as build
 RUN npm run build

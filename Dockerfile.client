@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM node:lts-alpine as src
 RUN apk add bash
 
 COPY ./scripts/wait-for-it.sh /usr/bin/wait-for-it

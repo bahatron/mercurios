@@ -1,0 +1,12 @@
+.git
+.scripts
+!.scripts/wait-for-it.sh
+node_modules
+client/node_modules
+client/dist
+server/dist
+server/node_modules
+web/dist
+web/node_modules
+web/.nuxt
+web/coverage

@@ -30,4 +30,5 @@ const $config = new Proxy(
     }
 );
 
+export { $env };
 export default $config;

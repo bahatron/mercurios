@@ -13,7 +13,7 @@ export default <WsRequestHandler>(
     }) {
         $logger.debug("subscribing to topic", { topic, subscription });
 
-        if (!subscription || connection.subscriptions.has(subscription)) {
+        if (!topic || connection.subscriptions.has(subscription)) {
             return;
         }
 
@@ -58,7 +58,7 @@ export default <WsRequestHandler>(
             }
         );
 
-        connection.subscriptions.set(topic, sub);
+        connection.subscriptions.set(subscription, sub);
 
         $logger.debug(`subscribed to topic successfully`, {
             subscription,

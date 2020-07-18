@@ -6,10 +6,10 @@ docker_build('mercurios_http', '.', dockerfile = 'Dockerfile.server',
     live_update=[
         sync('./server', '/app/server'),
     ],
-    only=[
-        "./server",
-        "./scripts",
-    ],
+    ignore=[
+        "client/*",
+        "web/*",
+    ]
 )
 
 docker_build('mercurios_web', '.', dockerfile = 'Dockerfile.web',

@@ -9,7 +9,7 @@ import { Logger } from "@bahatron/logger";
 
 export interface MercuriosClientMessage {
     action: string;
-    topic: string;
+    topic?: string;
     queue?: string;
     subscription?: string;
 }
@@ -17,7 +17,7 @@ export interface MercuriosClientMessage {
 export interface WsRequestHandler {
     (params: {
         connection: Connection;
-        topic: string;
+        topic?: string;
         subscription?: string;
         queue?: string;
     }): void;
