@@ -24,6 +24,14 @@ x-mysql-config: &mysql-config
     MYSQL_PORT: ${MYSQL_PORT:-3306}
 
 services:
+    nats:
+        image: nats
+        container_name: mercurios_nats
+        # command: ["-V"]
+        ports:
+            - 4222:4222
+            - 8222:8222
+
     postgres:
         image: postgres:11
         container_name: mercurios_postgres
@@ -32,14 +40,6 @@ services:
         environment:
             <<: *postgres-config
         command: -c 'max_connections=500'
-
-    nats:
-        image: nats
-        container_name: mercurios_nats
-        # command: ["-V"]
-        ports:
-            - 4222:4222
-            - 8222:8222
 
     mysql:
         image: mysql:5.6
@@ -64,16 +64,6 @@ services:
             <<: *mysql-config
             <<: *mercurios-config
 
-    web:
-        build:
-            context: .
-            dockerfile: Dockerfile.web
-        container_name: mercurios_web
-        image: mercurios_web
-        command: npm run dev
-        ports:
-            - 3120:3000
-
     client:
         build:
             context: .
@@ -81,7 +71,7 @@ services:
         image: mercurios_client
         container_name: mercurios_client
         ports:
-            - 3130:3000
+            - 4250:4250
         command: sh -c "wait-for-it server:4254 -t 30 -s -- npm run dev"
         environment:
             NODE_ENV: dev

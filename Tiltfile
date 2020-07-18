@@ -7,30 +7,21 @@ docker_build('mercurios_http', '.', dockerfile = 'Dockerfile.server',
         sync('./server', '/app/server'),
     ],
     ignore=[
-        "client/*",
-        "web/*",
+        "./client/**/*",
     ]
 )
 
-docker_build('mercurios_web', '.', dockerfile = 'Dockerfile.web',
-    live_update=[
-        sync('./web', '/app/web'),
-    ],
-    only=[
-        "./web",
-        "./client",
-        "./scripts",
-    ],
-    target="src"
-)
 
 docker_build('mercurios_client', '.', dockerfile = 'Dockerfile.client',
     live_update=[
         sync('./client', '/app/client'),
-        # restart_container(), # docker-compose only
+        restart_container(), # docker-compose only
     ],
     only=[
         "./client",
         "./scripts",
+    ],
+    ignore=[
+        "./server/**/*"
     ]
 )
