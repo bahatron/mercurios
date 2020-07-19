@@ -9,7 +9,6 @@ describe("Feature: Emit Event", () => {
     it("can emit events", async () => {
         return new Promise(async (resolve) => {
             let testData = { morty: "smith" };
-
             let event = await _client.emit("test_emit", { data: testData });
 
             expect(event).toBeTruthy();

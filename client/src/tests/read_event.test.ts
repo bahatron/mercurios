@@ -13,7 +13,7 @@ describe("Feature: Read Event", () => {
 
         await _client
             .publish(topic, { expectedSeq: 1, data })
-            .catch((err) => console.error(err));
+            .catch((err) => (err.code === 417 ? err : console.error(err)));
 
         let event = await _client.read(topic, 1);
 

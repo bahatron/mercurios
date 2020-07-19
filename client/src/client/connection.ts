@@ -1,4 +1,5 @@
 import ws from "ws";
+import { type } from "os";
 
 export interface MercuriosMessage {
     subscription: string;
@@ -24,12 +25,23 @@ export interface ServerMessage {
     queue?: string;
 }
 
-function wsc(url: string): ws | WebSocket {
-    return new ws(url);
+function Socket(_url: string, _id?: string): ws | WebSocket {
+    if (typeof window === "undefined") {
+        return new ws(_url, <ws.ClientOptions>{});
+    }
+
+    let browserUrl = new URL(_url);
+
+    return new WebSocket(
+        `${browserUrl.hostname}${browserUrl.port ? `:${browserUrl.port}` : ""}${
+            _id ? `?id=${_id}` : ""
+        }`,
+        "ws"
+    );
 }
 
-export function ClientSocket(_url: string, _id?: string) {
-    let _socket = wsc(_url);
+export function Connection(_url: string, _id?: string) {
+    let _socket = Socket(_url);
     let _listeners: Record<string, Set<MercuriosEventHandler>> = {};
     let _queue: Array<() => void> = [];
 
@@ -49,8 +61,8 @@ export function ClientSocket(_url: string, _id?: string) {
     };
 
     _socket.onerror = function onSocketError(err: any) {
-        socket.close();
-
+        connection.close();
+        connection;
         if (err) {
             throw err;
         }
@@ -61,23 +73,23 @@ export function ClientSocket(_url: string, _id?: string) {
             (message.data ?? message).toString()
         );
 
-        socket.emit(subscription, { subscription, subject, event });
+        connection.emit(subscription, { subscription, subject, event });
     };
 
-    let socket = {
-        emit(topic: string, message: MercuriosMessage): void {
-            if (!_listeners[topic]) {
+    let connection = {
+        emit(event: string, message: MercuriosMessage): void {
+            if (!_listeners[event]) {
                 return;
             }
 
-            _listeners[topic].forEach((listener) => listener(message));
+            _listeners[event].forEach((listener) => listener(message));
         },
 
         once(event: string, handler: MercuriosEventHandler): void {
             new Promise((resolve) => {
-                socket.on(event, async (msg) => {
+                connection.on(event, async (msg) => {
                     await handler(msg);
-                    socket.off(event, handler);
+                    connection.off(event, handler);
                     return resolve();
                 });
             });
@@ -123,7 +135,7 @@ export function ClientSocket(_url: string, _id?: string) {
                         resolve();
                     };
 
-                    if (socket.isOpen()) {
+                    if (connection.isOpen()) {
                         action();
                     } else {
                         _queue.push(action);
@@ -135,5 +147,5 @@ export function ClientSocket(_url: string, _id?: string) {
         },
     } as const;
 
-    return socket;
+    return connection;
 }

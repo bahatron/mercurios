@@ -1,8 +1,8 @@
 import {
-    ClientSocket,
+    Connection,
     MercuriosEvent,
     MercuriosEventHandler,
-} from "./client_socket";
+} from "./connection";
 import { $axios } from "../utils/axios";
 import { $error } from "../utils/error";
 
@@ -22,7 +22,7 @@ function randomString(): string {
 }
 
 export function MercuriosClient(_url: string, _id?: string) {
-    let _socket = ClientSocket(_url, _id);
+    let _socket = Connection(_url, _id);
 
     return {
         async publish(
@@ -117,9 +117,13 @@ export function MercuriosClient(_url: string, _id?: string) {
 
         async unsubscribe(subscription: string): Promise<void> {
             await _socket.send({
-                action: "subscribe",
+                action: "unsubscribe",
                 subscription,
             });
         },
+
+        on: _socket.on,
+
+        once: _socket.once,
     };
 }

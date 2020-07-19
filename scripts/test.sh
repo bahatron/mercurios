@@ -8,6 +8,8 @@ docker-compose -f ${GITROOT}/docker-compose.test.yml up -d
 # run test
 docker-compose -f ${GITROOT}/docker-compose.test.yml exec -T server \
     sh -c "wait-for-it localhost:4254 -t 30 -- npm run test" || exit 1
+docker-compose -f ${GITROOT}/docker-compose.test.yml exec -T client \
+    sh -c "wait-for-it server:4254 -- npm run test" || exit 1
     
 # run benchmark
 docker-compose -f ${GITROOT}/docker-compose.test.yml exec -T server \

@@ -16,7 +16,6 @@ describe("Feature: Subscribe To Topic", () => {
                 expect(msg.subject).toEqual(topic);
                 expect(msg.event.topic).toEqual(topic);
                 expect(msg.event.data).toEqual(data);
-
                 resolve();
             });
 

@@ -6,7 +6,7 @@
     "types": "dist/index.d.ts",
     "scripts": {
         "prepublishOnly": "npm run build && npm run test",
-        "dev": "npm run build && wait-for-it server:4254 -- node dist/playground/server.js",
+        "dev": "npm run build && nodemon dist/playground/server.js",
         "test": "jest --forceExit --reporters=default",
         "build:clean": "rm -rf dist && npm run build",
         "build": "tsc"

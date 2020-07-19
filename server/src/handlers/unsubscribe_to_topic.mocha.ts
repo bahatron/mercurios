@@ -49,7 +49,7 @@ describe("WS action: unsubscribe", () => {
         // then unsubscribe and validate we don't get a new message
         return new Promise(async (resolve, reject) => {
             _wsc.once("message", (data) => {
-                reject(new Error("should not recieve a message"));
+                reject(new Error("should not receive a message"));
             });
 
             _wsc.send(

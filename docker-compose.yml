@@ -74,5 +74,4 @@ services:
             - 4250:4250
         command: sh -c "wait-for-it server:4254 -t 30 -s -- npm run dev"
         environment:
-            NODE_ENV: dev
             MERCURIOS_URL: http://server:4254

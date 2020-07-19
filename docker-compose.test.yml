@@ -23,16 +23,6 @@ x-mysql-config: &mysql-config
     MYSQL_PORT: ${MYSQL_PORT:-3306}
 
 services:
-    server:
-        image: mercurios_server
-        container_name: mercurios_server
-        # command: "wait-for-it postgres:5432 -- npm start"
-        command: "wait-for-it mysql:3306 -- npm start"
-        environment:
-            <<: *postgres-config
-            <<: *mysql-config
-            <<: *mercurios-config
-
     mysql:
         image: mysql:5.6
         container_name: mercurios_mysql
@@ -48,3 +38,20 @@ services:
     nats:
         image: nats
         container_name: mercurios_nats
+
+    server:
+        image: mercurios_server
+        container_name: mercurios_server
+        # command: "wait-for-it postgres:5432 -- npm start"
+        command: "wait-for-it mysql:3306 -- npm start"
+        environment:
+            <<: *postgres-config
+            <<: *mysql-config
+            <<: *mercurios-config
+
+    client:
+        image: mercurios_client
+        container_name: mercurios_client
+        command: npm run dev
+        environment:
+            MERCURIOS_URL: http://server:4254
