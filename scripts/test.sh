@@ -13,4 +13,4 @@ docker-compose -f ${GITROOT}/docker-compose.test.yml exec -T client \
     
 # run benchmark
 docker-compose -f ${GITROOT}/docker-compose.test.yml exec -T server \
-    sh -c "npm run benchmark -- -d 10 -s 10  --ping --multi --write --read --conflictive --json"
+    sh -c "npm run benchmark -- -d 10 -s 10  --ping --write --read --conflictive --json"
