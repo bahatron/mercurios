@@ -32,13 +32,14 @@ function breakdown(result: Result | Result[]) {
         } = result;
 
         $logger.inspect({
+            title,
             connections,
             pipelining,
-            title,
             requests: {
                 mean: requests.mean,
                 stddev: requests.stddev,
-                total: requests.total,
+                max: requests.max,
+                p97_5: requests.p97_5,
                 p99: requests.p99,
             },
 
@@ -46,6 +47,7 @@ function breakdown(result: Result | Result[]) {
                 mean: latency.mean,
                 stddev: latency.stddev,
                 max: latency.max,
+                p97_5: latency.p97_5,
                 p99: latency.p99,
             },
             throughput: {
@@ -160,7 +162,7 @@ async function conflictiveWrites() {
 }
 
 async function multiStream(streams = _streams) {
-    await Promise.all(
+    let results = await Promise.all(
         Array(streams)
             .fill(null)
             .map((val, index) => {
@@ -173,7 +175,30 @@ async function multiStream(streams = _streams) {
                     method: "POST",
                 });
             })
-    ).then(breakdown);
+    );
+
+    let combined = results.reduce((combined, result: any) => {
+        breakdown(result);
+        for (let key in combined.requests) {
+            (combined as any).requests[key] += result.requests[key];
+        }
+
+        return combined;
+    }, results.shift() as Result);
+
+    $logger.inspect({
+        title: `combined multi stream benchmark results`,
+        requests: {
+            mean: combined.requests.mean,
+        },
+        latency: {
+            mean: combined.latency.mean,
+        },
+        throughput: {
+            mean: combined.throughput.mean,
+        },
+        errors: combined.errors,
+    });
 }
 
 async function main() {
