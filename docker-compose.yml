@@ -53,8 +53,8 @@ services:
         build:
             context: .
             dockerfile: Dockerfile.server
-        image: mercurios_http
-        container_name: mercurios_http
+        image: mercurios_server
+        container_name: mercurios_server
         ports:
             - ${MERCURIOS_PORT:-4254}:${MERCURIOS_PORT:-4254}
         command: sh -c "wait-for-it mysql:3306 -s -t 30 -- npm run dev"

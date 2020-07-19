@@ -20,6 +20,7 @@ describe("WS action: unsubscribe", () => {
 
     it("will stop receiving messages after unsubscribing", async () => {
         const _topic = "ws_unsubscribe_test";
+        const _subscription = "ws_unsubscribe_test";
 
         // first subscribe to a topic
         await new Promise((resolve) => {
@@ -32,6 +33,7 @@ describe("WS action: unsubscribe", () => {
                 JSON.stringify({
                     action: "subscribe",
                     topic: _topic,
+                    subscription: _subscription,
                 }),
 
                 (err) => {
@@ -53,7 +55,7 @@ describe("WS action: unsubscribe", () => {
             _wsc.send(
                 JSON.stringify({
                     action: "unsubscribe",
-                    topic: _topic,
+                    subscription: _subscription,
                 }),
 
                 (err) => {

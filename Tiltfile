@@ -2,7 +2,7 @@ docker_compose(['./docker-compose.yml'])
 
 # update_settings(max_parallel_updates=2)
 
-docker_build('mercurios_http', '.', dockerfile = 'Dockerfile.server',
+docker_build('mercurios_server', '.', dockerfile = 'Dockerfile.server',
     live_update=[
         sync('./server', '/app/server'),
     ],

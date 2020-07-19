@@ -24,8 +24,8 @@ x-mysql-config: &mysql-config
 
 services:
     server:
-        image: mercurios_http
-        container_name: mercurios_http
+        image: mercurios_server
+        container_name: mercurios_server
         # command: "wait-for-it postgres:5432 -- npm start"
         command: "wait-for-it mysql:3306 -- npm start"
         environment:
