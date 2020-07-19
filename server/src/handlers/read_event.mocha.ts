@@ -31,7 +31,7 @@ describe("GET /read/:topic/:seq", () => {
     });
 
     describe("Scenario: topic exists but event does not", () => {
-        const _topic = `read_event_test`;
+        const _topic = `server_read_event_test`;
         let _response: AxiosResponse;
 
         before(async () => {
@@ -56,7 +56,7 @@ describe("GET /read/:topic/:seq", () => {
     });
 
     describe("Scenario: topic and event exists", () => {
-        const _topic = `read_event_test`;
+        const _topic = `server_read_event_test`;
         let _event: any;
 
         before(async () => {

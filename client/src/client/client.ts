@@ -15,10 +15,10 @@ export interface SubscribeOptions {
     queue?: string;
 }
 
-function randomString() {
+function randomString(): string {
     let generator = () => Math.random().toString(36).substring(2);
 
-    return `${generator()}${generator()}`;
+    return `${generator().repeat(2)}`;
 }
 
 export function MercuriosClient(_url: string, _id?: string) {
