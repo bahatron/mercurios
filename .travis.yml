@@ -18,7 +18,7 @@ before_install:
 #     - my_script
 
 script:
-    - docker-compose build server
+    - docker-compose build server client
     - ./scripts/test.sh
     - ./scripts/push.sh
 

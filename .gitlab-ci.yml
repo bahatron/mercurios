@@ -14,6 +14,6 @@ stages:
 build_:
     stage: build
     script:
-        - docker-compose build server
+        - docker-compose build server client
         - ./scripts/test.sh
         - BRANCH_NAME=${CI_COMMIT_BRANCH} ./scripts/push.sh
