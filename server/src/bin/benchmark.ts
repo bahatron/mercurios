@@ -31,6 +31,7 @@ function breakdown(result: Result | Result[]) {
             non2xx,
         } = result;
 
+        console.log(`=`.repeat(80));
         $logger.inspect({
             title,
             connections,

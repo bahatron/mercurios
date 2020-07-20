@@ -8,7 +8,6 @@ fi
 
 if [ $1 = "down" ]; then
     tilt down
-    exit 0
 fi
 
 if [ $1 = "test" ]; then
@@ -19,5 +18,4 @@ fi
 
 if [ $1 = "build" ]; then
     docker-compose build
-    exit 0
 fi
