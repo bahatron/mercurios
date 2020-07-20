@@ -1,14 +1,14 @@
 {
     "name": "@bahatron/mercurios",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "description": "mercurios client",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "main": "lib/index.js",
+    "types": "lib/index.d.ts",
     "scripts": {
         "prepublishOnly": "npm run build && npm run test",
-        "dev": "npm run build && nodemon dist/playground/server.js",
+        "dev": "npm run build && nodemon lib/playground/server.js",
         "test": "jest --forceExit --reporters=default",
-        "build:clean": "rm -rf dist && npm run build",
+        "build:clean": "rm -rf lib && npm run build",
         "build": "tsc"
     },
     "author": "simonpiscitelli@gmail.com",

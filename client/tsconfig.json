@@ -5,12 +5,11 @@
         "declaration": true,
         "incremental": true,
         "sourceMap": true,
-        "outDir": "dist",
+        "outDir": "lib",
         "strict": true,
     },
     "include": [
         "src",
-        "package.json`"
     ],
     "exclude": [
         "node_modules",
