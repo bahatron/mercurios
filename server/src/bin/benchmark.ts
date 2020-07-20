@@ -40,7 +40,6 @@ function breakdown(result: Result | Result[]) {
                 mean: requests.mean,
                 stddev: requests.stddev,
                 max: requests.max,
-                p97_5: requests.p97_5,
                 p99: requests.p99,
             },
 
@@ -48,7 +47,6 @@ function breakdown(result: Result | Result[]) {
                 mean: latency.mean,
                 stddev: latency.stddev,
                 max: latency.max,
-                p97_5: latency.p97_5,
                 p99: latency.p99,
             },
             throughput: {
