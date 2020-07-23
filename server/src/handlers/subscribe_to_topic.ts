@@ -11,8 +11,6 @@ export default <WsRequestHandler>(
         subscription = uuid.v4(),
         queue,
     }) {
-        $logger.debug("subscribing to topic", { topic, subscription });
-
         if (!topic || connection.subscriptions.has(subscription)) {
             return;
         }
@@ -21,13 +19,10 @@ export default <WsRequestHandler>(
             `topic.${topic}`,
             (err, msg) => {
                 return new Promise((resolve) => {
-                    connection.logger.debug(
-                        `messaged received from dispatcher`,
-                        {
-                            topic,
-                            subscription,
-                        }
-                    );
+                    connection.logger.debug(`subscription message received`, {
+                        topic,
+                        subscription,
+                    });
 
                     if (err) {
                         connection.logger.error("error receiving message", err);
@@ -60,7 +55,7 @@ export default <WsRequestHandler>(
 
         connection.subscriptions.set(subscription, sub);
 
-        $logger.debug(`subscribed to topic successfully`, {
+        $logger.debug(`subscribed to topic`, {
             subscription,
             topic,
         });

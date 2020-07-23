@@ -2,7 +2,7 @@ import { WsRequestHandler } from "../http/ws_connection";
 import { Subscription } from "ts-nats";
 
 export default <WsRequestHandler>(
-    async function unsubscribeToTopic({ subscription, connection }) {
+    async function unsubscribeToTopic({ subscription, topic, connection }) {
         connection.logger.debug("unsubscribing to topic", {
             subscription,
         });
@@ -17,8 +17,9 @@ export default <WsRequestHandler>(
 
         connection.subscriptions.delete(subscription);
 
-        connection.logger.debug("unsubscribed to topic successfully", {
+        connection.logger.debug("removed subscription", {
             subscription,
+            topic,
         });
     }
 );

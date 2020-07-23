@@ -8,7 +8,11 @@ export default async function readEvent(
 ): Promise<MercuriosEvent | null> {
     let event = await $store.fetch(topic, seq);
 
-    $logger.debug(`fetched event`, { topic, seq, found: Boolean(event) });
+    $logger.debug(`fetched event - ${topic}`, {
+        topic,
+        seq,
+        found: Boolean(event),
+    });
 
     return event;
 }
