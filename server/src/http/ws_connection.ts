@@ -2,7 +2,7 @@ import ws from "ws";
 import { Subscription } from "ts-nats";
 import subscribe_to_topic from "../handlers/subscribe_to_topic";
 import unsubscribe_to_topic from "../handlers/unsubscribe_to_topic";
-import $nats from "../utils/nats";
+import $nats from "../services/nats";
 import $logger from "../utils/logger";
 import $json from "../utils/json";
 import { Logger } from "@bahatron/logger";
@@ -75,12 +75,15 @@ export function Connection(_id: string, _socket: ws) {
                 subscription,
             }: MercuriosClientMessage = $json.parse(data);
 
-            _logger.debug(`ws message received: ${action}`, {
-                action,
-                topic,
-                queue,
-                subscription,
-            });
+            _logger.debug(
+                {
+                    action,
+                    topic,
+                    queue,
+                    subscription,
+                },
+                `ws message received: ${action}`
+            );
 
             await ACTIONS[action]?.({
                 connection: conn,
@@ -102,7 +105,7 @@ export function Connection(_id: string, _socket: ws) {
     });
 
     _socket.on("error", async (err) => {
-        _logger.error("socket error", err);
+        _logger.error(err, "socket error");
         await conn.close();
     });
 

@@ -1,30 +1,34 @@
 version: "3.5"
 
 x-mercurios-config: &mercurios-config
-    MERCURIOS_PORT: ${MERCURIOS_PORT:-4254}
-    TEST_URL: ${TEST_URL:-http://server:4254}
-    NATS_URL: ${NATS_URL:-nats://nats:4222}
+    NATS_URL: nats://mercurios_nats:4222
+    # MERCURIOS_PORT: 4254
+    MERCURIOS_TEST_URL: http://mercurios_server:4254
     # MERCURIOS_DRIVER: pg
+    MERCURIOS_DRIVER: mysql
+    MERCURIOS_WORKERS: 6
     MERCURIOS_DEBUG: 1
     MERCURIOS_ENV: dev
 
 x-postgres-config: &postgres-config
-    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
-    POSTGRES_DB: ${POSTGRES_DB:-mercurios}
-    POSTGRES_USER: ${POSTGRES_USER:-admin}
-    POSTGRES_PORT: ${POSTGRES_PORT:-5432}
-    POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+    POSTGRES_PASSWORD: secret
+    POSTGRES_DB: mercurios
+    POSTGRES_USER: admin
+    POSTGRES_PORT: 5432
+    POSTGRES_HOST: mercurios_postgres
 
 x-mysql-config: &mysql-config
-    MYSQL_USER: ${MYSQL_USER:-admin}
-    MYSQL_DATABASE: ${MYSQL_DATABASE:-mercurios}
-    MYSQL_PASSWORD: ${MYSQL_PASSWORD:-secret}
-    MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-secret}
-    MYSQL_HOST: ${MYSQL_HOST:-mysql}
-    MYSQL_PORT: ${MYSQL_PORT:-3306}
+    MYSQL_USER: admin
+    MYSQL_DATABASE: mercurios
+    MYSQL_PASSWORD: secret
+    MYSQL_ROOT_PASSWORD: secret
+    MYSQL_HOST: mercurios_mysql
+    MYSQL_PORT: 3306
+    # rds ssl cert will be present at /etc/ssl/rds-combined-ca-bundle.pem
+    MYSQL_RDS_SSL: 0
 
 services:
-    nats:
+    mercurios_nats:
         image: nats
         container_name: mercurios_nats
         # command: ["-V"]
@@ -32,8 +36,8 @@ services:
             - 4222:4222
             - 8222:8222
 
-    postgres:
-        image: postgres:11
+    mercurios_postgres:
+        image: postgres
         container_name: mercurios_postgres
         ports:
             - 5432:5432
@@ -41,37 +45,49 @@ services:
             <<: *postgres-config
         command: -c 'max_connections=500'
 
-    mysql:
+    mercurios_mysql:
         image: mysql:5.6
         container_name: mercurios_mysql
         ports:
             - 3306:3306
         environment:
             <<: *mysql-config
+        # command: --default-authentication-plugin=mysql_native_password
 
-    server:
+    mercurios_server:
         build:
             context: .
             dockerfile: Dockerfile.server
         image: mercurios_server
         container_name: mercurios_server
         ports:
-            - ${MERCURIOS_PORT:-4254}:${MERCURIOS_PORT:-4254}
-        command: sh -c "wait-for-it mysql:3306 -s -t 30 -- npm run dev"
-        # command: sh -c "wait-for-it postgres:5432 -s -t 30 -- npm run migrate:pg && npm run dev"
+            - 4254:4254
+        command: sh -c "wait-for-it mercurios_mysql:3306 -s -t 30 -- npm run migrate && npm run dev"
         environment:
             <<: *postgres-config
             <<: *mysql-config
             <<: *mercurios-config
 
-    client:
+    mercurios_client:
         build:
             context: .
             dockerfile: Dockerfile.client
         image: mercurios_client
         container_name: mercurios_client
+        command: sh -c "npm run dev"
+        volumes:
+            - ./client/lib:/app/client/lib
+        environment:
+            MERCURIOS_URL: http://mercurios_server:4254
+
+    mercurios_playground:
+        build:
+            context: .
+            dockerfile: Dockerfile.playground
+        image: mercurios_playground
+        container_name: mercurios_playground
+        command: sh -c "wait-for-it mercurios_server:4254 -- npm run dev"
         ports:
             - 4250:4250
-        command: sh -c "wait-for-it server:4254 -t 30 -s -- npm run dev"
         environment:
-            MERCURIOS_URL: http://server:4254
+            MERCURIOS_URL: http://mercurios_server:4254

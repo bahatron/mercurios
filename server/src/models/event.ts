@@ -2,7 +2,8 @@ import $json from "../utils/json";
 import $validator from "../utils/validator";
 
 export interface MercuriosEvent {
-    seq?: number;
+    seq: number | null;
+    key: string | null;
     data: any;
     published_at: string;
     topic: string;
@@ -10,14 +11,16 @@ export interface MercuriosEvent {
 
 export default function $event({
     topic,
-    seq,
     published_at,
-    data,
-}: MercuriosEvent): MercuriosEvent {
+    seq = null,
+    data = null,
+    key = null,
+}: Partial<MercuriosEvent>): MercuriosEvent {
     return {
         topic: $validator.string(topic),
-        seq: $validator.nullableInt(seq) ?? undefined,
         published_at: $validator.isoDate(published_at),
+        seq: $validator.nullableInt(seq),
+        key: $validator.nullableString(key),
         data: $json.parse(data),
     };
 }

@@ -1,19 +1,23 @@
 import Knex from "knex";
 
 export const up = async function (knex: Knex) {
-    await knex.schema.createTableIfNotExists("mercurios_topics", (table) => {
-        table.string("topic").primary();
-        table.integer("seq");
-    });
+    if (!(await knex.schema.hasTable("mercurios_topics"))) {
+        await knex.schema.createTable("mercurios_topics", (table) => {
+            table.string("topic").primary();
+            table.integer("seq");
+        });
+    }
 
-    await knex.schema.createTableIfNotExists("mercurios_events", (table) => {
-        table.string("topic");
-        table.integer("seq");
-        table.string("published_at", 30);
-        table.text("data");
+    if (!(await knex.schema.hasTable("mercurios_events"))) {
+        await knex.schema.createTable("mercurios_events", (table) => {
+            table.string("topic");
+            table.integer("seq");
+            table.string("published_at", 30);
+            table.text("data");
 
-        table.primary(["topic", "seq"]);
-    });
+            table.primary(["topic", "seq"]);
+        });
+    }
 
     await knex.raw(`
         CREATE OR REPLACE PROCEDURE store_event (

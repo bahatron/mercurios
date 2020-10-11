@@ -1,8 +1,7 @@
-import client from "../client";
-import $logger from "../utils/logger";
+import { connect } from "..";
 
 describe("Feature: Read Event", () => {
-    const _client = client.connect({
+    const _client = connect({
         url: process.env.MERCURIOS_URL || "",
         id: "client_read_event_test",
     });
@@ -13,7 +12,7 @@ describe("Feature: Read Event", () => {
 
         await _client
             .publish(topic, { expectedSeq: 1, data })
-            .catch((err) => (err.code === 417 ? err : console.error(err)));
+            .catch((err) => (err.httpCode === 417 ? err : console.error(err)));
 
         let event = await _client.read(topic, 1);
 

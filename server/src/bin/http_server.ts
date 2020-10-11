@@ -11,12 +11,12 @@ const HTTP_SERVER = new http.Server(expressApp);
 const WEBSOCKET_SERVER = createWsServer(HTTP_SERVER);
 
 process.on("uncaughtException", (err) => {
-    $logger.error("uncaught expection", err);
+    $logger.error(err, "uncaught expection");
     process.exit(-1);
 });
 
 process.on("unhandledRejection", async (reason, promise) => {
-    await $logger.error("unhlanded rejection", { reason });
+    await $logger.error({ reason }, "unhlanded rejection");
     process.exit(-1);
 });
 
@@ -27,7 +27,7 @@ process.on("unhandledRejection", async (reason, promise) => {
 
     server.on("error", (err) => {
         $logger.warning(`${server.constructor.name} error - ${err.message}`);
-        $logger.error(err.message, err);
+        $logger.error(err);
     });
 });
 

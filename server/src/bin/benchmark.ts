@@ -1,12 +1,12 @@
 import autocannon, { Options, Result } from "autocannon";
 import yargs from "yargs";
 import $logger from "@bahatron/logger";
-import $env from "@bahatron/env";
 import BIG_JSON from "../tests/fixtures/big_json";
 import $json from "../utils/json";
 import $axios from "../utils/axios";
+import $config from "../utils/config";
 
-const MERCURIOS_TEST_URL = $env.get("TEST_URL");
+const MERCURIOS_TEST_URL = $config.test_url;
 
 $logger.inspect(yargs.argv);
 let _streams = parseInt(yargs.argv.s as string) || 10;
@@ -147,6 +147,7 @@ async function conflictiveWrites() {
             },
             body: $json.stringify({
                 expectedSeq: 1,
+                key: "conflictive writes",
             }),
         }),
         autocannon({
@@ -156,13 +157,20 @@ async function conflictiveWrites() {
             title: "publishing with no expectedSeq",
             url: `${MERCURIOS_TEST_URL}/publish/${topic}`,
             method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: $json.stringify({
+                expectedSeq: 1,
+                key: "conflictive writes",
+            }),
         }),
     ]).then(breakdown);
 }
 
 async function multiStream(streams = _streams) {
     let results = await Promise.all(
-        Array(streams)
+        Array(streams + 1)
             .fill(null)
             .map((val, index) => {
                 return autocannon({
@@ -201,6 +209,8 @@ async function multiStream(streams = _streams) {
 }
 
 async function main() {
+    $logger.info(`benchmark started - driver ${$config.mercurios_driver}`);
+
     if (yargs.argv.write === true) {
         await writeBench();
     }

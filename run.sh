@@ -2,20 +2,40 @@
 
 export GITROOT=$(git rev-parse --show-toplevel)
 
-if [ $1 = "dev" ]; then
+execute_build()
+{
+    docker-compose -f ${GITROOT}/docker-compose.yml build --parallel || exit 1
+    execute_shutdown
+}
+
+execute_shutdown()
+{
+    tilt down
+    docker-compose -f ${GITROOT}/docker-compose.yml down --remove-orphans
+    docker-compose -f ${GITROOT}/docker-compose.test.yml down --remove-orphans
+}
+
+if [ $1 = "up" ]; then
     tilt up --hud=TRUE
+    execute_shutdown
 fi
 
 if [ $1 = "down" ]; then
-    tilt down
-fi
-
-if [ $1 = "test" ]; then
-    ${GITROOT}/scripts/test.sh || exit 1
-    # exit $?
-    exit 0
+    execute_shutdown
 fi
 
 if [ $1 = "build" ]; then
-    docker-compose build
+    echo "building images..."
+    execute_build
+    exit 0
+fi
+
+if [ $1 = "test" ]; then
+    if [ ${2} = "-b" ]; then
+        execute_build
+    fi
+    
+    ${GITROOT}/scripts/test.sh || exit 1
+    # exit $?
+    exit 0
 fi

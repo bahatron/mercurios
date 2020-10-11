@@ -1,9 +1,9 @@
 import { Response, Request, NextFunction } from "express";
-import { HttpError } from "../../utils/error";
 import $logger from "../../utils/logger";
+import { Exception } from "../../utils/error";
 
 export default function errorHandler(
-    err: HttpError,
+    err: Exception,
     req: Request,
     res: Response,
     next: NextFunction
@@ -11,9 +11,7 @@ export default function errorHandler(
     let code = err.httpCode || 500;
 
     if (code >= 500) {
-        $logger.error(err.message, err);
-    } else {
-        $logger.debug(err.message, err);
+        $logger.error(err);
     }
 
     return res.status(code).json({ message: err.message, ...err.context });

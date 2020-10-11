@@ -1,0 +1,24 @@
+FROM node:lts-alpine
+RUN apk add bash
+
+COPY ./scripts/wait-for-it.sh /usr/bin/wait-for-it
+
+WORKDIR /app/client
+COPY ./client/package.json .
+COPY ./client/package-lock.json .
+RUN npm install
+
+WORKDIR /app/playground
+COPY ./playground/package.json .
+COPY ./playground/package-lock.json .
+RUN npm install
+
+WORKDIR /app/client
+COPY ./client .
+RUN npm run build
+
+WORKDIR /app/playground
+COPY ./playground .
+RUN npm run build
+
+CMD ["npm", "run", "dev"]

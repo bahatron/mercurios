@@ -11,7 +11,7 @@ stages:
     - test
     - deploy
 
-build_:
+build:
     stage: build
     script:
         - docker-compose build server client

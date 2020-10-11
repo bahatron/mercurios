@@ -1,8 +1,6 @@
 FROM node:lts-alpine as src
 RUN apk add bash
 
-COPY ./scripts/wait-for-it.sh /usr/bin/wait-for-it
-
 WORKDIR /app/client
 COPY ./client/package.json ./package.json
 COPY ./client/package-lock.json ./package-lock.json

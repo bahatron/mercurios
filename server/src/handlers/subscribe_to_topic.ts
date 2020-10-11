@@ -19,13 +19,16 @@ export default <WsRequestHandler>(
             `topic.${topic}`,
             (err, msg) => {
                 return new Promise((resolve) => {
-                    connection.logger.debug(`subscription message received`, {
-                        topic,
-                        subscription,
-                    });
+                    connection.logger.debug(
+                        {
+                            topic,
+                            subscription,
+                        },
+                        `subscription message received`
+                    );
 
                     if (err) {
-                        connection.logger.error("error receiving message", err);
+                        connection.logger.error(err, "error receiving message");
                         return;
                     }
 
@@ -33,13 +36,13 @@ export default <WsRequestHandler>(
                         $json.stringify({
                             subscription,
                             subject: topic,
-                            event: msg.data,
+                            event: msg.data.event,
                         }),
                         (err) => {
                             if (err) {
                                 connection.logger.error(
-                                    "error sending message",
-                                    err
+                                    err,
+                                    "error sending message"
                                 );
                             }
 
@@ -55,9 +58,12 @@ export default <WsRequestHandler>(
 
         connection.subscriptions.set(subscription, sub);
 
-        $logger.debug(`subscribed to topic`, {
-            subscription,
-            topic,
-        });
+        $logger.debug(
+            {
+                subscription,
+                topic,
+            },
+            `subscribed to topic`
+        );
     }
 );

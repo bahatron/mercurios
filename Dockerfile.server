@@ -1,8 +1,11 @@
 FROM node:lts-alpine
 RUN apk add bash
+RUN npm i -g pm2
 
-ARG MERCURIOS_PORT
-EXPOSE ${MERCURIOS_PORT:-4254}
+RUN  wget https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem -O /etc/ssl/rds-combined-ca-bundle.pem
+
+ARG MERCURIOS_PORT=4254
+EXPOSE ${MERCURIOS_PORT}
 ENV MERCURIOS_ENV=production
 
 COPY ./scripts/wait-for-it.sh /usr/bin/wait-for-it

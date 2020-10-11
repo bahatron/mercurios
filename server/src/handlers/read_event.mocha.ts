@@ -5,7 +5,7 @@ import $logger from "@bahatron/logger";
 import { publishEventEndpoint } from "./publish_event.mocha";
 import $store from "../models/store";
 
-const MERCURIOS_TEST_URL = env.get("TEST_URL");
+const MERCURIOS_MERCURIOS_TEST_URL = env.get("MERCURIOS_TEST_URL");
 
 describe("GET /read/:topic/:seq", () => {
     async function readEvent(
@@ -13,7 +13,7 @@ describe("GET /read/:topic/:seq", () => {
         seq: number
     ): Promise<AxiosResponse> {
         return $axios
-            .get(`${MERCURIOS_TEST_URL}/read/${topic}/${seq}`)
+            .get(`${MERCURIOS_MERCURIOS_TEST_URL}/read/${topic}/${seq}`)
             .catch((err) => err.response);
     }
 
@@ -38,10 +38,10 @@ describe("GET /read/:topic/:seq", () => {
             try {
                 await $store.deleteStream(_topic);
 
-                await publishEventEndpoint(_topic, "hello");
+                await publishEventEndpoint(_topic, { data: "hello" });
                 _response = await readEvent(_topic, 2);
             } catch (err) {
-                $logger.error(err.message, err);
+                $logger.error(err);
                 throw err;
             }
         });
@@ -62,10 +62,12 @@ describe("GET /read/:topic/:seq", () => {
         before(async () => {
             try {
                 _event = (
-                    await publishEventEndpoint(_topic, { rick: "sanchez" })
+                    await publishEventEndpoint(_topic, {
+                        data: { rick: "sanchez" },
+                    })
                 ).data;
             } catch (err) {
-                $logger.error(err.message, err);
+                $logger.error(err);
                 throw err;
             }
         });
@@ -80,6 +82,7 @@ describe("GET /read/:topic/:seq", () => {
             expect(_event).to.have.all.keys([
                 "seq",
                 "published_at",
+                "key",
                 "data",
                 "topic",
             ]);

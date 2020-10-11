@@ -4,14 +4,14 @@ import { Connection } from "./ws_connection";
 import url from "url";
 import uuid from "uuid";
 import $logger from "../utils/logger";
-import { $env } from "../utils/config";
+import $config from "../utils/config";
 
 const _clients: Map<string, Connection> = new Map();
 export default function createWsServer(httpServer: Server): ws.Server {
     const wss = new ws.Server({ server: httpServer });
 
     wss.on("error", (err) => {
-        $logger.error(`ws server error - ${err.message}`, err);
+        $logger.error(err, `ws server error - ${err.message}`);
     });
 
     wss.on("connection", (socket, request) => {
@@ -19,9 +19,8 @@ export default function createWsServer(httpServer: Server): ws.Server {
 
         let id = typeof query.id === "string" ? query.id : uuid.v4();
         let pingInterval =
-            parseInt(
-                typeof query.pingInterval === "string" ? query.pingInterval : ""
-            ) || parseInt($env.get("MERCURIOS_PING_INTERVAL", "30000"));
+            parseInt(query.pingInterval?.toString()) ||
+            parseInt($config.mercurios_ping_interval);
 
         if (_clients.has(id)) {
             socket.close();

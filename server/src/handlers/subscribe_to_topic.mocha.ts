@@ -1,17 +1,17 @@
 import $ws from "ws";
-import $env from "@bahatron/env";
 import $logger from "@bahatron/logger";
 import { publishEventEndpoint } from "./publish_event.mocha";
 import uuid from "uuid";
+import $config from "../utils/config";
 
-const TEST_URL = $env.get("TEST_URL");
+const MERCURIOS_TEST_URL = $config.test_url;
 
 describe("WS action: subscribe", () => {
     let _wsc: $ws;
 
     before(async () => {
         return new Promise((resolve) => {
-            _wsc = new $ws(`${TEST_URL}?id=subscribe_test`);
+            _wsc = new $ws(`${MERCURIOS_TEST_URL}?id=subscribe_test`);
 
             _wsc.on("open", () => {
                 resolve();
@@ -19,8 +19,7 @@ describe("WS action: subscribe", () => {
         });
     });
 
-    /** @todo: find why second tests does not send msg to ws server */
-    it("can subcribe to a topic", async () => {
+    it("can subscribe to a topic", async () => {
         const _topic = "ws_subscribe_test";
 
         return new Promise(async (resolve) => {
@@ -38,7 +37,7 @@ describe("WS action: subscribe", () => {
                 }),
                 (err) => {
                     if (err) {
-                        return $logger.error(err.message, err);
+                        return $logger.error(err);
                     }
                 }
             );

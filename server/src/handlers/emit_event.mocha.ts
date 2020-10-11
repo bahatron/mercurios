@@ -2,9 +2,9 @@ import $axios, { AxiosResponse } from "axios";
 import env from "@bahatron/env";
 import { expect } from "chai";
 import $event from "../models/event";
-import $nats from "../utils/nats";
+import $nats from "../services/nats";
 
-const MERCURIOS_TEST_URL = env.get("TEST_URL");
+const MERCURIOS_TEST_URL = env.get("MERCURIOS_TEST_URL");
 
 export async function emitEvent(topic: string, data?: any) {
     return $axios.post(`${MERCURIOS_TEST_URL}/emit/${topic}`, {
@@ -34,8 +34,8 @@ describe("POST /emit/:topic", () => {
         });
 
         it("emits a MercuriosEvent", async () => {
-            expect(_message).to.exist;
-            expect(() => $event(_message)).not.to.throw();
+            expect(_message.event).to.exist;
+            expect(() => $event(_message.event)).not.to.throw();
         });
     });
 });

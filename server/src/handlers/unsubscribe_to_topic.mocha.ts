@@ -1,16 +1,16 @@
 import $ws from "ws";
-import $env from "@bahatron/env";
 import $logger from "@bahatron/logger";
 import { publishEventEndpoint } from "./publish_event.mocha";
+import $config from "../utils/config";
 
-const TEST_URL = $env.get("TEST_URL");
+const MERCURIOS_TEST_URL = $config.test_url;
 
 describe("WS action: unsubscribe", () => {
     let _wsc: $ws;
 
     before(async () => {
         return new Promise((resolve) => {
-            _wsc = new $ws(`${TEST_URL}?id=unsubscribe_test`);
+            _wsc = new $ws(`${MERCURIOS_TEST_URL}?id=unsubscribe_test`);
 
             _wsc.on("open", async () => {
                 resolve();

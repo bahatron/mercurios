@@ -1,8 +1,6 @@
-
-
 ```ts
 // connect to server
-let mercurios = $mercurios.connect({ url: process.env.TEST_URL || "" });
+let mercurios = $mercurios.connect({ url: "http://mercurios:4254" });
 
 // subscribe to a topic
 await mercurios.subscribe("123", (event) => {

@@ -1,12 +1,11 @@
 import { createLogger, Logger, Handler } from "@bahatron/logger";
 import $config from "./config";
-import $json from "./json";
 
 const $logger: Logger = createLogger({
     debug: $config.debug,
     id: `mercurios`,
     colours: $config.dev_mode,
-    formatter: $config.dev_mode ? undefined : $json.stringify,
+    formatter: $config.dev_mode ? undefined : JSON.stringify,
 });
 
 const inspectEntry: Handler = ({ context }) => {

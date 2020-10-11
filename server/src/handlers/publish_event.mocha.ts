@@ -2,22 +2,25 @@ import $axios, { AxiosResponse } from "axios";
 import env from "@bahatron/env";
 import { expect } from "chai";
 import $logger from "@bahatron/logger";
-import $nats from "../utils/nats";
-import $store from "../models/store";
+import $nats from "../services/nats";
 import { MercuriosEvent } from "../models/event";
-import { SubscriptionOptions } from "ts-nats";
+import $store from "../models/store";
 
-const MERCURIOS_TEST_URL = env.get("TEST_URL");
+const MERCURIOS_MERCURIOS_TEST_URL = env.get("MERCURIOS_TEST_URL");
 
 export async function publishEventEndpoint(
     topic: string,
-    data?: any,
-    expectedSeq?: number
+    options: {
+        data?: any;
+        expectedSeq?: number;
+        key?: string;
+    } = {}
 ): Promise<AxiosResponse> {
     return $axios
-        .post(`${MERCURIOS_TEST_URL}/publish/${topic}`, {
-            data,
-            expectedSeq,
+        .post(`${MERCURIOS_MERCURIOS_TEST_URL}/publish/${topic}`, {
+            data: options.data,
+            expectedSeq: options.expectedSeq,
+            key: options.key,
         })
         .catch((err) => err.response);
 }
@@ -26,21 +29,25 @@ describe("POST /publish/:topic", () => {
     describe("Scenario: publish to non existent stream", () => {
         const _topic = `publish_event_test`;
         let _response: AxiosResponse;
-        let _event: MercuriosEvent;
+        let _message: { event: MercuriosEvent };
 
         before(async () => {
             await $store.deleteStream(_topic);
 
             expect(await $store.streamExists(_topic)).to.be.false;
 
-            [_event, _response] = await Promise.all([
-                new Promise<any>((resolve) => {
-                    $nats.subscribe(`topic.${_topic}`, (err, msg) => {
-                        resolve(msg);
+            _message = await new Promise<any>((resolve) => {
+                $nats
+                    .subscribe(`topic.${_topic}`, (err, msg) => {
+                        resolve(msg.data);
+                    })
+                    .then(async () => {
+                        _response = await publishEventEndpoint(_topic, {
+                            data: { foo: "bar" },
+                            key: "hello_from_publish",
+                        });
                     });
-                }),
-                publishEventEndpoint(_topic, { foo: "bar" }),
-            ]);
+            });
         });
 
         it("responds with http 201", () => {
@@ -48,14 +55,14 @@ describe("POST /publish/:topic", () => {
         });
 
         it("creates and stores an event", async () => {
-            let event = await $store.fetch(_topic, _response.data.seq);
+            let event = await $store.read(_topic, _response.data.seq);
 
             expect(event).to.exist;
             expect(event).to.deep.eq(_response.data);
         });
 
         it("emits an event with the same http response", async () => {
-            expect(_event.data).to.deep.eq(_response.data);
+            expect(_message.event).to.deep.eq(_response.data);
         });
 
         it("creates a stream", async () => {
@@ -74,40 +81,43 @@ describe("POST /publish/:topic", () => {
                     Array(11)
                         .fill(null)
                         .map((val, index) => {
-                            return publishEventEndpoint(_topic, index + 1);
+                            return publishEventEndpoint(_topic, {
+                                data: index + 1,
+                            });
                         })
                 );
             } catch (err) {
                 $logger.warning("error loading fixtures");
-                $logger.error(err.message, err);
+                $logger.error(err);
                 throw err;
             }
         });
 
         it("responds with http status code 417 if seq number is already taken", async () => {
-            let response = await publishEventEndpoint(
-                _topic,
-                "another message",
-                15
-            );
+            let response = await publishEventEndpoint(_topic, {
+                data: "another message",
+                expectedSeq: 15,
+            });
             expect(response.status).to.eq(417);
         });
 
         it("responds with http status code 417 if expected sequence number is higher than actual", async () => {
-            let response = await publishEventEndpoint(
-                _topic,
-                "another message",
-                15
-            );
+            let response = await publishEventEndpoint(_topic, {
+                data: "another message",
+                expectedSeq: 15,
+            });
             expect(response.status).to.eq(417);
         });
 
         it("publishes the event if 'next' sequence number matches the expected", async () => {
-            let response = await publishEventEndpoint(
-                _topic,
-                "12 from test",
-                12
-            );
+            let response = await publishEventEndpoint(_topic, {
+                data: {
+                    rick: "sanchez",
+                },
+                expectedSeq: 12,
+            });
+
+            $logger.debug(response.data);
 
             expect(response.data.seq).to.eq(12);
         });
@@ -121,7 +131,9 @@ describe("POST /publish/:topic", () => {
             let responses = await Promise.all(
                 Array(10)
                     .fill(null)
-                    .map(async () => publishEventEndpoint(topic, null, 1))
+                    .map(async () =>
+                        publishEventEndpoint(topic, { expectedSeq: 1 })
+                    )
             );
             expect(
                 responses.filter((response) => response.status === 201).length
@@ -130,6 +142,24 @@ describe("POST /publish/:topic", () => {
             expect(
                 responses.filter((response) => response.status !== 201).length
             ).to.eq(responses.length - 1);
+        });
+    });
+
+    describe("Scenario: using key", () => {
+        let _topic = "using.key.test";
+        let _data = "foo";
+        let _key = "my-key";
+        let _response: AxiosResponse;
+
+        before(async () => {
+            _response = await publishEventEndpoint(_topic, {
+                data: _data,
+                key: _key,
+            });
+        });
+
+        it("stores the key", () => {
+            expect(_response.data.key).to.eq(_key);
         });
     });
 });

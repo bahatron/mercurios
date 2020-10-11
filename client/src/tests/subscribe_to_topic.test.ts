@@ -1,7 +1,7 @@
-import client from "../client";
+import { connect } from "..";
 
 describe("Feature: Subscribe To Topic", () => {
-    let _client = client.connect({
+    let _client = connect({
         url: process.env.MERCURIOS_URL || "",
         id: "subscribe_topic_test",
     });

@@ -1,13 +1,13 @@
 {
     "name": "@bahatron/mercurios",
-    "version": "2.0.1",
+    "version": "2.2.0",
     "description": "mercurios client",
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
     "scripts": {
         "prepublishOnly": "npm run build && npm run test",
-        "dev": "npm run build && nodemon lib/playground/server.js",
-        "test": "jest --forceExit --reporters=default",
+        "dev": "tsc --watch",
+        "test": "jest --forceExit --reporters=default --runInBand",
         "build:clean": "rm -rf lib && npm run build",
         "build": "tsc"
     },
@@ -15,18 +15,18 @@
     "license": "Apache-2.0",
     "dependencies": {
         "axios": "^0.19.2",
-        "typescript": "^3.9.7",
+        "uuid": "^8.3.0",
         "ws": "^7.3.1"
     },
     "devDependencies": {
         "@bahatron/logger": "^3.0.3",
-        "@types/express": "^4.17.7",
-        "@types/jest": "^26.0.5",
-        "@types/node": "^14.0.23",
-        "@types/ws": "^7.2.6",
-        "express": "^4.17.1",
-        "jest": "^26.1.0",
+        "@types/jest": "^26.0.14",
+        "@types/node": "^14.11.2",
+        "@types/uuid": "^8.3.0",
+        "@types/ws": "^7.2.7",
+        "jest": "^26.4.2",
         "nodemon": "^2.0.4",
-        "swagger-ui-express": "^4.1.4"
+        "tslib": "^2.0.1",
+        "typescript": "^3.9.7"
     }
 }

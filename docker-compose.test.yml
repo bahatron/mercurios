@@ -1,57 +1,59 @@
 version: "3.5"
 
 x-mercurios-config: &mercurios-config
-    MERCURIOS_PORT: ${MERCURIOS_PORT:-4254}
+    MERCURIOS_PORT: 4254
     # MERCURIOS_DEBUG: 1
-    TEST_URL: ${TEST_URL:-http://server:4254}
-    NATS_URL: ${NATS_URL:-nats://nats:4222}
+    #  max
+    MERCURIOS_WORKERS: 4
+    MERCURIOS_TEST_URL: http://mercurios_server:4254
+    NATS_URL: nats://mercurios_nats:4222
     # MERCURIOS_DRIVER: pg
+    MERCURIOS_DRIVER: mysql
 
 x-postgres-config: &postgres-config
-    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
-    POSTGRES_DB: ${POSTGRES_DB:-mercurios}
-    POSTGRES_USER: ${POSTGRES_USER:-admin}
-    POSTGRES_PORT: ${POSTGRES_PORT:-5432}
-    POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+    POSTGRES_PASSWORD: secret
+    POSTGRES_DB: mercurios
+    POSTGRES_USER: admin
+    POSTGRES_PORT: 5432
+    POSTGRES_HOST: mercurios_postgres
 
 x-mysql-config: &mysql-config
-    MYSQL_USER: ${MYSQL_USER:-admin}
-    MYSQL_DATABASE: ${MYSQL_DATABASE:-mercurios}
-    MYSQL_PASSWORD: ${MYSQL_PASSWORD:-secret}
-    MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-secret}
-    MYSQL_HOST: ${MYSQL_HOST:-mysql}
-    MYSQL_PORT: ${MYSQL_PORT:-3306}
+    MYSQL_USER: admin
+    MYSQL_DATABASE: mercurios
+    MYSQL_PASSWORD: secret
+    MYSQL_ROOT_PASSWORD: secret
+    MYSQL_HOST: mercurios_mysql
+    MYSQL_PORT: 3306
 
 services:
-    mysql:
+    mercurios_mysql:
         image: mysql:5.6
+        # command: --default-authentication-plugin=mysql_native_password
         container_name: mercurios_mysql
         environment:
             <<: *mysql-config
 
-    postgres:
-        image: postgres:11
+    mercurios_postgres:
+        image: postgres
         container_name: mercurios_postgres
         environment:
             <<: *postgres-config
 
-    nats:
+    mercurios_nats:
         image: nats
         container_name: mercurios_nats
 
-    server:
+    mercurios_server:
         image: mercurios_server
         container_name: mercurios_server
-        # command: "wait-for-it postgres:5432 -- npm start"
-        command: "wait-for-it mysql:3306 -- npm start"
+        command: sh -c "wait-for-it mercurios_mysql:3306 -- npm run migrate && npm start"
         environment:
             <<: *postgres-config
             <<: *mysql-config
             <<: *mercurios-config
 
-    client:
+    mercurios_client:
         image: mercurios_client
         container_name: mercurios_client
-        command: npm run dev
         environment:
-            MERCURIOS_URL: http://server:4254
+            MERCURIOS_URL: http://mercurios_server:4254

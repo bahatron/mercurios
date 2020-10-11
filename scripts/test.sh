@@ -2,15 +2,9 @@
 set -x
 export GITROOT=$(git rev-parse --show-toplevel)
 
-docker-compose -f ${GITROOT}/docker-compose.test.yml down --remove-orphans
 docker-compose -f ${GITROOT}/docker-compose.test.yml up -d
 
-# run test
-docker-compose -f ${GITROOT}/docker-compose.test.yml exec -T server \
-    sh -c "wait-for-it localhost:4254 -t 30 -- npm run test" || exit 1
-docker-compose -f ${GITROOT}/docker-compose.test.yml exec -T client \
-    sh -c "wait-for-it server:4254 -- npm run test" || exit 1
-    
-# run benchmark
-docker-compose -f ${GITROOT}/docker-compose.test.yml exec -T server \
-    sh -c "npm run benchmark -- -d 10 -s 10  --ping --write --read --conflictive --json"
+docker-compose -f ${GITROOT}/docker-compose.test.yml run -T mercurios_server \
+    sh -c "wait-for-it mercurios_server:4254 -t 30 -- npm run test" || exit 1
+docker-compose -f ${GITROOT}/docker-compose.test.yml run -T mercurios_client \
+    sh -c "npm run test" || exit 1

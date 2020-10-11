@@ -18,22 +18,17 @@ HTTP based event bus
     curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
 ```
 
--   run tilt:
+-   run.sh :
 
 ```sh
-    # start app
-    tilt up
+    # start dev environment
+    ./run.sh up
 
-    # tear down dev env
-    tilt down
+    # tests services; -b will build images before tests
+    ./run.sh test -b
 ```
 
-### using docker-compose:
-
-```sh
-    # no volume mapping
-    docker-compose up
-```
+-   navigate to localhost:4250 in your browser for playground UI
 
 ## ENV variables
 
@@ -44,6 +39,8 @@ MYSQL_PORT=3306
 MYSQL_USERNAME=root
 MYSQL_PASSWORD=secret
 MYSQL_DATABASE=mercurios
+# only necessary for AWS RDS SSL connectivity - values 1|any
+MYSQL_RDS_SSL=0
 
 # pg config if using pg driver
 POSTGRES_PASSWORD: secret
@@ -58,11 +55,17 @@ NATS_URL=nats://nats:4222
 # optional, true|1|any
 MERCURIOS_DEBUG=1
 
-# chose the storage option, options: pg|mysql_multitable
-MERCURIOS_DRIVER=mysql_multitable
+# optional, number, default 30000
+MERCURIOS_PING_INTERVAL=30000
+
+# chose the storage option, options: pg|mysql default: mysql
+MERCURIOS_DRIVER=mysql
+
+# workers, values: number|"max" default "max"; max will create as many workers as the cpu cores
+MERCURIOS_WORKERS=1
 
 # optional, server url for tests
-MERCURIOS_TEST_URL=http://localhost:3000
+MERCURIOS_TEST_URL=http://localhost:4254
 ```
 
 ## testing
@@ -70,4 +73,7 @@ MERCURIOS_TEST_URL=http://localhost:3000
 ```sh
 # ci testing using docker-compose
 scripts/test.sh
+
+# run benchmark
+scripts/test.sh --benchmark
 ```
