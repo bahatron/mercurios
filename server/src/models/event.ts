@@ -19,8 +19,8 @@ export default function $event({
     return {
         topic: $validator.string(topic),
         published_at: $validator.isoDate(published_at),
-        seq: $validator.nullableInt(seq),
-        key: $validator.nullableString(key),
+        seq: $validator.optionalInt(seq),
+        key: $validator.optionalString(key),
         data: $json.parse(data),
     };
 }

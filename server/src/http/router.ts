@@ -73,9 +73,9 @@ router.get(
 
         return res.status(200).json(
             await filterTopic(req.params.topic, {
-                from: $validator.nullableInt(from) ?? undefined,
-                to: $validator.nullableInt(to) ?? undefined,
-                key: $validator.nullableString(key) ?? undefined,
+                from: $validator.optionalInt(from) ?? undefined,
+                to: $validator.optionalInt(to) ?? undefined,
+                key: $validator.optionalString(key) ?? undefined,
             })
         );
     })

@@ -27,58 +27,86 @@ export interface ServerMessage {
     queue?: string;
 }
 
-function Socket(_url: string, _id: string = v4()): ws | WebSocket {
-    try {
-        if (typeof window === "undefined") {
-            return new ws(_url, <ws.ClientOptions>{});
-        }
-
-        let browserUrl = new URL(_url);
-
-        return new WebSocket(
-            `${browserUrl.hostname}${
-                browserUrl.port ? `:${browserUrl.port}` : ""
-            }${_id ? `?id=${_id}` : ""}`,
-            "ws"
-        );
-    } catch (err) {
-        throw $error.ConnectionError(
-            "error connecting to mercurios WS server",
-            {
-                url: _url,
-                id: _id,
-                message: err.message,
-            }
-        );
-    }
+interface QueuedHandler {
+    (): void;
 }
 
-export function Connection(_url: string, _id?: string) {
-    let _queue: Array<() => void> = [];
-    let _socket = connect(_url, _id);
+export function Connection(_url: string, _id: string = v4()) {
+    let _queue: Array<QueuedHandler> = [];
+    let _socket = connect();
     let _interval: any;
     let _listeners: Record<string, Set<MercuriosEventHandler>> = {};
 
-    async function onSocketOpen() {
-        if (process.env.NODE_ENV !== "production") {
-            console.log(`DEBUG: socket open`);
-        }
-
-        let action: (() => void) | undefined;
-
-        while ((action = _queue.pop())) {
-            if (action) {
-                await action();
+    function Socket(): ws | WebSocket {
+        try {
+            if (typeof window === "undefined") {
+                return new ws(_url, <ws.ClientOptions>{});
             }
+
+            let browserUrl = new URL(_url);
+
+            return new WebSocket(
+                `${browserUrl.hostname}${
+                    browserUrl.port ? `:${browserUrl.port}` : ""
+                }${_id ? `?id=${_id}` : ""}`,
+                "ws"
+            );
+        } catch (err) {
+            throw $error.ConnectionError(
+                "error connecting to mercurios WS server",
+                {
+                    url: _url,
+                    id: _id,
+                    message: err.message,
+                }
+            );
         }
     }
 
-    function onSocketMessage(message: any) {
-        let { subscription, subject, event } = JSON.parse(
-            (message.data ?? message).toString()
-        );
+    function connect() {
+        let socket = Socket();
 
-        connection.emit(subscription, { subscription, subject, event });
+        socket.onopen = async function onSocketOpen() {
+            if (process.env.NODE_ENV !== "production") {
+                console.log(`DEBUG: socket open`);
+            }
+
+            let action: QueuedHandler | undefined;
+
+            while ((action = _queue.pop())) {
+                await action();
+            }
+        };
+
+        socket.onmessage = function onSocketMessage(message: any) {
+            let { subscription, subject, event } = JSON.parse(
+                (message.data ?? message).toString()
+            );
+
+            connection.emit(subscription, { subscription, subject, event });
+        };
+
+        socket.onerror = async function onSocketError({ message, error }: any) {
+            if (process.env.NODE_ENV !== "production") {
+                console.log({ on: "onError", message, error });
+            }
+
+            reconnect();
+        };
+
+        socket.onclose = function onSocketClose({ wasClean, code }: any) {
+            if (process.env.NODE_ENV !== "production") {
+                console.log({ on: "onClose", wasClean, code });
+            }
+
+            if (code == 1000) {
+                return;
+            }
+
+            reconnect();
+        };
+
+        return socket;
     }
 
     async function reconnect() {
@@ -93,36 +121,8 @@ export function Connection(_url: string, _id?: string) {
                 return;
             }
 
-            _socket = connect(_url, _id);
+            _socket = connect();
         }, 1000);
-    }
-
-    function connect(url: string, id?: string) {
-        let socket = Socket(url, id);
-
-        socket.onopen = onSocketOpen;
-        socket.onmessage = onSocketMessage;
-        socket.onerror = function ({ message, error }: any) {
-            if (process.env.NODE_ENV !== "production") {
-                console.log({ on: "onError", message, error });
-            }
-
-            reconnect();
-        };
-
-        socket.onclose = function ({ wasClean, code }: any) {
-            if (process.env.NODE_ENV !== "production") {
-                console.log({ on: "onClose", wasClean, code });
-            }
-
-            if (code == 1000) {
-                return;
-            }
-
-            reconnect();
-        };
-
-        return socket;
     }
 
     let connection = {
