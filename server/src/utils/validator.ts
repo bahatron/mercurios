@@ -70,6 +70,14 @@ export const $validator = {
         );
     },
 
+    optionalIsoDate(val: any): string | undefined {
+        if (val && moment(val).isValid()) {
+            return moment(val).toISOString();
+        }
+
+        return undefined;
+    },
+
     isIsoDate(val: any): boolean {
         return Boolean(val && moment(val).isValid());
     },
