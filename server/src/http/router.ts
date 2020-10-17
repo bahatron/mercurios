@@ -1,4 +1,4 @@
-import express, { Request, Response, RequestHandler } from "express";
+import { Router, RequestHandler } from "express";
 import publishEvent from "../handlers/publish_event";
 import emitEvent from "../handlers/emit_event";
 import readEvent from "../handlers/read_event";
@@ -6,19 +6,17 @@ import listTopics from "../handlers/list_topics";
 import filterTopic from "../handlers/filter_topic";
 import $validator from "../utils/validator";
 
-function asyncRoute(
-    handler: (req: Request, res: Response) => void
-): RequestHandler {
+function asyncRoute(handler: RequestHandler): RequestHandler {
     return async (req, res, next) => {
         try {
-            await handler(req, res);
+            await handler(req, res, next);
         } catch (err) {
             next(err);
         }
     };
 }
 
-const router = express.Router();
+const router = Router();
 
 router.get("/ping", (req, res) => res.json("pong"));
 
@@ -48,7 +46,7 @@ router.post(
         return res.status(200).json(
             await emitEvent({
                 topic: req.params.topic,
-                data: req.body.data,
+                ...req.body,
             })
         );
     })

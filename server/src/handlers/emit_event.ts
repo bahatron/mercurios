@@ -1,16 +1,24 @@
 import $nats from "../services/nats";
 import $event, { MercuriosEvent } from "../models/event";
-import moment from "moment";
 import $logger from "../utils/logger";
 
 export default async function emitEvent({
     topic,
     data,
+    published_at,
+    key,
 }: {
     topic: string;
     data: any;
+    published_at?: string;
+    key?: string;
 }): Promise<MercuriosEvent> {
-    let event = $event({ topic, published_at: moment().toISOString(), data });
+    let event = $event({
+        topic,
+        published_at,
+        data,
+        key,
+    });
 
     await $nats.publish(`topic.${topic}`, { event });
 
