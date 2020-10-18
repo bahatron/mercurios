@@ -10,11 +10,18 @@ export interface FilterOptions {
     from?: number;
     to?: number;
     key?: string;
+    after?: string;
+    before?: string;
 }
+
 export interface PublishOptions {
     data?: any;
     expectedSeq?: number;
     key?: string;
+}
+
+export interface EmitOptions {
+    data?: any;
 }
 
 export interface SubscribeOptions {
@@ -88,7 +95,7 @@ export function MercuriosClient({
 
         async emit(
             topic: string,
-            options: PublishOptions = {}
+            options: EmitOptions = {}
         ): Promise<MercuriosEvent> {
             try {
                 let response = await $axios.post(

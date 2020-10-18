@@ -1,3 +1,4 @@
+import { $date } from "../utils/date";
 import $json from "../utils/json";
 import $validator from "../utils/validator";
 
@@ -18,7 +19,8 @@ export default function $event({
 }: Partial<MercuriosEvent>): MercuriosEvent {
     return {
         topic: $validator.string(topic),
-        published_at: $validator.isoDate(published_at),
+        published_at:
+            $validator.optionalIsoDate(published_at) ?? $date.isoString(),
         seq: $validator.optionalInt(seq),
         key: $validator.optionalString(key),
         data: $json.parse(data),
