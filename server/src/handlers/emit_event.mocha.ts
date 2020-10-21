@@ -1,4 +1,4 @@
-import $axios, { AxiosResponse } from "axios";
+import $http, { AxiosResponse } from "axios";
 import env from "@bahatron/env";
 import { expect } from "chai";
 import $event from "../models/event";
@@ -7,7 +7,7 @@ import $nats from "../services/nats";
 const MERCURIOS_TEST_URL = env.get("MERCURIOS_TEST_URL");
 
 export async function emitEvent(topic: string, data?: any) {
-    return $axios.post(`${MERCURIOS_TEST_URL}/emit/${topic}`, {
+    return $http.post(`${MERCURIOS_TEST_URL}/emit/${topic}`, {
         data,
     });
 }
@@ -22,7 +22,7 @@ describe("POST /emit/:topic", () => {
         let _message: any;
         let _response: AxiosResponse;
         before(async () => {
-            $nats.subscribe(`topic.${_topic}`, (err, msg) => {
+            $nats.subscribe(`mercurios.topic.${_topic}`, (err, msg) => {
                 _message = msg.data;
             });
 

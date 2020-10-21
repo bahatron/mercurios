@@ -4,7 +4,7 @@ import emitEvent from "../handlers/emit_event";
 import readEvent from "../handlers/read_event";
 import listTopics from "../handlers/list_topics";
 import filterTopic from "../handlers/filter_topic";
-import $validator from "../utils/validator";
+import { $validator } from "../utils/validator";
 
 function asyncRoute(handler: RequestHandler): RequestHandler {
     return async (req, res, next) => {
@@ -57,7 +57,7 @@ router.get(
     asyncRoute(async (req, res) => {
         let event = await readEvent(req.params.topic, parseInt(req.params.seq));
         if (!event) {
-            return res.status(204).json();
+            return res.status(404).json();
         }
 
         return res.status(200).json(event);

@@ -3,12 +3,9 @@ import { Subscription } from "ts-nats";
 
 export default <WsRequestHandler>(
     async function unsubscribeToTopic({ subscription, topic, connection }) {
-        connection.logger.debug(
-            {
-                subscription,
-            },
-            "unsubscribing to topic"
-        );
+        connection.logger.debug("unsubscribing to topic", {
+            subscription,
+        });
 
         if (!subscription || !connection.subscriptions.has(subscription)) {
             return;
@@ -20,12 +17,9 @@ export default <WsRequestHandler>(
 
         connection.subscriptions.delete(subscription);
 
-        connection.logger.debug(
-            {
-                subscription,
-                topic,
-            },
-            "removed subscription"
-        );
+        connection.logger.debug("removed subscription", {
+            subscription,
+            topic,
+        });
     }
 );

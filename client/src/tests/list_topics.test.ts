@@ -1,5 +1,5 @@
 import { connect } from "..";
-import { $axios } from "../utils/axios";
+import { $http } from "../utils/axios";
 
 const TEST_TOPICS = [
     "test.123",
@@ -30,7 +30,7 @@ describe("Feature: List Topics", () => {
         ];
 
         for (let query of queries) {
-            let serverResponse = await $axios.get(
+            let serverResponse = await $http.get(
                 `${process.env.MERCURIOS_URL}/topics?`,
                 {
                     params: {

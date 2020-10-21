@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const $axios = axios.create({
+export const $http = axios.create({
     headers: {
         "Access-Control-Allow-Origin": "*",
     },

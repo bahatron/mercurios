@@ -4,40 +4,35 @@ import moment from "moment";
 import $store from "../models/store";
 import $event, { MercuriosEvent } from "../models/event";
 
-interface PublishPayload {
-    data?: any;
-    key?: string;
-    expectedSeq?: number;
-    topic: string;
-}
-
 export default async function publishEvent({
     data,
     key,
     expectedSeq,
     topic,
-}: PublishPayload): Promise<MercuriosEvent> {
+}: {
+    data: MercuriosEvent["data"];
+    key: MercuriosEvent["key"];
+    expectedSeq: MercuriosEvent["seq"];
+    topic: MercuriosEvent["topic"];
+}): Promise<MercuriosEvent> {
+    $logger.debug(`publishing event...`, {
+        data,
+        key,
+        expectedSeq,
+        topic,
+    });
+
     let event = await $store.append(
         $event({
             published_at: moment().toISOString(),
-            seq: expectedSeq ?? null,
-            key: key ?? null,
+            seq: expectedSeq,
+            key: key,
             topic,
             data,
         })
     );
 
-    await $nats.publish(`topic.${topic}`, { event });
-
-    $logger.debug(
-        {
-            topic: event.topic,
-            key: event.key,
-            seq: event.seq,
-            published_at: event.published_at,
-        },
-        `event published`
-    );
+    await $nats.publish(`mercurios.topic.${topic}`, { event });
 
     return event;
 }

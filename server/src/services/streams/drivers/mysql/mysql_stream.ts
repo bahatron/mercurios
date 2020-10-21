@@ -4,6 +4,7 @@ import $json from "../../../../utils/json";
 import $nats from "../../../nats";
 import $error, { ERROR_CODES } from "../../../../utils/error";
 import { $mysql } from ".";
+import { $validator } from "../../../../utils/validator";
 
 const EVENT_TABLE = "mercurios_events";
 const TOPIC_TABLE = "mercurios_topics";
@@ -72,14 +73,6 @@ export function MySQLStream(_topic: string): MercuriosStream {
     return {
         async append({ published_at, data, seq, key }) {
             try {
-                let newSeq = await appendTransaction({
-                    published_at,
-                    key,
-                    data,
-                    seq,
-                    topic: _topic,
-                });
-
                 // let newSeq = await appendProcedure({
                 //     data,
                 //     seq,
@@ -87,6 +80,14 @@ export function MySQLStream(_topic: string): MercuriosStream {
                 //     key,
                 //     topic: _topic,
                 // });
+
+                let newSeq = await appendTransaction({
+                    published_at,
+                    key,
+                    data,
+                    seq,
+                    topic: _topic,
+                });
 
                 return $event({
                     topic: _topic,
@@ -122,18 +123,21 @@ export function MySQLStream(_topic: string): MercuriosStream {
                 .first();
 
             if (!result) {
-                return null;
+                return undefined;
             }
 
             return $event(result);
         },
 
-        async filter({ from = 1, to, key }) {
+        async filter({ from, to, key, before, after }) {
             let query = $mysql
                 .table(EVENT_TABLE)
                 .select("*")
-                .where({ topic: _topic })
-                .where("seq", ">=", from);
+                .where({ topic: _topic });
+
+            if (from) {
+                query.where("seq", ">=", from);
+            }
 
             if (to) {
                 query.where("seq", "<=", to);
@@ -141,6 +145,22 @@ export function MySQLStream(_topic: string): MercuriosStream {
 
             if (key) {
                 query.where({ key });
+            }
+
+            if (before) {
+                query.where(
+                    "published_at",
+                    "<",
+                    $validator.optionalIsoDate(before) || before
+                );
+            }
+
+            if (after) {
+                query.where(
+                    "published_at",
+                    ">",
+                    $validator.optionalIsoDate(after) || after
+                );
             }
 
             let result = await query;

@@ -14,9 +14,4 @@ const inspectEntry: Handler = ({ context }) => {
     }
 };
 
-if ($config.dev_mode) {
-    $logger.on("debug", inspectEntry);
-    $logger.on("error", inspectEntry);
-}
-
 export default $logger;

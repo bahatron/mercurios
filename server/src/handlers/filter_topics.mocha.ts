@@ -1,5 +1,5 @@
 import { FilterParams } from "../services/streams/interfaces";
-import $axios from "../utils/axios";
+import $http from "../utils/axios";
 import $config from "../utils/config";
 import $store from "../models/store";
 import publishEvent from "./publish_event";
@@ -8,7 +8,7 @@ import $logger from "../utils/logger";
 import { MercuriosEvent } from "../models/event";
 
 async function filterTopicEndpoint(topic: string, query: FilterParams = {}) {
-    return $axios.get<MercuriosEvent[]>(`${$config.test_url}/filter/${topic}`, {
+    return $http.get<MercuriosEvent[]>(`${$config.test_url}/filter/${topic}`, {
         params: query,
     });
 }

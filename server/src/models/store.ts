@@ -13,8 +13,9 @@ const $store: EventStore = {
 
     async read(topic, seq) {
         let stream = await $streams.fetchStream(topic);
+
         if (!stream) {
-            throw $error.NotFound(`stream not found`, { topic });
+            return undefined;
         }
 
         return stream.read(seq);

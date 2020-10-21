@@ -25,7 +25,8 @@ docker_build('mercurios_playground', '.', dockerfile = 'Dockerfile.playground',
         sync('./playground', '/app/playground'),
         # restart_container() # docker-compose only
     ],
-    ignore=[
-        "./server",
+    only=[
+        "./playground",
+        "./scripts"
     ],
 )

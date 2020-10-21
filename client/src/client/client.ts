@@ -3,7 +3,7 @@ import {
     MercuriosEvent,
     MercuriosEventHandler,
 } from "./connection";
-import { $axios } from "../utils/axios";
+import { $http } from "../utils/axios";
 import { $error } from "../utils/error";
 
 export interface FilterOptions {
@@ -56,7 +56,7 @@ export function MercuriosClient({
 
         async ping(): Promise<boolean> {
             try {
-                await $axios.get(`${_url}/ping`);
+                await $http.get(`${_url}/ping`);
                 return true;
             } catch (err) {
                 return false;
@@ -65,7 +65,7 @@ export function MercuriosClient({
 
         async topics({ like }: { like?: string } = {}): Promise<string[]> {
             try {
-                let response = await $axios.get(`${_url}/topics`, {
+                let response = await $http.get(`${_url}/topics`, {
                     params: {
                         like,
                     },
@@ -82,7 +82,7 @@ export function MercuriosClient({
             options: PublishOptions = {}
         ): Promise<MercuriosEvent> {
             try {
-                let response = await $axios.post(
+                let response = await $http.post(
                     `${_url}/publish/${topic}`,
                     options
                 );
@@ -98,7 +98,7 @@ export function MercuriosClient({
             options: EmitOptions = {}
         ): Promise<MercuriosEvent> {
             try {
-                let response = await $axios.post(
+                let response = await $http.post(
                     `${_url}/emit/${topic}`,
                     options
                 );
@@ -111,7 +111,7 @@ export function MercuriosClient({
 
         async read(topic: string, seq: number): Promise<MercuriosEvent> {
             try {
-                let response = await $axios.get(`${_url}/read/${topic}/${seq}`);
+                let response = await $http.get(`${_url}/read/${topic}/${seq}`);
 
                 return response.data;
             } catch (err) {
@@ -124,7 +124,7 @@ export function MercuriosClient({
             options: FilterOptions = {}
         ): Promise<MercuriosEvent[]> {
             try {
-                let response = await $axios.get(`${_url}/filter/${topic}`, {
+                let response = await $http.get(`${_url}/filter/${topic}`, {
                     params: options,
                 });
 

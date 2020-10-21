@@ -16,16 +16,13 @@ export default <WsRequestHandler>(
         }
 
         let sub: Subscription = await (await connection.dispatcher).subscribe(
-            `topic.${topic}`,
+            `mercurios.topic.${topic}`,
             (err, msg) => {
                 return new Promise((resolve) => {
-                    connection.logger.debug(
-                        {
-                            topic,
-                            subscription,
-                        },
-                        `subscription message received`
-                    );
+                    connection.logger.debug(`subscription message received`, {
+                        topic,
+                        subscription,
+                    });
 
                     if (err) {
                         connection.logger.error(err, "error receiving message");
@@ -59,11 +56,12 @@ export default <WsRequestHandler>(
         connection.subscriptions.set(subscription, sub);
 
         $logger.debug(
+            `subscribed to topic`,
+
             {
                 subscription,
                 topic,
-            },
-            `subscribed to topic`
+            }
         );
     }
 );

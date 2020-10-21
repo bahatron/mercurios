@@ -1,4 +1,4 @@
-import $axios from "../utils/axios";
+import $http from "../utils/axios";
 import $config from "../utils/config";
 import $store from "../models/store";
 import publishEvent from "./publish_event";
@@ -7,7 +7,7 @@ import $logger from "../utils/logger";
 
 describe("GET /topics", () => {
     async function listTopicsEndpoint() {
-        return $axios
+        return $http
             .get(`${$config.test_url}/topics`)
             .catch((err) => err.response || $logger.error(err));
     }

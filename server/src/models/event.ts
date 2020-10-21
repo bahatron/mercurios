@@ -1,10 +1,10 @@
 import { $date } from "../utils/date";
 import $json from "../utils/json";
-import $validator from "../utils/validator";
+import { $validator } from "../utils/validator";
 
 export interface MercuriosEvent {
-    seq: number | null;
-    key: string | null;
+    seq?: number;
+    key?: string;
     data: any;
     published_at: string;
     topic: string;
@@ -13,9 +13,9 @@ export interface MercuriosEvent {
 export default function $event({
     topic,
     published_at,
-    seq = null,
-    data = null,
-    key = null,
+    seq,
+    data,
+    key,
 }: Partial<MercuriosEvent>): MercuriosEvent {
     return {
         topic: $validator.string(topic),

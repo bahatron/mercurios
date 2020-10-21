@@ -31,8 +31,9 @@ const ACTIONS: Record<string, WsRequestHandler> = {
 
 export type Connection = ReturnType<typeof Connection>;
 export function Connection(_id: string, _socket: ws) {
-    let _dispatcher = $nats.connect(`wsc_${_id}`);
-    let _logger: Logger = $logger.id(`wsc_${_id}`);
+    let clientName = `mercurios:wsc:${_id}`;
+    let _dispatcher = $nats.connect(clientName);
+    let _logger: Logger = $logger.id(clientName);
     let _subscriptions: Map<string, Subscription> = new Map();
 
     const conn = {
@@ -75,15 +76,12 @@ export function Connection(_id: string, _socket: ws) {
                 subscription,
             }: MercuriosClientMessage = $json.parse(data);
 
-            _logger.debug(
-                {
-                    action,
-                    topic,
-                    queue,
-                    subscription,
-                },
-                `ws message received: ${action}`
-            );
+            _logger.debug(`ws message received`, {
+                action,
+                topic,
+                queue,
+                subscription,
+            });
 
             await ACTIONS[action]?.({
                 connection: conn,

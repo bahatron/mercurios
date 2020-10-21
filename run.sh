@@ -16,8 +16,13 @@ execute_shutdown()
 }
 
 if [ $1 = "up" ]; then
+    if [ $2 = "-c" ]; then
+        execute_shutdown
+    fi
+
     tilt up --hud=TRUE
     execute_shutdown
+    exit 0
 fi
 
 if [ $1 = "down" ]; then

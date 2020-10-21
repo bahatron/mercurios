@@ -1,4 +1,4 @@
-import $axios, { AxiosResponse } from "axios";
+import $http, { AxiosResponse } from "axios";
 import env from "@bahatron/env";
 import { expect } from "chai";
 import $logger from "@bahatron/logger";
@@ -16,7 +16,7 @@ export async function publishEventEndpoint(
         key?: string;
     } = {}
 ): Promise<AxiosResponse> {
-    return $axios
+    return $http
         .post(`${MERCURIOS_MERCURIOS_TEST_URL}/publish/${topic}`, {
             data: options.data,
             expectedSeq: options.expectedSeq,
@@ -38,7 +38,7 @@ describe("POST /publish/:topic", () => {
 
             _message = await new Promise<any>((resolve) => {
                 $nats
-                    .subscribe(`topic.${_topic}`, (err, msg) => {
+                    .subscribe(`mercurios.topic.${_topic}`, (err, msg) => {
                         resolve(msg.data);
                     })
                     .then(async () => {
@@ -116,8 +116,6 @@ describe("POST /publish/:topic", () => {
                 },
                 expectedSeq: 12,
             });
-
-            $logger.debug(response.data);
 
             expect(response.data.seq).to.eq(12);
         });

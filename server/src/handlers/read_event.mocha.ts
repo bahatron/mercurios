@@ -1,4 +1,4 @@
-import $axios, { AxiosResponse } from "axios";
+import $http, { AxiosResponse } from "axios";
 import env from "@bahatron/env";
 import { expect } from "chai";
 import $logger from "@bahatron/logger";
@@ -12,7 +12,7 @@ describe("GET /read/:topic/:seq", () => {
         topic: string,
         seq: number
     ): Promise<AxiosResponse> {
-        return $axios
+        return $http
             .get(`${MERCURIOS_MERCURIOS_TEST_URL}/read/${topic}/${seq}`)
             .catch((err) => err.response);
     }
@@ -46,8 +46,8 @@ describe("GET /read/:topic/:seq", () => {
             }
         });
 
-        it("responds with http 204", () => {
-            expect(_response.status).to.eq(204);
+        it("responds with http 404", () => {
+            expect(_response.status).to.eq(404);
         });
 
         it("response payload is empty", async () => {
@@ -78,14 +78,14 @@ describe("GET /read/:topic/:seq", () => {
             expect(response.data).to.deep.eq(_event);
         });
 
-        it("has the expected schema", async () => {
-            expect(_event).to.have.all.keys([
-                "seq",
-                "published_at",
-                "key",
-                "data",
-                "topic",
-            ]);
-        });
+        // it("has the expected schema", async () => {
+        //     expect(_event).to.have.keys([
+        //         "seq",
+        //         "published_at",
+        //         "key",
+        //         "data",
+        //         "topic",
+        //     ]);
+        // });
     });
 });

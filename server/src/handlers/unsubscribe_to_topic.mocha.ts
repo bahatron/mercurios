@@ -25,7 +25,6 @@ describe("WS action: unsubscribe", () => {
         // first subscribe to a topic
         await new Promise((resolve) => {
             _wsc.once("message", (data) => {
-                $logger.debug("subscription is active");
                 resolve();
             });
 

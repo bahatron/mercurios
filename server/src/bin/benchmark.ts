@@ -3,7 +3,7 @@ import yargs from "yargs";
 import $logger from "@bahatron/logger";
 import BIG_JSON from "../tests/fixtures/big_json";
 import $json from "../utils/json";
-import $axios from "../utils/axios";
+import $http from "../utils/axios";
 import $config from "../utils/config";
 
 const MERCURIOS_TEST_URL = $config.test_url;
@@ -115,7 +115,7 @@ async function dataWriteBench() {
 async function readBench() {
     let topic = "readBench";
 
-    await $axios.post(`${MERCURIOS_TEST_URL}/publish/${topic}`, {
+    await $http.post(`${MERCURIOS_TEST_URL}/publish/${topic}`, {
         data: {
             rick: "sanchez",
         },

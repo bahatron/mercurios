@@ -20,8 +20,8 @@ export const $validator = {
         return val;
     },
 
-    optionalString(val: any): string | null {
-        return typeof val === "string" ? val : null;
+    optionalString(val: any): string | undefined {
+        return typeof val === "string" ? val : undefined;
     },
 
     int(val: any, message?: string): number {
@@ -34,9 +34,9 @@ export const $validator = {
         return parseInt(val);
     },
 
-    optionalInt(val: any): number | null {
+    optionalInt(val: any): number | undefined {
         if (isNaN(parseInt(val))) {
-            return null;
+            return undefined;
         }
 
         return parseInt(val);
@@ -52,9 +52,9 @@ export const $validator = {
         return parseFloat(val);
     },
 
-    optionalFloat(val: any): number | null {
+    optionalFloat(val: any): number | undefined {
         if (isNaN(parseFloat(val))) {
-            return null;
+            return undefined;
         }
 
         return parseFloat(val);
@@ -82,5 +82,3 @@ export const $validator = {
         return Boolean(val && moment(val).isValid());
     },
 };
-
-export default $validator;

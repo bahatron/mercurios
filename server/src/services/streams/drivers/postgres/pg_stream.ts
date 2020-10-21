@@ -4,7 +4,7 @@ import $json from "../../../../utils/json";
 import $nats from "../../../nats";
 import $error, { ERROR_CODES } from "../../../../utils/error";
 import $pg from ".";
-import $logger from "../../../../utils/logger";
+import { $validator } from "../../../../utils/validator";
 
 const EVENT_TABLE = "mercurios_events";
 const TOPIC_TABLE = "mercurios_topics";
@@ -26,6 +26,7 @@ export function PgStream(_topic: string): MercuriosStream {
 
                 let resultData = result.rows.shift();
 
+                // return $event(await testTransaction(params));
                 return $event({
                     topic: resultData.v_topic,
                     key: resultData.v_key,
@@ -33,8 +34,6 @@ export function PgStream(_topic: string): MercuriosStream {
                     published_at: resultData.v_published_at,
                     data: resultData.v_data,
                 });
-
-                // return $event(await testTransaction(params));
             } catch (err) {
                 if ((err.message as string).includes("ERR_CONFLICT")) {
                     throw $error.ExpectationFailed(
@@ -62,18 +61,21 @@ export function PgStream(_topic: string): MercuriosStream {
                 .first();
 
             if (!result) {
-                return null;
+                return undefined;
             }
 
             return $event(result);
         },
 
-        async filter({ from = 1, to, key }) {
+        async filter({ from, to, key, before, after }) {
             let query = $pg
                 .table(EVENT_TABLE)
                 .select("*")
-                .where({ topic: _topic })
-                .where("seq", ">=", from);
+                .where({ topic: _topic });
+
+            if (from) {
+                query.where("seq", ">=", from);
+            }
 
             if (to) {
                 query.where("seq", "<=", to);
@@ -81,6 +83,22 @@ export function PgStream(_topic: string): MercuriosStream {
 
             if (key) {
                 query.where({ key });
+            }
+
+            if (before) {
+                query.where(
+                    "published_at",
+                    "<",
+                    $validator.optionalIsoDate(before) || before
+                );
+            }
+
+            if (after) {
+                query.where(
+                    "published_at",
+                    ">",
+                    $validator.optionalIsoDate(after) || after
+                );
             }
 
             let result = await query;
