@@ -3,7 +3,7 @@ import yargs from "yargs";
 import $logger from "@bahatron/logger";
 import BIG_JSON from "../tests/fixtures/big_json";
 import $json from "../utils/json";
-import $http from "../utils/axios";
+import $http from "../utils/http";
 import $config from "../utils/config";
 
 const MERCURIOS_TEST_URL = $config.test_url;
