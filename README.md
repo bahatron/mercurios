@@ -75,5 +75,5 @@ MERCURIOS_TEST_URL=http://localhost:4254
 scripts/test.sh
 
 # run benchmark
-scripts/test.sh --benchmark
+scripts/benchmark.sh
 ```

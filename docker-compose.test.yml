@@ -7,8 +7,8 @@ x-mercurios-config: &mercurios-config
     MERCURIOS_WORKERS: 4
     MERCURIOS_TEST_URL: http://mercurios_server:4254
     NATS_URL: nats://mercurios_nats:4222
-    # MERCURIOS_DRIVER: pg
-    MERCURIOS_DRIVER: mysql
+    MERCURIOS_DRIVER: pg
+    # MERCURIOS_DRIVER: mysql
 
 x-postgres-config: &postgres-config
     POSTGRES_PASSWORD: secret
@@ -51,6 +51,10 @@ services:
             <<: *postgres-config
             <<: *mysql-config
             <<: *mercurios-config
+        depends_on:
+            - mercurios_postgres
+            - mercurios_mysql
+            - mercurios_nats
 
     mercurios_client:
         image: mercurios_client

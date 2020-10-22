@@ -82,23 +82,38 @@ async function pingBench() {
 }
 
 async function writeBench() {
+    let body = $json.stringify({
+        key: "test-key",
+        data: {
+            foo: "bar",
+            rick: ["sanchez", "c-137"],
+        },
+    });
+
     breakdown(
         await autocannon({
-            title: `publish to single topic with no data`,
+            title: `publish to single topic`,
             connections: _connections,
             pipelining: _pipelining,
             duration: _duration,
             url: `${MERCURIOS_TEST_URL}/publish/singleTopicBench`,
             method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body,
         })
     );
 }
 
 async function dataWriteBench() {
-    let bigJson = $json.stringify(BIG_JSON);
+    let bigJson = $json.stringify({
+        data: BIG_JSON,
+    });
+
     breakdown(
         await autocannon({
-            title: "publish 1.5mb json file",
+            title: "publish 1mb json file",
             connections: _connections,
             pipelining: _pipelining,
             duration: _duration,
@@ -169,6 +184,14 @@ async function conflictiveWrites() {
 }
 
 async function multiStream(streams = _streams) {
+    let body = $json.stringify({
+        key: "test-key",
+        data: {
+            foo: "bar",
+            rick: ["sanchez", "c-137"],
+        },
+    });
+
     let results = await Promise.all(
         Array(streams + 1)
             .fill(null)
@@ -180,6 +203,10 @@ async function multiStream(streams = _streams) {
                     title: `concurrent publish to stream number: ${index}`,
                     url: `${MERCURIOS_TEST_URL}/publish/multiBench${index}`,
                     method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body,
                 });
             })
     );
@@ -193,6 +220,7 @@ async function multiStream(streams = _streams) {
         return combined;
     }, results.shift() as Result);
 
+    console.log(`=`.repeat(80));
     $logger.inspect({
         title: `combined multi stream benchmark results`,
         requests: {

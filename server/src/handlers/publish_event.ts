@@ -15,13 +15,6 @@ export default async function publishEvent({
     expectedSeq?: MercuriosEvent["seq"];
     topic: MercuriosEvent["topic"];
 }): Promise<MercuriosEvent> {
-    $logger.debug(`publishing event...`, {
-        data,
-        key,
-        expectedSeq,
-        topic,
-    });
-
     let event = await $store.append(
         $event({
             published_at: moment().toISOString(),
@@ -33,6 +26,13 @@ export default async function publishEvent({
     );
 
     await $nats.publish(`mercurios.topic.${topic}`, { event });
+
+    $logger.debug(`event published`, {
+        key,
+        expectedSeq,
+        seq: event.seq,
+        topic,
+    });
 
     return event;
 }

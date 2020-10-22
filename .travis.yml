@@ -13,6 +13,7 @@ script:
     - docker-compose build mercurios_server mercurios_client || exit 1
     - ./scripts/test.sh || exit 1
     - ./scripts/dockerhub-push.sh || exit 1
+    - ./scripts/benchmark.sh
 
 branches:
     only:
