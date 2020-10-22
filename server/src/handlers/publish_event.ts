@@ -10,9 +10,9 @@ export default async function publishEvent({
     expectedSeq,
     topic,
 }: {
-    data: MercuriosEvent["data"];
-    key: MercuriosEvent["key"];
-    expectedSeq: MercuriosEvent["seq"];
+    data?: MercuriosEvent["data"];
+    key?: MercuriosEvent["key"];
+    expectedSeq?: MercuriosEvent["seq"];
     topic: MercuriosEvent["topic"];
 }): Promise<MercuriosEvent> {
     $logger.debug(`publishing event...`, {

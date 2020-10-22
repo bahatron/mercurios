@@ -4,6 +4,8 @@ import { expect } from "chai";
 import $logger from "@bahatron/logger";
 import { publishEventEndpoint } from "./publish_event.mocha";
 import $store from "../models/store";
+import { $validator } from "../utils/validator";
+import { EventSchema } from "../models/event.schema";
 
 const MERCURIOS_MERCURIOS_TEST_URL = env.get("MERCURIOS_TEST_URL");
 
@@ -78,14 +80,8 @@ describe("GET /read/:topic/:seq", () => {
             expect(response.data).to.deep.eq(_event);
         });
 
-        // it("has the expected schema", async () => {
-        //     expect(_event).to.have.keys([
-        //         "seq",
-        //         "published_at",
-        //         "key",
-        //         "data",
-        //         "topic",
-        //     ]);
-        // });
+        it("has the expected schema", async () => {
+            expect($validator.jsonSchema(_event, EventSchema).length).to.eq(0);
+        });
     });
 });

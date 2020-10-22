@@ -79,6 +79,7 @@ services:
             - ./client/lib:/app/client/lib
         environment:
             MERCURIOS_URL: http://mercurios_server:4254
+            MERCURIOS_ENV: dev
 
     mercurios_playground:
         build:

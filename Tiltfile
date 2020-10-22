@@ -23,10 +23,10 @@ docker_build('mercurios_client', '.', dockerfile = 'Dockerfile.client',
 docker_build('mercurios_playground', '.', dockerfile = 'Dockerfile.playground',
     live_update=[
         sync('./playground', '/app/playground'),
-        # restart_container() # docker-compose only
     ],
     only=[
         "./playground",
-        "./scripts"
+        "./scripts",
+        "./client"
     ],
 )
