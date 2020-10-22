@@ -1,6 +1,5 @@
 import { AxiosError } from "axios";
 
-const WS_CONNECTION_ERROR = "WS_CONNECTION_ERROR";
 class MercuriosError extends Error {
     constructor(
         public readonly message: string,
@@ -37,6 +36,6 @@ export const $error = {
     },
 
     ConnectionError(message: string, context = {}) {
-        return new MercuriosError(message, WS_CONNECTION_ERROR, context);
+        return new MercuriosError(message, "WS_CONNECTION_ERROR", context);
     },
 };
