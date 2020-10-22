@@ -1,10 +1,11 @@
 {
     "name": "@bahatron/mercurios",
-    "version": "2.2.0",
+    "version": "2.2.1",
     "description": "mercurios client",
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
     "scripts": {
+        "preversion": "npm run prepublishOnly",
         "prepublishOnly": "npm run build && npm run test",
         "dev": "tsc --watch",
         "test": "jest --forceExit --reporters=default --runInBand",
