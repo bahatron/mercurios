@@ -17,7 +17,7 @@ describe("Feature: Read Event", () => {
         let event = await _client.read(topic, 1);
 
         expect(event).toBeTruthy();
-        expect(event.data).toEqual(data);
-        expect(event.seq).toBe(1);
+        expect(event?.data).toEqual(data);
+        expect(event?.seq).toBe(1);
     });
 });

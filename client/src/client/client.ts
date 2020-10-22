@@ -5,6 +5,7 @@ import {
 } from "./connection";
 import { $http } from "../utils/axios";
 import { $error } from "../utils/error";
+import { AxiosError } from "axios";
 
 export interface FilterOptions {
     from?: number;
@@ -109,12 +110,19 @@ export function MercuriosClient({
             }
         },
 
-        async read(topic: string, seq: number): Promise<MercuriosEvent> {
+        async read(
+            topic: string,
+            seq: number
+        ): Promise<MercuriosEvent | undefined> {
             try {
                 let response = await $http.get(`${_url}/read/${topic}/${seq}`);
 
                 return response.data;
             } catch (err) {
+                if ((err as AxiosError)?.response?.status === 404) {
+                    return undefined;
+                }
+
                 throw $error.HttpError(err);
             }
         },

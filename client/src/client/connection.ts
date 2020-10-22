@@ -1,6 +1,7 @@
 import ws from "ws";
 import { $error } from "../utils/error";
 import { v4 } from "uuid";
+import { $logger } from "../utils/logger";
 
 export interface MercuriosMessage {
     subscription: string;
@@ -52,6 +53,8 @@ export function Connection(_url: string, _id: string = v4()) {
                 "ws"
             );
         } catch (err) {
+            $logger.error(err);
+
             throw $error.ConnectionError(
                 "error connecting to mercurios WS server",
                 {
@@ -64,11 +67,12 @@ export function Connection(_url: string, _id: string = v4()) {
     }
 
     function connect() {
+        $logger.debug(`connecting...`);
         let socket = Socket();
 
         socket.onopen = async function onSocketOpen() {
-            if (process.env.NODE_ENV !== "production") {
-                console.log(`DEBUG: socket open`);
+            if (process.env.MERCURIOS_ENV !== "production") {
+                $logger.debug("socket open");
             }
 
             let action: QueuedHandler | undefined;
@@ -84,9 +88,13 @@ export function Connection(_url: string, _id: string = v4()) {
             );
 
             connection.emit(subscription, { subscription, subject, event });
+
+            $logger.debug("message received", { subscription, subject, event });
         };
 
         socket.onerror = async function onSocketError({ message, error }: any) {
+            $logger.debug(`socket error`, { message });
+
             if (process.env.NODE_ENV !== "production") {
                 console.log({ on: "onError", message, error });
             }
@@ -95,6 +103,8 @@ export function Connection(_url: string, _id: string = v4()) {
         };
 
         socket.onclose = function onSocketClose({ wasClean, code }: any) {
+            $logger.debug(`socket closed`, { wasClean, code });
+
             if (process.env.NODE_ENV !== "production") {
                 console.log({ on: "onClose", wasClean, code });
             }
@@ -110,7 +120,9 @@ export function Connection(_url: string, _id: string = v4()) {
     }
 
     async function reconnect() {
+        $logger.debug(`reconnecting...`);
         if (_interval) {
+            $logger.debug(`already reconnecting.`);
             return;
         }
 
