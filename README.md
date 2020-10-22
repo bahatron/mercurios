@@ -1,12 +1,12 @@
 # Mercurios
 
-HTTP based event bus
+HTTP based event sourcing and message broker
 
-## Notes
+## Guarantees
 
 -   Event ordering is not guaranteed. However, it's possible to use `expectedSeq` when publishing to control the order of events in a stream
 
-## dev mode
+## DEV environment
 
 ### using tilt:
 
