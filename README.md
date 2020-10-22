@@ -2,9 +2,10 @@
 
 HTTP based event sourcing and message broker
 
-## Guarantees
+## Notes
 
 -   Event ordering is not guaranteed. However, it's possible to use `expectedSeq` when publishing to control the order of events in a stream
+-   Event data is hard capped to 1mb (for AWS multi-master compatability)
 
 ## DEV environment
 
