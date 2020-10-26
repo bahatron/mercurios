@@ -1,0 +1,20 @@
+version: "3.5"
+
+services:
+    mercurios_server:
+        build:
+            context: .
+            dockerfile: Dockerfile.server
+        image: mercurios_server
+
+    mercurios_client:
+        build:
+            context: .
+            dockerfile: Dockerfile.client
+        image: mercurios_client
+
+    mercurios_playground:
+        build:
+            context: .
+            dockerfile: Dockerfile.playground
+        image: mercurios_playground

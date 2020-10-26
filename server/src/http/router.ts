@@ -5,6 +5,7 @@ import readEvent from "../handlers/read_event";
 import listTopics from "../handlers/list_topics";
 import filterTopic from "../handlers/filter_topic";
 import { $validator } from "../utils/validator";
+import { $json } from "../utils/json";
 
 function asyncRoute(handler: RequestHandler): RequestHandler {
     return async (req, res, next) => {
@@ -23,8 +24,13 @@ router.get("/ping", (req, res) => res.json("pong"));
 router.get(
     "/topics",
     asyncRoute(async (req, res) => {
-        let { like } = req.query;
-        return res.status(200).json(await listTopics(like as string));
+        let { like, withEvents } = req.query;
+        return res.status(200).json(
+            await listTopics({
+                like: $validator.optionalString(like),
+                withEvents: $json.parse(withEvents),
+            })
+        );
     })
 );
 

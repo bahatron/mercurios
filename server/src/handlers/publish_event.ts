@@ -1,7 +1,7 @@
 import $nats from "../services/nats";
 import $logger from "../utils/logger";
 import moment from "moment";
-import $store from "../models/store";
+import { $store } from "../models/store";
 import $event, { MercuriosEvent } from "../models/event";
 
 export default async function publishEvent({

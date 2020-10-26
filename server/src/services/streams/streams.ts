@@ -3,12 +3,12 @@ import $config from "../../utils/config";
 import $pg from "./drivers/postgres";
 import { PgStream } from "./drivers/postgres/pg_stream";
 import $nats from "../nats";
-import { MercuriosStream } from "./interfaces";
+import { EventFilters, MercuriosStream } from "./interfaces";
 import $error from "../../utils/error";
 import $logger from "../../utils/logger";
 import { MySQLStream } from "./drivers/mysql/mysql_stream";
 import { $mysql } from "./drivers/mysql";
-import { natsQueryToSql } from "./helpers";
+import { natsQueryToSql, sqlEventFilters } from "./helpers";
 
 export let driver: Knex;
 let Stream: (topic: string) => MercuriosStream;
@@ -41,10 +41,21 @@ $nats.subscribe("mercurios_streams_created", (err, msg) => {
 });
 
 export const $streams = {
-    async list(filter?: string): Promise<string[]> {
-        let query = driver.table("mercurios_topics").select("topic");
-        if (filter) {
-            query.where("topic", "like", natsQueryToSql(filter));
+    async list({
+        like,
+        withEvents,
+    }: {
+        like?: string;
+        withEvents?: EventFilters;
+    }): Promise<string[]> {
+        let query = driver.table("mercurios_events").distinct("topic");
+
+        if (withEvents) {
+            sqlEventFilters(query, withEvents);
+        }
+
+        if (like) {
+            query.where(`topic`, "like", natsQueryToSql(like));
         }
 
         let topics = (await query).map((record) => record.topic);

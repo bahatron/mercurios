@@ -5,6 +5,7 @@ import $nats from "../../../nats";
 import $error, { ERROR_CODES } from "../../../../utils/error";
 import { $mysql } from ".";
 import { $validator } from "../../../../utils/validator";
+import { sqlEventFilters } from "../../helpers";
 
 const EVENT_TABLE = "mercurios_events";
 const TOPIC_TABLE = "mercurios_topics";
@@ -129,41 +130,13 @@ export function MySQLStream(_topic: string): MercuriosStream {
             return $event(result);
         },
 
-        async filter({ from, to, key, before, after }) {
+        async filter(filters) {
             let query = $mysql
                 .table(EVENT_TABLE)
                 .select("*")
                 .where({ topic: _topic });
 
-            if (from) {
-                query.where("seq", ">=", from);
-            }
-
-            if (to) {
-                query.where("seq", "<=", to);
-            }
-
-            if (key) {
-                query.where({ key });
-            }
-
-            if (before) {
-                query.where(
-                    "published_at",
-                    "<",
-                    $validator.optionalIsoDate(before) || before
-                );
-            }
-
-            if (after) {
-                query.where(
-                    "published_at",
-                    ">",
-                    $validator.optionalIsoDate(after) || after
-                );
-            }
-
-            let result = await query;
+            let result = await sqlEventFilters(query, filters);
 
             return result.map($event);
         },

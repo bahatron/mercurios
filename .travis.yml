@@ -10,7 +10,7 @@ before_install:
     - sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
 script:
-    - docker-compose build mercurios_server mercurios_client || exit 1
+    - docker-compose -f docker-compose.base.yml build mercurios_server mercurios_client || exit 1
     - ./scripts/test.sh || exit 1
     - ./scripts/dockerhub-push.sh || exit 1
     - ./scripts/benchmark.sh

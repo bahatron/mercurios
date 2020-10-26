@@ -1,13 +1,13 @@
-import { FilterParams } from "../services/streams/interfaces";
+import { EventFilters } from "../services/streams/interfaces";
 import $http from "../utils/http";
 import $config from "../utils/config";
-import $store from "../models/store";
+import { $store } from "../models/store";
 import publishEvent from "./publish_event";
 import { expect } from "chai";
 import $logger from "../utils/logger";
 import { MercuriosEvent } from "../models/event";
 
-async function filterTopicEndpoint(topic: string, query: FilterParams = {}) {
+async function filterTopicEndpoint(topic: string, query: EventFilters = {}) {
     return $http.get<MercuriosEvent[]>(`${$config.test_url}/filter/${topic}`, {
         params: query,
     });
