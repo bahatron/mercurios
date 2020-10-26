@@ -47,10 +47,13 @@ export const $streams = {
         like?: string;
         withEvents?: EventFilters;
     }): Promise<string[]> {
-        let query = driver.table("mercurios_events").distinct("topic");
+        let query: Knex.QueryBuilder;
 
         if (withEvents) {
+            query = driver.table("mercurios_events").distinct("topic");
             sqlEventFilters(query, withEvents);
+        } else {
+            query = driver.table("mercurios_topics").select("topic");
         }
 
         if (like) {
