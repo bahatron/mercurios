@@ -4,7 +4,6 @@ import $pg from "./drivers/postgres";
 import { PgStream } from "./drivers/postgres/pg_stream";
 import $nats from "../nats";
 import { EventFilters, MercuriosStream } from "./interfaces";
-import $error from "../../utils/error";
 import $logger from "../../utils/logger";
 import { MySQLStream } from "./drivers/mysql/mysql_stream";
 import { $mysql } from "./drivers/mysql";

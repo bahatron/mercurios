@@ -52,7 +52,7 @@ export function sqlEventFilters(
     if (after) {
         builder.where(
             "published_at",
-            ">",
+            ">=",
             $validator.isoDate(after, `Invalid date format: ${after}`)
         );
     }
