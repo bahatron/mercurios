@@ -3,9 +3,9 @@ import $config from "../utils/config";
 
 const NATS_URL = $config.nats_url;
 
-const CLIENT = _connect(`mercurios_server_${process.pid}`);
+const CLIENT = connect(`mercurios:server:${process.pid}`);
 
-export async function _connect(name: string): Promise<nats.Client> {
+export async function connect(name: string): Promise<nats.Client> {
     return nats.connect(<nats.NatsConnectionOptions>{
         name: name,
         url: NATS_URL,
@@ -13,11 +13,11 @@ export async function _connect(name: string): Promise<nats.Client> {
     });
 }
 
-async function publish(topic: string, message: any): Promise<void> {
+export async function publish(topic: string, message: any): Promise<void> {
     return (await CLIENT).publish(topic, message);
 }
 
-async function subscribe(
+export async function subscribe(
     topic: string,
     handler: nats.MsgCallback,
     options?: nats.SubscriptionOptions
@@ -26,7 +26,7 @@ async function subscribe(
 }
 
 const $nats = {
-    connect: _connect,
+    connect,
     publish,
     subscribe,
 };
