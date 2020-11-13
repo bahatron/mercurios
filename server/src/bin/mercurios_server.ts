@@ -1,6 +1,6 @@
 #!/usr/bin/node
 import http from "http";
-import expressApp from "../http/server";
+import expressApp from "../server/server";
 import createWsServer from "../websocket/ws_server";
 import $config from "../utils/config";
 import $logger from "../utils/logger";

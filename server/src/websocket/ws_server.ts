@@ -6,6 +6,8 @@ import uuid from "uuid";
 import $logger from "../utils/logger";
 import $config from "../utils/config";
 
+const CONNECTION_TIMEOUT = "connection timeout";
+
 const _clients: Map<string, Connection> = new Map();
 export default function createWsServer(httpServer: Server): ws.Server {
     const wss = new ws.Server({ server: httpServer });
@@ -50,11 +52,12 @@ async function ping(conn: Connection) {
         conn.logger.debug(`PING`);
 
         if (conn.socket.readyState !== 1) {
-            throw new Error(`socket not open, ping failed`);
+            await kill(conn);
+            return;
         }
 
         await new Promise((resolve, reject) => {
-            setTimeout(() => reject(new Error("connection timeout")), 1000);
+            setTimeout(() => reject(new Error(CONNECTION_TIMEOUT)), 2000);
 
             conn.socket.once("pong", () => {
                 conn.logger.debug(`PONG`);
@@ -64,8 +67,17 @@ async function ping(conn: Connection) {
             conn.socket.ping();
         });
     } catch (err) {
-        conn.logger.warning(`PING ERROR - ${err.message}`);
-        await conn.close();
-        _clients.delete(conn.id);
+        if (err.message === CONNECTION_TIMEOUT) {
+            conn.logger.warning(`PING FAILED - connection timeout`);
+        } else {
+            conn.logger.error(err);
+        }
+
+        await kill(conn);
     }
+}
+
+async function kill(conn: Connection) {
+    await conn.close();
+    _clients.delete(conn.id);
 }
