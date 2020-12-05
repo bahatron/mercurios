@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
         {
-            script: "dist/bin/mercurios_server.js",
+            script: "dist/bin/mercurios-server.js",
             name: "mercurios",
             exec_mode: "cluster",
             instances: process.env.MERCURIOS_WORKERS || 0,

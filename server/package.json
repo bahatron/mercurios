@@ -1,15 +1,14 @@
 {
     "name": "mercurios",
     "version": "2.0.0",
-    "description": "an event stream server",
+    "description": "http event sourcing",
     "author": "simonpiscitelli@gmail.com",
     "scripts": {
         "start": "npm run migrate && pm2-runtime start process.config.js",
         "dev": "npm run build:watch & npm start",
-        "test": "MERCURIOS_DEBUG=0 mocha 'dist/**/*.mocha.js' -t 5000",
+        "test": "MERCURIOS_DEBUG=0 mocha",
         "benchmark": "node dist/bin/benchmark.js",
         "migrate": "node dist/bin/migrate.js",
-        "migrate:pg": "node dist/bin/migrate_pg.js",
         "build": "tsc",
         "build:watch": "npm run build -- --watch",
         "build:clean": "rm -rf dist/ && npm run build"
@@ -42,6 +41,7 @@
         "mysql2": "^1.7.0",
         "pg": "^8.3.0",
         "ts-nats": "^1.2.15",
+        "ts-node": "^9.1.0",
         "typescript": "^3.9.7",
         "uuid": "^3.4.0",
         "ws": "^7.3.1",

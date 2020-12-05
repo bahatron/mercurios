@@ -8,5 +8,5 @@ aws configure set default.source_profile "default"
 
 aws ecr get-login-password | docker login --username AWS --password-stdin "${ECR_URL}"
 
-docker tag  mercurios_server "${ECR_URL}/mercurios:${IMAGE_TAG}"
+docker tag  mercurios-server "${ECR_URL}/mercurios:${IMAGE_TAG}"
 docker push "${ECR_URL}/mercurios:${IMAGE_TAG}"

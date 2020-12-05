@@ -1,6 +1,6 @@
 import $ws from "ws";
 import $logger from "@bahatron/logger";
-import { publishEventEndpoint } from "./publish_event.mocha";
+import { publishEventEndpoint } from "./publish-event.mocha";
 import $config from "../utils/config";
 
 const MERCURIOS_TEST_URL = $config.test_url;

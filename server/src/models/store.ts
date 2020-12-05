@@ -1,7 +1,7 @@
 import { $streams } from "../services/streams";
 import { EventFilters } from "../services/streams/interfaces";
 import $error from "../utils/error";
-import { MercuriosEvent } from "./event";
+import { MercuriosEvent } from "./event/event";
 
 export const $store = {
     async append({

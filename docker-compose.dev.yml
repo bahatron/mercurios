@@ -1,0 +1,86 @@
+version: "3.5"
+
+x-mercurios-config: &mercurios-config
+    NATS_URL: nats://mercurios-nats:4222
+    # MERCURIOS_PORT: 4254
+    MERCURIOS_TEST_URL: http://mercurios-server:4254
+    # MERCURIOS_DRIVER: pg
+    MERCURIOS_DRIVER: mysql
+    MERCURIOS_WORKERS: 6
+    MERCURIOS_DEBUG: 1
+    MERCURIOS_ENV: dev
+
+x-postgres-config: &postgres-config
+    POSTGRES_PASSWORD: secret
+    POSTGRES_DB: mercurios
+    POSTGRES_USER: admin
+    POSTGRES_PORT: 5432
+    POSTGRES_HOST: mercurios-postgres
+
+x-mysql-config: &mysql-config
+    MYSQL_USER: admin
+    MYSQL_DATABASE: mercurios
+    MYSQL_PASSWORD: secret
+    MYSQL_ROOT_PASSWORD: secret
+    MYSQL_HOST: mercurios-mysql
+    MYSQL_PORT: 3306
+    # rds ssl cert will be present at /etc/ssl/rds-combined-ca-bundle.pem
+    MYSQL_RDS_SSL: 0
+
+services:
+    mercurios-nats:
+        image: nats
+        container_name: mercurios-nats
+        # command: ["-V"]
+        ports:
+            - 4222:4222
+            - 8222:8222
+
+    mercurios-postgres:
+        image: postgres
+        container_name: mercurios-postgres
+        ports:
+            - 5432:5432
+        environment:
+            <<: *postgres-config
+        command: -c 'max_connections=500'
+
+    mercurios-mysql:
+        image: mysql:5.6
+        container_name: mercurios-mysql
+        ports:
+            - 3306:3306
+        environment:
+            <<: *mysql-config
+        # command: --default-authentication-plugin=mysql_native_password
+
+    mercurios-server:
+        image: mercurios-server
+        container_name: mercurios-server
+        ports:
+            - 4254:4254
+        command: sh -c "wait-for-it mercurios-mysql:3306 -s -t 30 -- npm run migrate && npm run dev"
+        environment:
+            <<: *postgres-config
+            <<: *mysql-config
+            <<: *mercurios-config
+
+    mercurios-client:
+        image: mercurios-client
+        container_name: mercurios-client
+        command: sh -c "npm run dev"
+        volumes:
+            - ./client/lib:/app/client/lib
+        environment:
+            MERCURIOS_URL: http://mercurios-server:4254
+            MERCURIOS_ENV: dev
+
+    mercurios-playground:
+        image: mercurios-playground
+        container_name: mercurios-playground
+        command: sh -c "wait-for-it mercurios-server:4254 -- npm run dev:docker"
+        ports:
+            - 8080:8080
+            - 8081:8081
+        environment:
+            MERCURIOS_URL: http://mercurios-server:4254

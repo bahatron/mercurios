@@ -3,7 +3,7 @@ import env from "@bahatron/env";
 import { expect } from "chai";
 import $logger from "@bahatron/logger";
 import $nats from "../services/nats";
-import { MercuriosEvent } from "../models/event";
+import { MercuriosEvent } from "../models/event/event";
 import { $store } from "../models/store";
 
 const MERCURIOS_MERCURIOS_TEST_URL = env.get("MERCURIOS_TEST_URL");
