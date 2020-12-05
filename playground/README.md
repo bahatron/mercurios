@@ -1,20 +1,29 @@
-```ts
-// connect to server
-let mercurios = $mercurios.connect({
-    url: process.env.MERCURIOS_TEST_URL || "",
-});
+# Snorlax
 
-// subscribe to a topic
-await mercurios.subscribe("123", (event) => {
-    console.log(`recieved event! \n`, event);
-});
+## Project setup
 
-// publish to a topic
-await mercurios.publish("123", { rick: "sanchez" });
-
-// emit event
-await mercurios.emit("123", { foo: "bar" });
-
-// close connection
-await mercurios.close();
 ```
+npm install
+```
+
+### Compiles and hot-reloads for development
+
+```
+npm run serve
+```
+
+### Compiles and minifies for production
+
+```
+npm run build
+```
+
+### Lints and fixes files
+
+```
+npm run lint
+```
+
+### Customize configuration
+
+See [Configuration Reference](https://cli.vuejs.org/config/).
