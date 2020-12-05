@@ -1,4 +1,4 @@
-import { MercuriosEvent } from "../models/event";
+import { MercuriosEvent } from "../models/event/event";
 import { $store } from "../models/store";
 import $logger from "../utils/logger";
 

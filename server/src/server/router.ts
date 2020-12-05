@@ -1,9 +1,9 @@
 import { Router, RequestHandler } from "express";
-import publishEvent from "../handlers/publish_event";
-import emitEvent from "../handlers/emit_event";
-import readEvent from "../handlers/read_event";
-import listTopics from "../handlers/list_topics";
-import filterTopic from "../handlers/filter_topic";
+import publishEvent from "../handlers/publish-event";
+import emitEvent from "../handlers/emit-event";
+import readEvent from "../handlers/read-event";
+import listTopics from "../handlers/list-topics";
+import filterTopic from "../handlers/filter-topic";
 import { $validator } from "../utils/validator";
 import { $json } from "../utils/json";
 

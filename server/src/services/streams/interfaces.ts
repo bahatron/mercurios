@@ -1,4 +1,4 @@
-import { MercuriosEvent } from "../../models/event";
+import { MercuriosEvent } from "../../models/event/event";
 
 /** @todo: time filtering */
 export interface EventFilters {

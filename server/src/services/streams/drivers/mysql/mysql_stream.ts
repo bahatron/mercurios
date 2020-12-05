@@ -1,5 +1,5 @@
 import { MercuriosStream } from "../../interfaces";
-import $event, { MercuriosEvent } from "../../../../models/event";
+import $event, { MercuriosEvent } from "../../../../models/event/event";
 import $json from "../../../../utils/json";
 import $nats from "../../../nats";
 import $error, { ERROR_CODES } from "../../../../utils/error";

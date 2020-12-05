@@ -5,8 +5,8 @@ x-mercurios-config: &mercurios-config
     # MERCURIOS_DEBUG: 1
     #  max
     MERCURIOS_WORKERS: 4
-    MERCURIOS_TEST_URL: http://mercurios_server:4254
-    NATS_URL: nats://mercurios_nats:4222
+    MERCURIOS_TEST_URL: http://mercurios-server:4254
+    NATS_URL: nats://mercurios-nats:4222
     MERCURIOS_DRIVER: pg
     # MERCURIOS_DRIVER: mysql
 
@@ -15,49 +15,49 @@ x-postgres-config: &postgres-config
     POSTGRES_DB: mercurios
     POSTGRES_USER: admin
     POSTGRES_PORT: 5432
-    POSTGRES_HOST: mercurios_postgres
+    POSTGRES_HOST: mercurios-postgres
 
 x-mysql-config: &mysql-config
     MYSQL_USER: admin
     MYSQL_DATABASE: mercurios
     MYSQL_PASSWORD: secret
     MYSQL_ROOT_PASSWORD: secret
-    MYSQL_HOST: mercurios_mysql
+    MYSQL_HOST: mercurios-mysql
     MYSQL_PORT: 3306
 
 services:
-    mercurios_mysql:
+    mercurios-mysql:
         image: mysql:5.6
         # command: --default-authentication-plugin=mysql_native_password
-        container_name: mercurios_mysql
+        container_name: mercurios-mysql
         environment:
             <<: *mysql-config
 
-    mercurios_postgres:
+    mercurios-postgres:
         image: postgres
-        container_name: mercurios_postgres
+        container_name: mercurios-postgres
         environment:
             <<: *postgres-config
 
-    mercurios_nats:
+    mercurios-nats:
         image: nats
-        container_name: mercurios_nats
+        container_name: mercurios-nats
 
-    mercurios_server:
-        image: mercurios_server
-        container_name: mercurios_server
-        command: sh -c "wait-for-it mercurios_mysql:3306 -- npm run migrate && npm start"
+    mercurios-server:
+        image: mercurios-server
+        container_name: mercurios-server
+        command: sh -c "wait-for-it mercurios-mysql:3306 -- npm run migrate && npm start"
         environment:
             <<: *postgres-config
             <<: *mysql-config
             <<: *mercurios-config
         depends_on:
-            - mercurios_postgres
-            - mercurios_mysql
-            - mercurios_nats
+            - mercurios-postgres
+            - mercurios-mysql
+            - mercurios-nats
 
-    mercurios_client:
-        image: mercurios_client
-        container_name: mercurios_client
+    mercurios-client:
+        image: mercurios-client
+        container_name: mercurios-client
         environment:
-            MERCURIOS_URL: http://mercurios_server:4254
+            MERCURIOS_URL: http://mercurios-server:4254

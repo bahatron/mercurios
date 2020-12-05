@@ -1,5 +1,5 @@
 import { EventFilters } from "../services/streams/interfaces";
-import { MercuriosEvent } from "../models/event";
+import { MercuriosEvent } from "../models/event/event";
 import { $store } from "../models/store";
 import { Exception } from "../utils/error";
 

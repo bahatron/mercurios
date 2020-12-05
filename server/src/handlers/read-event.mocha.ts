@@ -2,10 +2,10 @@ import $http, { AxiosResponse } from "axios";
 import env from "@bahatron/env";
 import { expect } from "chai";
 import $logger from "@bahatron/logger";
-import { publishEventEndpoint } from "./publish_event.mocha";
+import { publishEventEndpoint } from "./publish-event.mocha";
 import { $store } from "../models/store";
 import { $validator } from "../utils/validator";
-import { EventSchema } from "../models/event.schema";
+import { EventSchema } from "../models/event/event.schema";
 
 const MERCURIOS_MERCURIOS_TEST_URL = env.get("MERCURIOS_TEST_URL");
 
