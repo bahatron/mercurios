@@ -15,7 +15,7 @@ export const $json = {
     },
 
     stringify(data: any): string {
-        return isStringifiable(data) ? JSON.stringify(data) : data?.toString();
+        return isStringifiable(data) ? JSON.stringify(data) : data;
     },
 };
 

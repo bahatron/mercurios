@@ -1,7 +1,8 @@
 #!/usr/bin/node
 import http from "http";
+import { $store } from "../models/store/store";
 import expressApp from "../server/server";
-import createWsServer from "../websocket/ws_server";
+import createWsServer from "../server/websocket/ws_server";
 import $config from "../utils/config";
 import $logger from "../utils/logger";
 
@@ -31,6 +32,9 @@ process.on("unhandledRejection", async (reason, promise) => {
     });
 });
 
-$logger.debug("Starting server in debug mode");
-
-HTTP_SERVER.listen(PORT);
+$store
+    .setup()
+    .then(() => {
+        HTTP_SERVER.listen(PORT);
+    })
+    .catch((err) => $logger.error(err) && process.exit(0));

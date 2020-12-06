@@ -3,7 +3,7 @@ import env from "@bahatron/env";
 import { expect } from "chai";
 import $logger from "@bahatron/logger";
 import { publishEventEndpoint } from "./publish-event.mocha";
-import { $store } from "../models/store";
+import { $store } from "../models/store/store";
 import { $validator } from "../utils/validator";
 import { EventSchema } from "../models/event/event.schema";
 

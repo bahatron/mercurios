@@ -1,7 +1,7 @@
 import knex, { Config } from "knex";
 import { resolve } from "path";
-import $config from "../../../../utils/config";
 import { readFileSync } from "fs";
+import $config from "../../utils/config";
 
 const config: Config = {
     client: "mysql2",
@@ -23,6 +23,7 @@ const config: Config = {
     migrations: {
         tableName: "mercurios_migrations",
         directory: resolve(__dirname, "./migrations"),
+        extension: "js",
     },
 };
 

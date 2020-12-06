@@ -1,6 +1,6 @@
-import { EventFilters } from "../services/streams/interfaces";
 import { MercuriosEvent } from "../models/event/event";
-import { $store } from "../models/store";
+import { EventFilters } from "../models/store/drivers/helpers";
+import { $store } from "../models/store/store";
 import { Exception } from "../utils/error";
 
 export default async function filterTopic(

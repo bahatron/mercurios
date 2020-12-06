@@ -1,5 +1,5 @@
 import Knex, { Config } from "knex";
-import $config from "../../../../utils/config";
+import $config from "../../utils/config";
 import { resolve } from "path";
 
 const config: Config = {
@@ -17,6 +17,6 @@ const config: Config = {
     },
 };
 
-const $pg = Knex(config);
+const $postgres = Knex(config);
 
-export default $pg;
+export default $postgres;

@@ -1,5 +1,5 @@
-import { $store } from "../models/store";
-import { EventFilters } from "../services/streams/interfaces";
+import { EventFilters } from "../models/store/drivers/helpers";
+import { $store } from "../models/store/store";
 import $logger from "../utils/logger";
 
 export default async function listTopics(params: {

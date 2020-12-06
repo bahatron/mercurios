@@ -1,9 +1,9 @@
 import $logger from "../utils/logger";
 import $config from "../utils/config";
-import { driver as $driver } from "../services/streams";
+import { $store } from "../models/store/store";
 
-$driver.migrate
-    .latest()
+$store
+    .setup()
     .then(() =>
         $logger.info(
             `migrations completed - driver: ${$config.mercurios_driver}`

@@ -1,6 +1,13 @@
 import Knex from "knex";
-import { $validator } from "../../utils/validator";
-import { EventFilters } from "./interfaces";
+import { $validator } from "../../../utils/validator";
+
+export interface EventFilters {
+    from?: number;
+    to?: number;
+    key?: string;
+    before?: string;
+    after?: string;
+}
 
 export function natsQueryToSql(filter: string): string {
     let splitted = filter.split(".");

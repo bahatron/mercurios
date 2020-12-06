@@ -1,5 +1,5 @@
 import $ws from "ws";
-import $config from "../utils/config";
+import $config from "../../utils/config";
 
 const MERCURIOS_TEST_URL = $config.test_url;
 

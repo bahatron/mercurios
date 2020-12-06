@@ -3,8 +3,8 @@ import { Server } from "http";
 import { Connection } from "./ws_connection";
 import url from "url";
 import uuid from "uuid";
-import $logger from "../utils/logger";
-import $config from "../utils/config";
+import $logger from "../../utils/logger";
+import $config from "../../utils/config";
 
 const CONNECTION_TIMEOUT = "connection timeout";
 
