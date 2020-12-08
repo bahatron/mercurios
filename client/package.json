@@ -1,6 +1,6 @@
 {
     "name": "@bahatron/mercurios",
-    "version": "2.2.4",
+    "version": "2.2.5",
     "description": "mercurios client",
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
@@ -9,8 +9,7 @@
         "prepublishOnly": "npm run build && npm run test",
         "dev": "tsc --watch",
         "test": "jest --forceExit --reporters=default --runInBand",
-        "build:clean": "rm -rf lib && npm run build",
-        "build": "tsc"
+        "build": "rm -rf lib && tsc"
     },
     "author": "simonpiscitelli@gmail.com",
     "license": "Apache-2.0",
