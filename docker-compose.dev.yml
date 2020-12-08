@@ -1,12 +1,18 @@
 version: "3.5"
 
+volumes:
+    yb-master-data:
+        driver: "local"
+    yb-tserver-data:
+        driver: "local"
+
 x-mercurios-config: &mercurios-config
-    NATS_URL: nats://mercurios-nats:4222
+    NATS_URL: nats://nats:4222
     # MERCURIOS_PORT: 4254
     MERCURIOS_TEST_URL: http://mercurios-server:4254
     # MERCURIOS_DRIVER: pg
-    MERCURIOS_DRIVER: mysql
-    MERCURIOS_WORKERS: 6
+    # MERCURIOS_DRIVER: mysql
+    MERCURIOS_WORKERS: 3
     MERCURIOS_DEBUG: 1
     MERCURIOS_ENV: dev
 
@@ -15,55 +21,107 @@ x-postgres-config: &postgres-config
     POSTGRES_DB: mercurios
     POSTGRES_USER: admin
     POSTGRES_PORT: 5432
-    POSTGRES_HOST: mercurios-postgres
+    POSTGRES_HOST: postgres
 
 x-mysql-config: &mysql-config
     MYSQL_USER: admin
     MYSQL_DATABASE: mercurios
     MYSQL_PASSWORD: secret
     MYSQL_ROOT_PASSWORD: secret
-    MYSQL_HOST: mercurios-mysql
+    MYSQL_HOST: mysql
     MYSQL_PORT: 3306
     # rds ssl cert will be present at /etc/ssl/rds-combined-ca-bundle.pem
     MYSQL_RDS_SSL: 0
 
+# todo: create store driver
+x-yugabyte-config: &yugabyte-config
+    YUGABYTE_USER: postgres
+    YUGABYTE_DB: postgres
+    YUGABYTE_HOST: yb-tserver
+    YUGABYTE_PORT: 5433
+
 services:
-    mercurios-nats:
-        image: nats
-        container_name: mercurios-nats
-        # command: ["-V"]
+    yb-master:
+        image: yugabytedb/yugabyte:latest
+        container_name: yb-master
+        volumes:
+            - yb-master-data:/mnt/master
+        command:
+            [
+                "/home/yugabyte/bin/yb-master",
+                "--fs_data_dirs=/mnt/master",
+                "--master_addresses=yb-master:7100",
+                "--rpc_bind_addresses=yb-master:7100",
+                "--replication_factor=1",
+            ]
         ports:
-            - 4222:4222
-            - 8222:8222
-
-    mercurios-postgres:
-        image: postgres
-        container_name: mercurios-postgres
-        ports:
-            - 5432:5432
+            - "7000:7000"
         environment:
-            <<: *postgres-config
-        command: -c 'max_connections=500'
+            SERVICE_7000_NAME: yb-master
 
-    mercurios-mysql:
+    yb-tserver:
+        image: yugabytedb/yugabyte:latest
+        container_name: yb-tserver
+        volumes:
+            - yb-tserver-data:/mnt/tserver
+        command:
+            [
+                "/home/yugabyte/bin/yb-tserver",
+                "--fs_data_dirs=/mnt/tserver",
+                "--start_pgsql_proxy",
+                "--rpc_bind_addresses=yb-tserver:9100",
+                "--tserver_master_addrs=yb-master:7100",
+            ]
+        ports:
+            - "9042:9042"
+            - "5433:5433"
+            - "9000:9000"
+        environment:
+            SERVICE_5433_NAME: ysql
+            SERVICE_9042_NAME: ycql
+            SERVICE_6379_NAME: yedis
+            SERVICE_9000_NAME: yb-tserver
+        depends_on:
+            - yb-master
+
+    mysql:
         image: mysql:5.6
-        container_name: mercurios-mysql
+        container_name: mysql
         ports:
             - 3306:3306
         environment:
             <<: *mysql-config
         # command: --default-authentication-plugin=mysql_native_password
 
+    postgres:
+        image: postgres
+        container_name: postgres
+        ports:
+            - 5432:5432
+        environment:
+            <<: *postgres-config
+        command: -c 'max_connections=500'
+
+    nats:
+        image: nats
+        container_name: nats
+        command: ["-V", "-m=8222"]
+        ports:
+            - 4222:4222
+            - 8222:8222
+
     mercurios-server:
         image: mercurios-server
         container_name: mercurios-server
         ports:
             - 4254:4254
-        command: sh -c "wait-for-it mercurios-mysql:3306 -s -t 30 -- npm run migrate && npm run dev"
+            - 9230:9230
+        command: sh -c "wait-for-it mysql:3306 -s -t 30 -- npm run dev"
         environment:
-            <<: *postgres-config
-            <<: *mysql-config
             <<: *mercurios-config
+            <<: *mysql-config
+            <<: *postgres-config
+            <<: *yugabyte-config
 
     mercurios-client:
         image: mercurios-client
@@ -83,4 +141,4 @@ services:
             - 8080:8080
             - 8081:8081
         environment:
-            MERCURIOS_URL: http://mercurios-server:4254
+            VUE_APP_MERCURIOS_URL: http://localhost:4254

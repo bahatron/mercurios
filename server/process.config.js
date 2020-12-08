@@ -1,3 +1,6 @@
+let isProd = process.env.MERCURIOS_ENV === "production";
+
+console.log(`================= isProd: ${isProd}`);
 module.exports = {
     apps: [
         {
@@ -5,11 +8,11 @@ module.exports = {
             name: "mercurios",
             exec_mode: "cluster",
             instances: process.env.MERCURIOS_WORKERS || 0,
-            watch:
-                process.env.MERCURIOS_ENV === "production" ? false : ["dist"],
-            autorestart: process.env.MERCURIOS_ENV === "production",
+            watch: isProd ? false : ["dist"],
+            autorestart: isProd,
             out_file: "/dev/null",
             error_file: "/dev/null",
+            node_args: isProd ? undefined : ["--inspect=0.0.0.0:9230"],
         },
     ],
 };

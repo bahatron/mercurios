@@ -2,7 +2,7 @@
 import http from "http";
 import { $store } from "../models/store/store";
 import expressApp from "../server/server";
-import createWsServer from "../server/websocket/ws_server";
+import createWsServer from "../server/websocket/ws-server";
 import $config from "../utils/config";
 import $logger from "../utils/logger";
 

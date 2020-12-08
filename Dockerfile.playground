@@ -15,6 +15,14 @@ ARG VUE_APP_MERCURIOS_URL
 WORKDIR /app/playground
 COPY ./playground/package*.json ./
 RUN npm install
+
+WORKDIR /app/client
+COPY ./client/package*.json ./
+RUN npm install
+COPY ./client .
+RUN npm run build
+
+WORKDIR /app/playground
 COPY ./playground .
 
 FROM src as prod

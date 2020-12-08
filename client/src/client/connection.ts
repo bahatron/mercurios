@@ -1,4 +1,4 @@
-import ws from "ws";
+import ws, { ClientOptions } from "ws";
 import { $error } from "../utils/error";
 import { v4 } from "uuid";
 import { $logger } from "../utils/logger";
@@ -34,24 +34,24 @@ interface QueuedHandler {
 
 export function Connection(_url: string, _id: string = v4()) {
     let _queue: Array<QueuedHandler> = [];
+    let _completed: Set<QueuedHandler> = new Set();
     let _socket = connect();
     let _interval: any;
     let _listeners: Record<string, Set<MercuriosEventHandler>> = {};
 
     function Socket(): ws | WebSocket {
         try {
+            let url = new URL(_url);
+            url.search = url.search ? `${url.search}&id=${_id}` : `?id=${_id}`;
+
             if (typeof window === "undefined") {
-                return new ws(_url, <ws.ClientOptions>{});
+                return new ws(url, <ClientOptions>{});
             }
 
-            let browserUrl = new URL(_url);
+            // url.protocol = url.protocol === "http:" ? "ws:" : "wss:";
+            url.protocol = "ws:";
 
-            return new WebSocket(
-                `${browserUrl.hostname}${
-                    browserUrl.port ? `:${browserUrl.port}` : ""
-                }${_id ? `?id=${_id}` : ""}`,
-                "ws"
-            );
+            return new WebSocket(<any>url);
         } catch (err) {
             $logger.error(err);
 
@@ -71,14 +71,15 @@ export function Connection(_url: string, _id: string = v4()) {
         let socket = Socket();
 
         socket.onopen = async function onSocketOpen() {
-            if (process.env.MERCURIOS_ENV !== "production") {
-                $logger.debug("socket open");
-            }
+            $logger.debug("socket open");
+
+            // recreate subscriptions on reconnect
+            _queue = _queue.concat(Array.from(_completed));
 
             let action: QueuedHandler | undefined;
-
             while ((action = _queue.pop())) {
                 await action();
+                _completed.add(action);
             }
         };
 
@@ -93,21 +94,17 @@ export function Connection(_url: string, _id: string = v4()) {
         };
 
         socket.onerror = async function onSocketError({ message, error }: any) {
-            $logger.debug(`socket error`, { message });
-
-            if (process.env.NODE_ENV !== "production") {
-                console.log({ on: "onError", message, error });
-            }
+            $logger.debug("socket error", {
+                on: "onError",
+                message,
+                error,
+            });
 
             reconnect();
         };
 
         socket.onclose = function onSocketClose({ wasClean, code }: any) {
             $logger.debug(`socket closed`, { wasClean, code });
-
-            if (process.env.NODE_ENV !== "production") {
-                console.log({ on: "onClose", wasClean, code });
-            }
 
             if (code == 1000) {
                 return;
@@ -122,7 +119,6 @@ export function Connection(_url: string, _id: string = v4()) {
     async function reconnect() {
         $logger.debug(`reconnecting...`);
         if (_interval) {
-            $logger.debug(`already reconnecting.`);
             return;
         }
 
@@ -183,6 +179,7 @@ export function Connection(_url: string, _id: string = v4()) {
 
         close() {
             _socket.close(1000);
+            _completed.clear();
         },
 
         isOpen() {
@@ -191,8 +188,13 @@ export function Connection(_url: string, _id: string = v4()) {
 
         send(message: ServerMessage): Promise<void> {
             return new Promise((resolve, reject) => {
+                /** @todo: maybe this is part of the connect logic, not send? */
                 setTimeout(() => {
-                    reject($error.ConnectionError("could not connect"));
+                    reject(
+                        $error.ConnectionError(
+                            "timeout reached while sending message"
+                        )
+                    );
                 }, 5000);
 
                 try {

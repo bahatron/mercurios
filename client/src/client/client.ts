@@ -6,6 +6,7 @@ import {
 import { $http } from "../utils/axios";
 import { $error } from "../utils/error";
 import { AxiosError } from "axios";
+import { v4 } from "uuid";
 
 export interface FilterOptions {
     from?: number;
@@ -29,21 +30,13 @@ export interface SubscribeOptions {
     queue?: string;
 }
 
-function randomString(): string {
-    let generator = () => Math.random().toString(36).substring(2);
-
-    return `${generator()}${generator()}`;
+export interface ConnectOptions {
+    url: string;
+    id?: string;
 }
 
 export type MercuriosClient = ReturnType<typeof MercuriosClient>;
-
-export function MercuriosClient({
-    url: _url,
-    id: _id,
-}: {
-    url: string;
-    id?: string;
-}) {
+export function MercuriosClient({ url: _url, id: _id }: ConnectOptions) {
     let _socket = Connection(_url, _id);
 
     return {
@@ -67,9 +60,10 @@ export function MercuriosClient({
         async topics({
             like,
             withEvents,
-        }: { like?: string; withEvents?: FilterOptions } = {}): Promise<
-            string[]
-        > {
+        }: {
+            like?: string;
+            withEvents?: FilterOptions;
+        } = {}): Promise<string[]> {
             try {
                 let response = await $http.get(`${_url}/topics`, {
                     params: {
@@ -157,7 +151,7 @@ export function MercuriosClient({
         ): Promise<string> {
             let { queue } = options;
 
-            let subscription = randomString();
+            let subscription = v4();
 
             _socket.on(subscription, handler);
 

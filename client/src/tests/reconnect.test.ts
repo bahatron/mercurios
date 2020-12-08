@@ -13,13 +13,12 @@ describe("Reconnect behaviour", () => {
         }
     });
 
-    it("can reconnect", () => {
+    it("will reconnect", () => {
         return new Promise(async (resolve) => {
             client.subscribe("hello", () => {
                 resolve();
             });
 
-            console.log("first test forcing reconnect...");
             await client.socket.emit("force_reconnect");
             await new Promise((resolve) => setTimeout(resolve, 100));
             await client.emit("hello");

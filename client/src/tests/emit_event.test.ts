@@ -2,7 +2,7 @@ import { connect } from "..";
 
 describe("Feature: Emit Event", () => {
     let _client = connect({
-        url: process.env.MERCURIOS_URL || "",
+        url: `${process.env.MERCURIOS_URL}` || "",
         id: "emit_event_test",
     });
 

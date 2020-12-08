@@ -2,7 +2,7 @@
 // https://jestjs.io/docs/en/configuration.html
 
 module.exports = {
-    silent: true,
+    silent: false,
     verbose: false,
     clearMocks: true,
     testEnvironment: "node",

@@ -1,6 +1,6 @@
-import { Connection, WsRequestHandler } from "../server/websocket/ws_connection";
+import { WsRequestHandler } from "../server/websocket/ws-connection";
 import $json from "../utils/json";
-import uuid from "uuid";
+import { v4 } from "uuid";
 import { Subscription } from "ts-nats";
 import $logger from "../utils/logger";
 
@@ -8,7 +8,7 @@ export default <WsRequestHandler>(
     async function subscribeToTopic({
         connection,
         topic,
-        subscription = uuid.v4(),
+        subscription = v4(),
         queue,
     }) {
         if (!topic || connection.subscriptions.has(subscription)) {
@@ -19,15 +19,11 @@ export default <WsRequestHandler>(
             `mercurios.topic.${topic}`,
             (err, msg) => {
                 return new Promise((resolve) => {
-                    connection.logger.debug(`subscription message received`, {
-                        topic,
-                        subscription,
-                    });
-
                     if (err) {
                         connection.logger.error(err, "error receiving message");
                         return;
                     }
+                    connection.logger.debug(`recieved message from dispatcher`);
 
                     connection.socket.send(
                         $json.stringify({
@@ -42,7 +38,7 @@ export default <WsRequestHandler>(
                                     "error sending message"
                                 );
                             }
-
+                            connection.logger.debug(`message sent to client`);
                             resolve();
                         }
                     );

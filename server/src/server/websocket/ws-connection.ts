@@ -5,7 +5,6 @@ import unsubscribe_to_topic from "../../handlers/unsubscribe-to-topic";
 import $nats from "../../services/nats";
 import $logger from "../../utils/logger";
 import $json from "../../utils/json";
-import { Logger } from "@bahatron/logger";
 
 export interface MercuriosClientMessage {
     action: string;
@@ -14,13 +13,14 @@ export interface MercuriosClientMessage {
     subscription?: string;
 }
 
+interface WsRequestHandlerParams {
+    connection: Connection;
+    topic?: string;
+    subscription?: string;
+    queue?: string;
+}
 export interface WsRequestHandler {
-    (params: {
-        connection: Connection;
-        topic?: string;
-        subscription?: string;
-        queue?: string;
-    }): void;
+    (params: WsRequestHandlerParams): void;
 }
 
 // this is my router
@@ -33,10 +33,10 @@ export type Connection = ReturnType<typeof Connection>;
 export function Connection(_id: string, _socket: ws) {
     let clientName = `mercurios:wsc:${_id}`;
     let _dispatcher = $nats.connect(clientName);
-    let _logger: Logger = $logger.id(clientName);
+    let _logger = $logger.id(clientName);
     let _subscriptions: Map<string, Subscription> = new Map();
 
-    const conn = {
+    let conn = {
         get id() {
             return _id;
         },
@@ -52,11 +52,11 @@ export function Connection(_id: string, _socket: ws) {
         get logger() {
             return _logger;
         },
-
         async close() {
             if (!(await _dispatcher).isClosed()) {
                 await (await _dispatcher).drain();
                 await (await _dispatcher).close();
+
                 _subscriptions.forEach((sub, topic) => {
                     sub.unsubscribe();
                     _subscriptions.delete(topic);
@@ -65,7 +65,25 @@ export function Connection(_id: string, _socket: ws) {
 
             return _socket.terminate();
         },
-    };
+        async ping() {
+            conn.logger.debug(`PING`);
+
+            if (conn.socket.readyState !== conn.socket.OPEN) {
+                throw new Error("already_closed");
+            }
+
+            await new Promise((resolve, reject) => {
+                setTimeout(() => reject(new Error("timeout")), 2000);
+
+                conn.socket.once("pong", () => {
+                    conn.logger.debug(`PONG`);
+                    resolve();
+                });
+
+                conn.socket.ping();
+            });
+        },
+    } as const;
 
     _socket.on("message", async (data) => {
         try {
