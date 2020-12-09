@@ -9,7 +9,6 @@ describe("Reconnect behaviour", () => {
     client.socket.on("force_reconnect", async () => {
         if (client.socket.isOpen()) {
             await client.socket.close();
-            console.log(`client closed...`);
         }
     });
 

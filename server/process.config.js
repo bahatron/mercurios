@@ -1,6 +1,5 @@
 let isProd = process.env.MERCURIOS_ENV === "production";
 
-console.log(`================= isProd: ${isProd}`);
 module.exports = {
     apps: [
         {
