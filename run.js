@@ -18,9 +18,9 @@ function build() {
 }
 
 function shutDown() {
-    exec(`test $(command -v tilt) && tilt down`);
     exec(`docker-compose -f ${DEV_COMPOSE} down --remove-orphans`);
     exec(`docker-compose -f ${TEST_COMPOSE} down --remove-orphans`);
+    exec(`test $(command -v tilt) && tilt down`);
 }
 
 function shouldCleanUp() {

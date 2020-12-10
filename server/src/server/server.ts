@@ -7,8 +7,9 @@ import errorHandler from "./middleware/error_handler";
 import { requestLogger } from "./middleware/request_logger";
 import createWsServer from "./websocket/ws-server";
 
-export const app = express();
-createWsServer(new http.Server(app));
+const app = express();
+export const server = new http.Server(app);
+createWsServer(server);
 
 app.use(express.json({ limit: "1mb" }));
 app.use(helmet());

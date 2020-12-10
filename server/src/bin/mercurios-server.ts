@@ -1,7 +1,7 @@
 #!/usr/bin/node
 
 import { $store } from "../models/store/store";
-import { app } from "../server/server";
+import { server } from "../server/server";
 import $config from "../utils/config";
 import $logger from "../utils/logger";
 
@@ -16,7 +16,7 @@ process.on("unhandledRejection", async (reason, promise) => {
 });
 
 $store.setup().then(() => {
-    app.listen(4254, () => {
+    server.listen(4254, () => {
         $logger.info(`Server listening on port 4254`);
     });
 });
