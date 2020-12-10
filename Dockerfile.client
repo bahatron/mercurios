@@ -7,4 +7,4 @@ COPY ./client/package-lock.json ./package-lock.json
 RUN npm install
 
 COPY ./client .
-RUN npm run build:clean
+RUN npm run build

@@ -28,6 +28,8 @@ export default function createWsServer(httpServer: Server): ws.Server {
                 }
             }
         }, PING_INTERVAl);
+
+        $logger.info("websocket server initiated");
     });
 
     wss.on("connection", (socket, request) => {
