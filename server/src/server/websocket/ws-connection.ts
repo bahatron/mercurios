@@ -5,6 +5,7 @@ import unsubscribe_to_topic from "../../handlers/unsubscribe-to-topic";
 import $nats from "../../services/nats";
 import $logger from "../../utils/logger";
 import $json from "../../utils/json";
+import { Logger } from "@bahatron/logger";
 
 export interface MercuriosClientMessage {
     action: string;
@@ -32,9 +33,13 @@ const ACTIONS: Record<string, WsRequestHandler> = {
 export type Connection = ReturnType<typeof Connection>;
 export function Connection(_id: string, _socket: ws) {
     let clientName = `mercurios:wsc:${_id}`;
-    let _dispatcher = $nats.connect(clientName);
-    let _logger = $logger.id(clientName);
+    let _logger: Logger = $logger.id(clientName);
     let _subscriptions: Map<string, Subscription> = new Map();
+
+    let _dispatcher = $nats.connect(clientName).then((client) => {
+        _logger.info("dispatcher connection stablished");
+        return client;
+    });
 
     let conn = {
         get id() {
@@ -108,7 +113,7 @@ export function Connection(_id: string, _socket: ws) {
                 queue,
             });
         } catch (err) {
-            _logger.warning(`message error: ${err.message}`, err);
+            _logger.warning(`error processing message: ${err.message}`, err);
         }
     });
 

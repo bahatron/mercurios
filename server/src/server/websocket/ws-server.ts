@@ -31,22 +31,26 @@ export default function createWsServer(httpServer: Server): ws.Server {
     });
 
     wss.on("connection", (socket, request) => {
-        let query = url.parse(request.url ?? "", true).query;
-        $logger.debug("received ws connection request", { query });
+        try {
+            let query = url.parse(request.url ?? "", true).query;
+            $logger.debug("received ws connection request", { query });
 
-        let id = typeof query.id === "string" ? query.id : v4();
+            let id = typeof query.id === "string" ? query.id : v4();
 
-        if (_clients[id]) {
-            socket.terminate();
-            return;
+            if (_clients[id]) {
+                socket.terminate();
+                return;
+            }
+
+            let conn = Connection(id, socket);
+            _clients[id] = conn;
+
+            conn.logger.info("connection open");
+
+            socket.on("close", () => removeConnection(conn));
+        } catch (err) {
+            $logger.error(err);
         }
-
-        let conn = Connection(id, socket);
-        _clients[id] = conn;
-
-        conn.logger.info("connection open");
-
-        socket.on("close", () => removeConnection(conn));
     });
 
     return wss;
