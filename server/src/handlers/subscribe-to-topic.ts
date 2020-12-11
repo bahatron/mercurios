@@ -18,7 +18,7 @@ export default <WsRequestHandler>(
         let sub: Subscription = await (await connection.dispatcher).subscribe(
             `mercurios.topic.${topic}`,
             (err, msg) => {
-                return new Promise((resolve) => {
+                return new Promise<void>((resolve) => {
                     if (err) {
                         connection.logger.error(err, "error receiving message");
                         return;
@@ -38,7 +38,6 @@ export default <WsRequestHandler>(
                                     "error sending message"
                                 );
                             }
-                            connection.logger.debug(`message sent to client`);
                             resolve();
                         }
                     );

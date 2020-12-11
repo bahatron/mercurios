@@ -13,7 +13,7 @@ createWsServer(server);
 
 app.use(express.json({ limit: "1mb" }));
 app.use(helmet());
-app.use(cors());
+app.use(cors() as any);
 
 app.use(requestLogger);
 app.use(router);
