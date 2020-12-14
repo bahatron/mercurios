@@ -7,7 +7,7 @@ import $logger from "../../utils/logger";
 import $config from "../../utils/config";
 
 const PING_INTERVAl = parseInt($config.mercurios_ping_interval);
-const _clients: Record<string, Connection> = {};
+const _clients: Set<Connection> = new Set();
 
 export default function createWsServer(httpServer: Server): ws.Server {
     const wss = new ws.Server({ server: httpServer });
@@ -18,7 +18,7 @@ export default function createWsServer(httpServer: Server): ws.Server {
 
     wss.on("listening", async () => {
         setInterval(async () => {
-            let clients = Object.values(_clients);
+            let clients = Array.from(_clients);
             for (let conn of clients) {
                 try {
                     await conn.ping();
@@ -39,13 +39,8 @@ export default function createWsServer(httpServer: Server): ws.Server {
 
             let id = typeof query.id === "string" ? query.id : v4();
 
-            if (_clients[id]) {
-                socket.terminate();
-                return;
-            }
-
             let conn = Connection(id, socket);
-            _clients[id] = conn;
+            _clients.add(conn);
 
             conn.logger.info("connection open");
 
@@ -60,7 +55,6 @@ export default function createWsServer(httpServer: Server): ws.Server {
 
 async function removeConnection(conn: Connection) {
     await conn.close();
-    await conn.socket.terminate();
-    delete _clients[conn.id];
-    $logger.debug("connection killed");
+    _clients.delete(conn);
+    $logger.debug("connection killed", { id: conn.id });
 }

@@ -15,7 +15,7 @@
     },
     "dependencies": {
         "@bahatron/env": "^0.1.14",
-        "@bahatron/logger": "^4.0.5",
+        "@bahatron/logger": "^4.0.6",
         "@types/autocannon": "^4.1.0",
         "@types/chai": "^4.2.12",
         "@types/cors": "^2.8.9",
@@ -23,7 +23,7 @@
         "@types/helmet": "0.0.44",
         "@types/lodash": "^4.14.165",
         "@types/mocha": "^5.2.7",
-        "@types/node": "^12.19.8",
+        "@types/node": "^12.19.9",
         "@types/uuid": "^3.4.9",
         "@types/ws": "^6.0.4",
         "@types/yargs": "^15.0.11",
