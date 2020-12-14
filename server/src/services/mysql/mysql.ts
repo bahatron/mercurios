@@ -3,7 +3,7 @@ import { resolve } from "path";
 import { readFileSync } from "fs";
 import $config from "../../utils/config";
 
-const config: Config = {
+export const MYSQL_CONFIG: Config = {
     client: "mysql2",
     connection: {
         host: $config.mysql_host,
@@ -27,4 +27,4 @@ const config: Config = {
     },
 };
 
-export const $mysql = knex(config);
+export const $mysql = knex(MYSQL_CONFIG);

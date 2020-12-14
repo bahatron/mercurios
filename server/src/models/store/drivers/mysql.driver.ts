@@ -1,10 +1,10 @@
-import { $mysql } from "../../../services/mysql/mysql";
+import { $mysql, MYSQL_CONFIG } from "../../../services/mysql/mysql";
 import { natsQueryToSql, sqlEventFilters, EventFilters } from "./helpers";
 import $error from "../../../utils/error";
 import $json from "../../../utils/json";
 import $event, { MercuriosEvent } from "../../event/event";
 import Knex from "knex";
-import { StoreDriver } from "../store";
+import { $store, StoreDriver } from "../store";
 import $logger from "../../../utils/logger";
 
 const EVENT_TABLE = "mercurios_events";
@@ -13,7 +13,19 @@ const TOPIC_TABLE = "mercurios_topics";
 export default function (): StoreDriver {
     return {
         async setup() {
-            await $mysql.migrate.latest();
+            if (await retrySetup()) {
+                return;
+            }
+
+            await $mysql.raw(
+                `DROP TABLE ${MYSQL_CONFIG.migrations?.tableName}_lock`
+            );
+
+            if (await retrySetup()) {
+                return;
+            }
+
+            throw $error.InternalError("MigrationLocked", { driver: "mysql" });
         },
 
         async createStream(topic) {
@@ -184,4 +196,27 @@ async function appendProcedure({
     });
 
     return result;
+}
+
+async function retrySetup(): Promise<boolean> {
+    let retry = 0;
+    while (retry < 3) {
+        try {
+            await $mysql.migrate.latest();
+
+            return true;
+        } catch (err) {
+            if (err.name === "MigrationLocked") {
+                retry++;
+
+                await new Promise((resolve) =>
+                    setTimeout(resolve, Math.random() * 100)
+                );
+            } else {
+                throw err;
+            }
+        }
+    }
+
+    return false;
 }
