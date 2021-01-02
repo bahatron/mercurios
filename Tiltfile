@@ -6,8 +6,8 @@ docker_build('mercurios-server', '.', dockerfile = 'Dockerfile.server',
         sync('./server', '/app/server'),
     ],
     only=[
-        "./server",
-        "./scripts"
+        './server',
+        './scripts'
     ]
 )
 
@@ -16,18 +16,18 @@ docker_build('mercurios-client', '.', dockerfile = 'Dockerfile.client',
         sync('./client', '/app/client'),
     ],
     only=[
-        "./client",
+        './client',
     ]
 )
 
 docker_build('mercurios-playground', '.', dockerfile = 'Dockerfile.playground',
-    target="src",
+    target='src',
     live_update=[
         sync('./playground', '/app/playground'),
     ],
     only=[
-        "./playground",
-        "./scripts",
-        "./client"
+        './playground',
+        './scripts',
+        './client'
     ],
 )

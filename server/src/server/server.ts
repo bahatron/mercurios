@@ -11,7 +11,7 @@ const app = express();
 export const server = new http.Server(app);
 createWsServer(server);
 
-app.use(express.json({ limit: "1mb" }));
+app.use(express.json());
 app.use(helmet());
 app.use(cors() as any);
 
