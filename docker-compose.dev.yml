@@ -9,11 +9,11 @@ volumes:
 x-mercurios-config: &mercurios-config
     NATS_URL: nats://mercurios-nats:4222
     MERCURIOS_TEST_URL: http://mercurios-server:4254
-    # MERCURIOS_DRIVER: pg
-    # MERCURIOS_DRIVER: mysql
-    MERCURIOS_WORKERS: 3
+    # MERCURIOS_STORE_DRIVER: pg
+    # MERCURIOS_STORE_DRIVER: mysql
+    MERCURIOS_WORKERS: 2
     MERCURIOS_DEBUG: 1
-    MERCURIOS_ENV: dev
+    MERCURIOS_DEV: 1
 
 x-postgres-config: &postgres-config
     POSTGRES_PASSWORD: secret

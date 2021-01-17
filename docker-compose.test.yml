@@ -5,7 +5,7 @@ x-mercurios-config: &mercurios-config
     MERCURIOS_WORKERS: 4
     NATS_URL: nats://nats:4222
     # MERCURIOS_DEBUG: 1
-    MERCURIOS_DRIVER: pg
+    MERCURIOS_STORE_DRIVER: pg
     # MERCURIOS_DRIVER: mysql
 
 x-postgres-config: &postgres-config

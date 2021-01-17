@@ -1,16 +1,20 @@
-let isProd = process.env.MERCURIOS_ENV === "production";
+// require("ts-node").register();
+
+const { $config } = require("./dist/utils/config");
 
 module.exports = {
     apps: [
         {
             script: "dist/bin/mercurios-server.js",
-            name: "mercurios",
+            name: "mercurios server",
             exec_mode: "cluster",
-            instances: process.env.MERCURIOS_WORKERS || 0,
-            watch: isProd ? false : ["dist"],
+            instances: $config.mercurios_workers,
             out_file: "/dev/null",
             error_file: "/dev/null",
-            node_args: isProd ? undefined : ["--inspect=0.0.0.0:9230"],
+            watch: $config.dev_mode ? ["dist"] : false,
+            node_args: $config.dev_mode
+                ? ["--inspect=0.0.0.0:9230"]
+                : undefined,
         },
     ],
 };

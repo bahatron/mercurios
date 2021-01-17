@@ -4,7 +4,7 @@ import $logger from "@bahatron/logger";
 import BIG_JSON from "../tests/fixtures/big_json";
 import $json from "../utils/json";
 import $http from "../utils/http";
-import $config from "../utils/config";
+import { $config } from "../utils/config";
 
 const MERCURIOS_TEST_URL = $config.test_url;
 
@@ -237,7 +237,7 @@ async function multiStream(streams = _streams) {
 }
 
 async function main() {
-    $logger.info(`benchmark started - driver ${$config.mercurios_driver}`);
+    $logger.info(`benchmark started - driver ${$config.mercurios_store_driver}`);
 
     if (yargs.argv.write === true) {
         await writeBench();

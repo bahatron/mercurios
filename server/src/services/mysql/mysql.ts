@@ -1,7 +1,7 @@
 import knex, { Config } from "knex";
 import { resolve } from "path";
 import { readFileSync } from "fs";
-import $config from "../../utils/config";
+import { $config } from "../../utils/config";
 
 export const MYSQL_CONFIG: Config = {
     client: "mysql2",

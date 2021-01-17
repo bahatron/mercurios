@@ -1,5 +1,5 @@
 import $ws from "ws";
-import $config from "../../utils/config";
+import { $config } from "../../utils/config";
 
 describe("Feature: websocket connection", () => {
     let _wsc: $ws;

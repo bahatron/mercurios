@@ -1,5 +1,5 @@
 import $http from "../utils/http";
-import $config from "../utils/config";
+import { $config } from "../utils/config";
 import { $store } from "../models/store/store";
 import publishEvent from "./publish-event";
 import { expect } from "chai";

@@ -1,7 +1,7 @@
 import $ws from "ws";
 import $logger from "@bahatron/logger";
 import { publishEventEndpoint } from "./publish-event.mocha";
-import $config from "../utils/config";
+import { $config } from "../utils/config";
 
 const MERCURIOS_TEST_URL = $config.test_url;
 
@@ -23,7 +23,7 @@ describe("WS action: unsubscribe", () => {
         const _subscription = "ws_unsubscribe_test";
 
         // first subscribe to a topic
-        await new Promise((resolve) => {
+        await new Promise<void>((resolve) => {
             _wsc.once("message", (data) => {
                 resolve();
             });

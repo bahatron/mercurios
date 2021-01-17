@@ -1,5 +1,5 @@
 import { createLogger, Logger, Handler } from "@bahatron/logger";
-import $config from "./config";
+import { $config } from "./config";
 
 const $logger: Logger = createLogger({
     debug: $config.debug,

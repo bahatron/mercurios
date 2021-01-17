@@ -3,7 +3,7 @@ import { MercuriosEvent } from "../event/event";
 import { EventFilters } from "./drivers/helpers";
 import pgDriver from "./drivers/postgres.driver";
 import mysqlDriver from "./drivers/mysql.driver";
-import $config from "../../utils/config";
+import { $config } from "../../utils/config";
 
 export interface StoreDriver {
     // run migrations for sql dbs
@@ -23,7 +23,7 @@ export interface StoreDriver {
 }
 
 let driver: StoreDriver;
-switch ($config.mercurios_driver) {
+switch ($config.mercurios_store_driver) {
     case "pg":
         driver = pgDriver();
         break;

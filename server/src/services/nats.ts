@@ -1,5 +1,5 @@
 import * as nats from "ts-nats";
-import $config from "../utils/config";
+import { $config } from "../utils/config";
 
 const NATS_URL = $config.nats_url;
 
