@@ -14,6 +14,7 @@ x-mercurios-config: &mercurios-config
     MERCURIOS_WORKERS: 2
     MERCURIOS_DEBUG: 1
     MERCURIOS_DEV: 1
+    MERCURIOS_SWAGGER: 1
 
 x-postgres-config: &postgres-config
     POSTGRES_PASSWORD: secret

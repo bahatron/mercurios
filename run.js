@@ -13,6 +13,29 @@ const argsContains = (flag) => {
 const DEV_COMPOSE = "docker-compose.dev.yml";
 const TEST_COMPOSE = "docker-compose.test.yml";
 
+if (argsContains("build")) {
+    build();
+    exit(0);
+} else if (argsContains("setup")) {
+    exec("npx lerna clean -y");
+    exec("npm install");
+    exit(0);
+} else if (argsContains("update")) {
+    exec("npx lerna exec -- npm update");
+    exit(0);
+} else if (argsContains("down")) {
+    shutDown();
+    exit(0);
+} else if (argsContains("up")) {
+    runUp();
+    exit(0);
+} else if (argsContains("test")) {
+    runTest();
+    exit(0);
+} else {
+    exit(0);
+}
+
 function build() {
     exec(`docker-compose build --parallel`);
 }
@@ -38,7 +61,9 @@ function shouldBuild() {
 function runUp() {
     shouldBuild();
     shouldCleanUp();
-    exec("tilt up --hud=true");
+    let services =
+        "mercurios-server mercurios-mysql mercurios-client mercurios-playground mercurios-nats";
+    exec(`tilt up ${services} --hud=true`);
     shutDown();
 }
 
@@ -52,27 +77,4 @@ function runTest() {
     exec(
         `docker-compose -f ${TEST_COMPOSE} run mercurios-client sh -c "npm run test"`
     );
-}
-
-if (argsContains("build")) {
-    build();
-    exit(0);
-} else if (argsContains("setup")) {
-    exec("npx lerna clean -y");
-    exec("npm install");
-    exit(0);
-} else if (argsContains("update")) {
-    exec("npx lerna exec -- npm update");
-    exit(0);
-} else if (argsContains("down")) {
-    shutDown();
-    exit(0);
-} else if (argsContains("up")) {
-    runUp();
-    exit(0);
-} else if (argsContains("test")) {
-    runTest();
-    exit(0);
-} else {
-    exit(0);
 }
