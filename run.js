@@ -61,8 +61,8 @@ function shouldBuild() {
 function runUp() {
     shouldBuild();
     shouldCleanUp();
-    let services =
-        "mercurios-server mercurios-mysql mercurios-client mercurios-playground mercurios-nats";
+    // let services =
+    //     "mercurios-server mercurios-mysql mercurios-client mercurios-playground mercurios-nats";
     exec(`tilt up ${services} --hud=true`);
     shutDown();
 }

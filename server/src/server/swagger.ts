@@ -195,6 +195,51 @@ export const swaggerDocs = {
                 },
             },
         },
+
+        "/topics": {
+            get: {
+                description: "list topics",
+                parameters: [
+                    {
+                        name: "like",
+                        in: "query",
+                        type: "string",
+                        required: false,
+                    },
+                    // {
+                    //     name: "topic",
+                    //     in: "path",
+                    //     required: true,
+                    //     example: "test_topic",
+                    // },
+                    // {
+                    //     name: "from",
+                    //     in: "query",
+                    //     type: "number",
+                    //     required: false,
+                    //     example: "1",
+                    // },
+                    // {
+                    //     name: "to",
+                    //     in: "query",
+                    //     type: "number",
+                    //     required: false,
+                    // },
+                    // {
+                    //     name: "key",
+                    //     in: "query",
+                    //     type: "string",
+                    //     required: false,
+                    //     example: "",
+                    // },
+                ],
+                responses: {
+                    200: {
+                        description: "mercurios event",
+                    },
+                },
+            },
+        },
     },
 
     components: {

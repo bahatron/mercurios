@@ -9,6 +9,8 @@ HTTP based event sourcing and message broker
 
 ## DEV environment
 
+> Dependencies: node:12+ - docker - docker-compose
+
 ### using tilt:
 
 > https://docs.tilt.dev/install.html
@@ -19,14 +21,14 @@ HTTP based event sourcing and message broker
     curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
 ```
 
--   run.sh :
+-   run.js :
 
 ```sh
     # start dev environment
-    ./run.sh up
+    ./run.js up
 
     # tests services; -b will build images before tests
-    ./run.sh test -b
+    ./run.js test -b
 ```
 
 -   navigate to localhost:4250 in your browser for playground UI
@@ -62,11 +64,14 @@ MERCURIOS_PING_INTERVAL=30000
 # chose the storage option, options: pg|mysql default: mysql
 MERCURIOS_DRIVER=mysql
 
-# workers, values: number|"max" default "max"; max will create as many workers as the cpu cores
+# workers, values: number|"max" default 1; max will create as many workers as the cpu cores
 MERCURIOS_WORKERS=1
 
 # optional, server url for tests
 MERCURIOS_TEST_URL=http://localhost:4254
+
+# optional, swagger doc page
+MERCURIOS_SWAGGER=1
 ```
 
 ## testing
