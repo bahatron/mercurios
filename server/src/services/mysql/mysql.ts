@@ -19,6 +19,11 @@ export const MYSQL_CONFIG: Config = {
                       ).toString(),
                   }
                 : undefined,
+        pool: <any>{
+            min: 2,
+            max: 20,
+            propagateCreateError: false,
+        },
     },
     migrations: {
         tableName: "mercurios_migrations",
