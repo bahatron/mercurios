@@ -9,21 +9,23 @@ HTTP based event sourcing and message broker
 
 ## DEV environment
 
-> Dependencies: node:12+ - docker - docker-compose
+**Dependencies**:
 
-### using tilt:
+-   node:12+
+    -   [Windows / MacOs](https://nodejs.org/en/download/)
+    -   [Debian based Linux](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-20-04)
+-   docker
+-   docker-compose
+-   [tilt](https://docs.tilt.dev/install.html)
 
-> https://docs.tilt.dev/install.html
+### Starting the derv environment
 
--   instal tilt:
+-   run.js
 
 ```sh
-    curl -fsSL https://raw.githubusercontent.com/tilt-dev/tilt/master/scripts/install.sh | bash
-```
+    ## IMPORTANT: it most be run before the first start of the application
+    ./run.js setup
 
--   run.js :
-
-```sh
     # start dev environment
     ./run.js up
 
