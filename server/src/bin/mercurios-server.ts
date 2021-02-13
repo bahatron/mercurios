@@ -18,7 +18,7 @@ process.on("unhandledRejection", async (reason, promise) => {
 $logger.info("starting mercurios server", {
     dev_mode: $config.dev_mode,
     debug: $config.debug,
-    store: $config.mercurios_store_driver,
+    store: $config.store_driver,
     pid: process.pid,
 });
 

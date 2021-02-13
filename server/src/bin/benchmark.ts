@@ -237,7 +237,7 @@ async function multiStream(streams = _streams) {
 }
 
 async function main() {
-    $logger.info(`benchmark started - driver ${$config.mercurios_store_driver}`);
+    $logger.info(`benchmark started - driver ${$config.store_driver}`);
 
     if (yargs.argv.write === true) {
         await writeBench();

@@ -6,8 +6,9 @@ import mysqlDriver from "./drivers/mysql.driver";
 import { $config } from "../../utils/config";
 
 export interface StoreDriver {
-    // run migrations for sql dbs
+    // driver management
     setup(): Promise<void>;
+    isHealthy(): Promise<boolean>;
     // these seem to be methods of a "Stream"
     append(event: MercuriosEvent): Promise<MercuriosEvent>;
     read(topic: string, seq: number): Promise<MercuriosEvent | undefined>;
@@ -23,7 +24,7 @@ export interface StoreDriver {
 }
 
 let driver: StoreDriver;
-switch ($config.mercurios_store_driver) {
+switch ($config.store_driver) {
     case "pg":
         driver = pgDriver();
         break;

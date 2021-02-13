@@ -12,6 +12,23 @@ const TOPIC_TABLE = "mercurios_topics";
 
 export default function (): StoreDriver {
     return {
+        async isHealthy() {
+            try {
+                let result = await $mysql
+                    .table(MYSQL_CONFIG.migrations?.tableName as string)
+                    .first();
+
+                if (!result) {
+                    return false;
+                }
+
+                return true;
+            } catch (err) {
+                $logger.error(err, "error checking postgres driver health");
+                return false;
+            }
+        },
+
         async setup() {
             if (await retrySetup()) {
                 return;

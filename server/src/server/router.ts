@@ -6,6 +6,7 @@ import listTopics from "../handlers/list-topics";
 import filterTopic from "../handlers/filter-topic";
 import { $validator } from "../utils/validator";
 import { $json } from "../utils/json";
+import { healthcheck } from "../handlers/healthcheck";
 
 export function asyncRoute(handler: RequestHandler): RequestHandler {
     return async (req, res, next) => {
@@ -45,6 +46,14 @@ const routes: Route[] = [
         method: "get",
         path: "/ping",
         handler: (req, res) => res.json("pong"),
+    },
+
+    {
+        method: "get",
+        path: "/healthcheck",
+        handler: asyncRoute(async (req, res) => {
+            return res.status(200).json(await healthcheck());
+        }),
     },
 
     {

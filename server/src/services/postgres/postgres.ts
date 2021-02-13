@@ -2,7 +2,7 @@ import Knex, { Config } from "knex";
 import { $config } from "../../utils/config";
 import { resolve } from "path";
 
-const config: Config = {
+export const POSTGRES_CONFIG: Config = {
     client: "pg",
     connection: {
         host: $config.postgre_host,
@@ -17,6 +17,6 @@ const config: Config = {
     },
 };
 
-const $postgres = Knex(config);
+const $postgres = Knex(POSTGRES_CONFIG);
 
 export default $postgres;

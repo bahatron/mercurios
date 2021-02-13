@@ -240,6 +240,70 @@ export const swaggerDocs = {
                 },
             },
         },
+
+        "/ping": {
+            get: {
+                tags: ["Monitoring"],
+                description: "ping",
+                responses: {
+                    200: {
+                        "application/json": {
+                            schema: {
+                                type: "object",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+
+        "/healthcheck": {
+            get: {
+                tags: ["Monitoring"],
+                description: "ping",
+                responses: {
+                    200: {
+                        "application/json": {
+                            schema: {
+                                type: "object",
+                                properties: {
+                                    store: {
+                                        type: "object",
+                                        properties: {
+                                            driver: {
+                                                type: "string",
+                                            },
+                                            result: {
+                                                type: "boolean",
+                                            },
+                                        },
+                                    },
+                                    nats: {
+                                        type: "object",
+                                        properties: {
+                                            result: {
+                                                type: "boolean",
+                                            },
+                                        },
+                                    },
+                                    http_api: {
+                                        type: "object",
+                                        properties: {
+                                            url: {
+                                                type: "string",
+                                            },
+                                            result: {
+                                                type: "boolean",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
     },
 
     components: {

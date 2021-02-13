@@ -3,7 +3,9 @@ import $error from "../../../utils/error";
 import $json from "../../../utils/json";
 import $event, { MercuriosEvent } from "../../event/event";
 import Knex from "knex";
-import $postgres from "../../../services/postgres/postgres";
+import $postgres, {
+    POSTGRES_CONFIG,
+} from "../../../services/postgres/postgres";
 import { StoreDriver } from "../store";
 import $logger from "../../../utils/logger";
 
@@ -13,6 +15,22 @@ const STORE_PROCEDURE = "store_event";
 
 export default function (): StoreDriver {
     return {
+        async isHealthy() {
+            try {
+                let result = await $postgres
+                    .table(POSTGRES_CONFIG.migrations?.tableName as string)
+                    .first();
+
+                if (!result) {
+                    return false;
+                }
+
+                return true;
+            } catch (err) {
+                $logger.error(err, "error checking postgres driver health");
+                return false;
+            }
+        },
         async setup() {
             await $postgres.migrate.latest();
         },

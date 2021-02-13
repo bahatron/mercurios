@@ -1,5 +1,7 @@
 import * as nats from "ts-nats";
 import { $config } from "../utils/config";
+import $error from "../utils/error";
+import $logger from "../utils/logger";
 
 const NATS_URL = $config.nats_url;
 
@@ -25,10 +27,50 @@ export async function subscribe(
     return (await CLIENT).subscribe(topic, handler, options);
 }
 
-const $nats = {
+export async function isHealthy(): Promise<boolean> {
+    try {
+        await new Promise<void>(async (resolve, reject) => {
+            let _client = await CLIENT;
+
+            _client.subscribe(
+                "mercurios_ping",
+                (msg) => {
+                    $logger.debug("ping message", msg);
+                    resolve();
+                },
+                <nats.SubscriptionOptions>{
+                    max: 1,
+                }
+            );
+
+            _client.publish("mercurios_ping", {
+                rick: "sanchez",
+            });
+
+            setTimeout(
+                () =>
+                    reject(
+                        $error.Error(
+                            "timeout exceeded waiting while waiting for nats ping response",
+                            500
+                        )
+                    ),
+                1000
+            );
+        });
+
+        return true;
+    } catch (err) {
+        $logger.error(err);
+        return false;
+    }
+}
+
+export const $nats = {
     connect,
     publish,
     subscribe,
+    isHealthy,
 };
 
 export default $nats;

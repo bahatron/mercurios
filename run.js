@@ -17,11 +17,7 @@ if (argsContains("build")) {
     build();
     exit(0);
 } else if (argsContains("setup")) {
-    exec("npx lerna clean -y");
-    exec("npm install");
-    exit(0);
-} else if (argsContains("update")) {
-    exec("npx lerna exec -- npm update");
+    runSetup();
     exit(0);
 } else if (argsContains("down")) {
     shutDown();
@@ -61,9 +57,14 @@ function shouldBuild() {
 function runUp() {
     shouldBuild();
     shouldCleanUp();
-    // let services =
-    //     "mercurios-server mercurios-mysql mercurios-client mercurios-playground mercurios-nats";
-    exec(`tilt up ${services} --hud=true`);
+    //= `mercurios-server mercurios-nats mercurios-client mercurios-playground`
+    let services;
+
+    if (argsContains(["--api"])) {
+        services = "";
+    }
+
+    exec(`tilt up ${services ?? ""} --hud=true`);
     shutDown();
 }
 
@@ -77,4 +78,9 @@ function runTest() {
     exec(
         `docker-compose -f ${TEST_COMPOSE} run mercurios-client sh -c "npm run test"`
     );
+}
+
+function runSetup() {
+    exec("npx lerna clean -y");
+    exec("npm install");
 }
