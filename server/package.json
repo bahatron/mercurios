@@ -4,11 +4,11 @@
     "description": "http event sourcing",
     "author": "simonpiscitelli@gmail.com",
     "scripts": {
-        "start": "pm2-runtime start process.config.js",
-        "dev": "npm run build:watch & npm start",
+        "start:pm2": "pm2-runtime start process.config.js",
+        "start": "node dist/bin/mercurios-server.js",
+        "dev": "npm run build:watch & npm run start:pm2",
         "test": "MERCURIOS_DEBUG=0 mocha",
         "benchmark": "node dist/bin/benchmark.js",
-        "migrate": "node dist/bin/migrate.js",
         "build": "tsc",
         "build:watch": "npm run build -- --watch",
         "build:clean": "rm -rf dist/ && npm run build"

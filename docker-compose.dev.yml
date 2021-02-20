@@ -11,7 +11,8 @@ x-mercurios-config: &mercurios-config
     MERCURIOS_TEST_URL: http://mercurios-server:4254
     # MERCURIOS_STORE_DRIVER: pg
     # MERCURIOS_STORE_DRIVER: mysql
-    MERCURIOS_WORKERS: 2
+    MERCURIOS_STORE: ${MERCURIOS_STORE}
+    MERCURIOS_WORKERS: ${MERCURIOS_WORKERS:-2}
     MERCURIOS_DEBUG: 1
     MERCURIOS_DEV: 1
     MERCURIOS_SWAGGER: 1
@@ -116,7 +117,7 @@ services:
         ports:
             - 4254:4254
             - 9230:9230
-        command: sh -c "wait-for-it mercurios-mysql:3306 -s -t 30 -- npm run dev"
+        command: sh -c "npm run dev"
         environment:
             <<: *mercurios-config
             <<: *mysql-config

@@ -1,4 +1,4 @@
-import $env, { getenv } from "@bahatron/env";
+import $env from "@bahatron/env";
 import $lodash from "lodash";
 
 export const $config = new Proxy(
@@ -7,7 +7,7 @@ export const $config = new Proxy(
         dev_mode: Boolean($env.get("MERCURIOS_DEV", "") === "1"),
         debug: Boolean($env.get("MERCURIOS_DEBUG", "") === "1"),
         store_driver: $env.get(
-            "MERCURIOS_STORE_DRIVER",
+            "MERCURIOS_STORE",
             $env.get("MERCURIOS_DRIVER", "mysql") // backwards compatability
         ),
         mercurios_ping_interval: $env.get("MERCURIOS_PING_INTERVAL", "30000"),

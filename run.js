@@ -1,7 +1,6 @@
 #!/usr/bin/node
 const { execSync } = require("child_process");
 const argv = process.argv.slice(2);
-
 const exec = (command) => execSync(command, { stdio: [0, 1, 2] });
 const exit = (code) => process.exit(code);
 const argsContains = (flag) => {
@@ -22,8 +21,8 @@ if (argsContains("build")) {
 } else if (argsContains("down")) {
     shutDown();
     exit(0);
-} else if (argsContains("up")) {
-    runUp();
+} else if (argsContains("dev")) {
+    runDev();
     exit(0);
 } else if (argsContains("test")) {
     runTest();
@@ -54,16 +53,28 @@ function shouldBuild() {
     }
 }
 
-function runUp() {
+function runDev() {
     shouldBuild();
     shouldCleanUp();
 
-    let services = `mercurios-server mercurios-nats mercurios-client mercurios-playground`;
+    let services = [
+        `mercurios-server`,
+        ` mercurios-nats`,
+        ` mercurios-client`,
+        ` mercurios-playground`,
+    ];
 
     if (argsContains(["--mysql"])) {
-        services += " mercurios-mysql";
+        services = [...services, "mercurios-mysql"];
 
-        exec(`tilt up --hud=true ${services}`);
+        exec(`MERCURIOS_STORE=mysql tilt up --hud=true ${services.join(" ")}`);
+        exit(0);
+    }
+
+    if (argsContains(["--pg"])) {
+        services = [...services, "mercurios-postgres"];
+
+        exec(`MERCURIOS_STORE=pg tilt up --hud=true ${services.join(" ")}`);
         exit(0);
     }
 
