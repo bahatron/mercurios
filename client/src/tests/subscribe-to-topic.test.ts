@@ -1,4 +1,5 @@
 import { connect } from "..";
+import { expect } from "chai";
 
 describe("Feature: Subscribe To Topic", () => {
     let _client = connect({
@@ -7,15 +8,15 @@ describe("Feature: Subscribe To Topic", () => {
     });
 
     it("can subscribe to topics", async () => {
-        return new Promise(async (resolve) => {
+        return new Promise<void>(async (resolve) => {
             let topic = "subscribe_topic_test";
             let data = { beth: "sanchez" };
 
             let subscription = await _client.subscribe(topic, (msg) => {
-                expect(msg.subscription).toEqual(subscription);
-                expect(msg.subject).toEqual(topic);
-                expect(msg.event.topic).toEqual(topic);
-                expect(msg.event.data).toEqual(data);
+                expect(msg.subscription).to.deep.eq(subscription);
+                expect(msg.subject).to.deep.eq(topic);
+                expect(msg.event.topic).to.deep.eq(topic);
+                expect(msg.event.data).to.deep.eq(data);
                 resolve();
             });
 

@@ -1,4 +1,5 @@
 import { connect } from "..";
+import { expect } from "chai";
 
 describe("Feature: Read Event", () => {
     const _client = connect({
@@ -16,8 +17,8 @@ describe("Feature: Read Event", () => {
 
         let event = await _client.read(topic, 1);
 
-        expect(event).toBeTruthy();
-        expect(event?.data).toEqual(data);
-        expect(event?.seq).toBe(1);
+        expect(event).to.be.true;
+        expect(event?.data).to.deep.eq(data);
+        expect(event?.seq).to.eq(1);
     });
 });

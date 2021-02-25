@@ -1,4 +1,5 @@
 import { connect } from "..";
+import { expect } from "chai";
 
 describe("Feature: Emit Event", () => {
     let _client = connect({
@@ -7,13 +8,13 @@ describe("Feature: Emit Event", () => {
     });
 
     it("can emit events", async () => {
-        return new Promise(async (resolve) => {
+        return new Promise<void>(async (resolve) => {
             let testData = { morty: "smith" };
             let event = await _client.emit("test_emit", { data: testData });
 
-            expect(event).toBeTruthy();
-            expect(event.seq).toBeFalsy();
-            expect(event.data).toEqual(testData);
+            expect(event).to.be.true;
+            expect(event.seq).to.be.false;
+            expect(event.data).to.deep.eq(testData);
 
             resolve();
         });

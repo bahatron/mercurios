@@ -90,21 +90,24 @@ export function Connection(_url: string, _id: string = v4()) {
 
             connection.emit(subscription, { subscription, subject, event });
 
-            $logger.debug("message received", { subscription, subject, event });
+            $logger.debug({ subscription, subject, event }, "message received");
         };
 
         socket.onerror = async function onSocketError({ message, error }: any) {
-            $logger.debug("socket error", {
-                on: "onError",
-                message,
-                error,
-            });
+            $logger.debug(
+                {
+                    on: "onError",
+                    message,
+                    error,
+                },
+                "socket error"
+            );
 
             reconnect();
         };
 
         socket.onclose = function onSocketClose({ wasClean, code }: any) {
-            $logger.debug(`socket closed`, { wasClean, code });
+            $logger.debug({ wasClean, code }, `socket closed`);
 
             if (code == 1000) {
                 return;
@@ -145,7 +148,7 @@ export function Connection(_url: string, _id: string = v4()) {
         },
 
         once(event: string, handler: MercuriosEventHandler): void {
-            new Promise((resolve) => {
+            new Promise<void>((resolve) => {
                 connection.on(event, async (msg) => {
                     await handler(msg);
                     connection.off(event, handler);

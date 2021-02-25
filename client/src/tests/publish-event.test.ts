@@ -1,4 +1,5 @@
 import { connect } from "..";
+import { expect } from "chai";
 
 describe("Feature: Publish Event", () => {
     let _client = connect({
@@ -7,7 +8,7 @@ describe("Feature: Publish Event", () => {
     });
 
     it("can publish events", async () => {
-        return new Promise(async (resolve) => {
+        return new Promise<void>(async (resolve) => {
             let testData = { rick: "sanchez" };
             let testKey = "testKey";
 
@@ -16,10 +17,10 @@ describe("Feature: Publish Event", () => {
                 key: testKey,
             });
 
-            expect(event).toBeTruthy();
-            expect(event.seq).toBeTruthy();
-            expect(event.data).toEqual(testData);
-            expect(event.key).toEqual(testKey);
+            expect(event).to.be.true;
+            expect(event.seq).to.be.true;
+            expect(event.data).to.deep.eq(testData);
+            expect(event.key).to.deep.eq(testKey);
 
             resolve();
         });

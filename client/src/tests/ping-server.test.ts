@@ -1,4 +1,5 @@
 import { connect } from "..";
+import { expect } from "chai";
 
 describe("Feature: Ping server", () => {
     let _client = connect({
@@ -7,6 +8,6 @@ describe("Feature: Ping server", () => {
     });
 
     it("can ping the server", async () => {
-        expect(await _client.ping()).toBeTruthy();
+        expect(await _client.ping()).to.be.true;
     });
 });

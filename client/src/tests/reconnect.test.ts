@@ -13,7 +13,7 @@ describe("Reconnect behaviour", () => {
     });
 
     it("will reconnect", () => {
-        return new Promise(async (resolve) => {
+        return new Promise<void>(async (resolve) => {
             client.subscribe("hello", () => {
                 resolve();
             });

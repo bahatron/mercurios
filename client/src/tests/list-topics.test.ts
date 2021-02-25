@@ -1,5 +1,6 @@
 import { connect } from "..";
 import { $http } from "../utils/axios";
+import { expect } from "chai";
 
 const TEST_TOPICS = [
     "test.123",
@@ -15,7 +16,7 @@ describe("Feature: List Topics", () => {
         id: "ping_event_test",
     });
 
-    beforeAll(async () => {
+    before(async () => {
         await Promise.all(TEST_TOPICS.map((topic) => _client.publish(topic)));
     });
 
@@ -39,7 +40,7 @@ describe("Feature: List Topics", () => {
                 }
             );
 
-            expect(await _client.topics({ like: query })).toEqual(
+            expect(await _client.topics({ like: query })).to.deep.eq(
                 serverResponse.data
             );
         }

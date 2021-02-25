@@ -1,6 +1,6 @@
 import { connect } from "..";
 import { EventEmitter } from "events";
-import { emit } from "process";
+import { expect } from "chai";
 
 describe("Feature: Unsubscribe to Topic", () => {
     let _client = connect({
@@ -22,7 +22,7 @@ describe("Feature: Unsubscribe to Topic", () => {
             await _client.emit(topic);
         });
 
-        return new Promise(async (resolve, reject) => {
+        return new Promise<void>(async (resolve, reject) => {
             await _client.unsubscribe(subscription);
 
             emitter.on("event", () => {
@@ -31,7 +31,7 @@ describe("Feature: Unsubscribe to Topic", () => {
 
             // resolve after waiting some time
             setTimeout(() => {
-                expect(true).toBeTruthy();
+                expect(true).to.be.true;
                 resolve();
             }, 500);
 
