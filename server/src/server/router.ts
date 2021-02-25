@@ -6,7 +6,7 @@ import listTopics from "../handlers/list-topics";
 import filterTopic from "../handlers/filter-topic";
 import { $validator } from "../utils/validator";
 import { $json } from "../utils/json";
-import { healthcheck } from "../handlers/healthcheck";
+import { ping } from "../handlers/ping";
 
 export function asyncRoute(handler: RequestHandler): RequestHandler {
     return async (req, res, next) => {
@@ -45,15 +45,7 @@ const routes: Route[] = [
     {
         method: "get",
         path: "/ping",
-        handler: (req, res) => res.json("pong"),
-    },
-
-    {
-        method: "get",
-        path: "/healthcheck",
-        handler: asyncRoute(async (req, res) => {
-            return res.status(200).json(await healthcheck());
-        }),
+        handler: async (req, res) => res.json(await ping()),
     },
 
     {
@@ -102,15 +94,9 @@ const routes: Route[] = [
         method: "get",
         path: "/filter/:topic",
         handler: asyncRoute(async (req, res) => {
-            let { from, to, key } = req.query;
-
-            return res.status(200).json(
-                await filterTopic(req.params.topic, {
-                    from: $validator.optionalInt(from) ?? undefined,
-                    to: $validator.optionalInt(to) ?? undefined,
-                    key: $validator.optionalString(key) ?? undefined,
-                })
-            );
+            return res
+                .status(200)
+                .json(await filterTopic(req.params.topic, req.query));
         }),
     },
 ];

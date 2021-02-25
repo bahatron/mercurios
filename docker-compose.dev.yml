@@ -86,7 +86,7 @@ services:
             - mercurios-yb-master
 
     mercurios-mysql:
-        image: mysql:5.6
+        image: mysql:5.7
         container_name: mercurios-mysql
         ports:
             - 3306:3306
@@ -132,7 +132,7 @@ services:
             - ./client/lib:/app/client/lib
         environment:
             MERCURIOS_URL: http://mercurios-server:4254
-            MERCURIOS_ENV: dev
+            MERCURIOS_DEV: 1
 
     mercurios-playground:
         image: mercurios-playground

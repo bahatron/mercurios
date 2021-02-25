@@ -59,9 +59,9 @@ function runDev() {
 
     let services = [
         `mercurios-server`,
-        ` mercurios-nats`,
-        ` mercurios-client`,
-        ` mercurios-playground`,
+        `mercurios-nats`,
+        `mercurios-client`,
+        `mercurios-playground`,
     ];
 
     if (argsContains(["--mysql"])) {
@@ -92,9 +92,4 @@ function runTest() {
     exec(
         `docker-compose -f ${TEST_COMPOSE} run mercurios-client sh -c "npm run test"`
     );
-}
-
-function runSetup() {
-    exec("npx lerna clean -y");
-    exec("npm install");
 }

@@ -250,22 +250,6 @@ export const swaggerDocs = {
                         "application/json": {
                             schema: {
                                 type: "object",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-
-        "/healthcheck": {
-            get: {
-                tags: ["Monitoring"],
-                description: "ping",
-                responses: {
-                    200: {
-                        "application/json": {
-                            schema: {
-                                type: "object",
                                 properties: {
                                     store: {
                                         type: "object",
@@ -281,17 +265,6 @@ export const swaggerDocs = {
                                     nats: {
                                         type: "object",
                                         properties: {
-                                            result: {
-                                                type: "boolean",
-                                            },
-                                        },
-                                    },
-                                    http_api: {
-                                        type: "object",
-                                        properties: {
-                                            url: {
-                                                type: "string",
-                                            },
                                             result: {
                                                 type: "boolean",
                                             },

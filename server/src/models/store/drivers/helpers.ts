@@ -1,4 +1,5 @@
 import Knex from "knex";
+import $logger from "../../../utils/logger";
 import { $validator } from "../../../utils/validator";
 
 export interface EventFilters {
@@ -33,8 +34,10 @@ export function natsQueryToSql(filter: string): string {
 export function sqlEventFilters(
     builder: Knex.QueryBuilder,
     filters: EventFilters
-) {
+): Knex.QueryBuilder {
     let { from, to, key, before, after } = filters;
+
+    $logger.debug("filters", filters);
 
     if (from) {
         builder.where("seq", ">=", from);
