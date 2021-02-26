@@ -6,13 +6,15 @@ import { publishEventEndpoint } from "./publish-event.mocha";
 import { $store } from "../models/store/store";
 import { $validator } from "../utils/validator";
 import { EventSchema } from "../models/event/event.schema";
+import publishEvent from "../handlers/publish-event";
+import filterTopic from "../handlers/filter-topic";
 
 const MERCURIOS_MERCURIOS_TEST_URL = env.get("MERCURIOS_TEST_URL");
 
 describe("GET /read/:topic/:seq", () => {
     async function readEvent(
         topic: string,
-        seq: number
+        seq: "latest" | number
     ): Promise<AxiosResponse> {
         return $http
             .get(`${MERCURIOS_MERCURIOS_TEST_URL}/read/${topic}/${seq}`)
@@ -82,6 +84,25 @@ describe("GET /read/:topic/:seq", () => {
 
         it("has the expected schema", async () => {
             expect($validator.jsonSchema(_event, EventSchema).length).to.eq(0);
+        });
+    });
+
+    describe.only("Scenario: latest sequence", () => {
+        const _topic = "server_read_latest_event_test";
+
+        before(async () => {
+            await Promise.all(
+                Array(10)
+                    .fill(null)
+                    .map(() => publishEvent({ topic: _topic }))
+            );
+        });
+
+        it("returns the latest event for a topic", async () => {
+            let latestOnStream = await (await filterTopic(_topic)).pop();
+            let latest = (await readEvent(_topic, "latest")).data;
+            
+            expect(latest.seq).to.eq(latestOnStream?.seq);
         });
     });
 });

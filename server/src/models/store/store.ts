@@ -1,8 +1,8 @@
 import $error from "../../utils/error";
 import { MercuriosEvent } from "../event/event";
 import { EventFilters } from "./drivers/helpers";
-import pgDriver from "./drivers/postgres.driver";
-import mysqlDriver from "./drivers/mysql.driver";
+import pgDriver from "./drivers/postgres.store";
+import mysqlDriver from "./drivers/mysql.store";
 import { $config } from "../../utils/config";
 
 export interface StoreDriver {
@@ -13,6 +13,7 @@ export interface StoreDriver {
     append(event: MercuriosEvent): Promise<MercuriosEvent>;
     read(topic: string, seq: number): Promise<MercuriosEvent | undefined>;
     filter(topic: string, query: EventFilters): Promise<MercuriosEvent[]>;
+    latest(topic: string): Promise<number | undefined>;
     // stream repository?
     createStream(topic: string): Promise<void>;
     deleteStream(topic: string): Promise<void>;

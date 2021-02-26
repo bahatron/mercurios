@@ -78,10 +78,15 @@ const routes: Route[] = [
         method: "get",
         path: "/read/:topic/:seq",
         handler: asyncRoute(async (req, res) => {
-            let event = await readEvent(
-                req.params.topic,
-                parseInt(req.params.seq)
-            );
+            let { seq }: any = req.params;
+
+            if (seq !== "latest" && isNaN(parseInt(seq))) {
+                return res.status(400).json({
+                    error: `Invalid sequence, must be either 'latest' or a number, recieved: ${seq}`,
+                });
+            }
+
+            let event = await readEvent(req.params.topic, seq);
             if (!event) {
                 return res.status(404).json();
             }

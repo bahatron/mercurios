@@ -1,5 +1,5 @@
 import { $mysql, MYSQL_CONFIG } from "../../../services/mysql/mysql";
-import { natsQueryToSql, sqlEventFilters, EventFilters } from "./helpers";
+import { natsQueryToSql, knexEventFilter, EventFilters } from "./helpers";
 import $error from "../../../utils/error";
 import $json from "../../../utils/json";
 import $event, { MercuriosEvent } from "../../event/event";
@@ -107,10 +107,23 @@ export default function (): StoreDriver {
             return $event(result);
         },
 
+        async latest(topic) {
+            let result = await $mysql
+                .table(TOPIC_TABLE)
+                .where({ topic })
+                .first();
+
+            if (!result) {
+                return undefined;
+            }
+
+            return result.seq;
+        },
+
         async filter(topic, filters) {
             let query = $mysql.table(EVENT_TABLE).select("*").where({ topic });
 
-            let result = await sqlEventFilters(query, filters);
+            let result = await knexEventFilter(query, filters);
 
             return result.map($event);
         },
@@ -120,7 +133,7 @@ export default function (): StoreDriver {
 
             if (withEvents) {
                 query = $mysql.table("mercurios_events").distinct("topic");
-                sqlEventFilters(query, withEvents);
+                knexEventFilter(query, withEvents);
             } else {
                 query = $mysql.table("mercurios_topics").select("topic");
             }

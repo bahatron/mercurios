@@ -146,7 +146,7 @@ export const swaggerDocs = {
                         in: "path",
                         type: "number",
                         required: true,
-                        example: "1",
+                        example: "latest",
                     },
                 ],
                 responses: {
@@ -172,7 +172,6 @@ export const swaggerDocs = {
                         in: "query",
                         type: "number",
                         required: false,
-                        example: "1",
                     },
                     {
                         name: "to",
@@ -185,7 +184,24 @@ export const swaggerDocs = {
                         in: "query",
                         type: "string",
                         required: false,
-                        example: "",
+                    },
+                    {
+                        name: "after",
+                        in: "query",
+                        type: {
+                            type: "string",
+                            format: "date-time",
+                        },
+                        required: false,
+                    },
+                    {
+                        name: "before",
+                        in: "query",
+                        type: {
+                            type: "string",
+                            format: "date-time",
+                        },
+                        required: false,
                     },
                 ],
                 responses: {
@@ -206,32 +222,43 @@ export const swaggerDocs = {
                         type: "string",
                         required: false,
                     },
-                    // {
-                    //     name: "topic",
-                    //     in: "path",
-                    //     required: true,
-                    //     example: "test_topic",
-                    // },
-                    // {
-                    //     name: "from",
-                    //     in: "query",
-                    //     type: "number",
-                    //     required: false,
-                    //     example: "1",
-                    // },
-                    // {
-                    //     name: "to",
-                    //     in: "query",
-                    //     type: "number",
-                    //     required: false,
-                    // },
-                    // {
-                    //     name: "key",
-                    //     in: "query",
-                    //     type: "string",
-                    //     required: false,
-                    //     example: "",
-                    // },
+                    {
+                        name: "withEvents",
+                        in: "query",
+                        required: false,
+                        type: {
+                            type: "object",
+                            properties: {
+                                from: {
+                                    type: "integer",
+                                },
+                                to: {
+                                    type: "integer",
+                                },
+                                key: {
+                                    type: "string",
+                                },
+                                after: {
+                                    type: {
+                                        type: "string",
+                                        format: "date-time",
+                                    },
+                                },
+                                before: {
+                                    type: {
+                                        type: "string",
+                                        format: "date-time",
+                                    },
+                                },
+                            },
+                        },
+                        example: JSON.stringify({
+                            from: 1,
+                            to: 20,
+                            after: "2020",
+                            before: "2030",
+                        }),
+                    },
                 ],
                 responses: {
                     200: {

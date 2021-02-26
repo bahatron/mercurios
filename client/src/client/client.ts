@@ -114,7 +114,7 @@ export function MercuriosClient({ url: _url, id: _id }: ConnectOptions) {
 
         async read(
             topic: string,
-            seq: number
+            seq: "latest" | number
         ): Promise<MercuriosEvent | undefined> {
             try {
                 let response = await $http.get(`${_url}/read/${topic}/${seq}`);

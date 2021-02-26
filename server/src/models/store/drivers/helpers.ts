@@ -31,7 +31,7 @@ export function natsQueryToSql(filter: string): string {
         .join(".");
 }
 
-export function sqlEventFilters(
+export function knexEventFilter(
     builder: Knex.QueryBuilder,
     filters: EventFilters
 ): Knex.QueryBuilder {

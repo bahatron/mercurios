@@ -27,7 +27,9 @@ export default async function publishEvent({
             })
         );
 
-        await $nats.publish(`mercurios.topic.${topic}`, { event });
+        $nats
+            .publish(`mercurios.topic.${topic}`, { event })
+            .catch($logger.error);
 
         $logger.debug(`event published`, {
             key,

@@ -60,7 +60,7 @@ export function Connection(_url: string, _id: string = v4()) {
                 {
                     url: _url,
                     id: _id,
-                    message: err.message,
+                    error: err,
                 }
             );
         }

@@ -1,4 +1,4 @@
-import { natsQueryToSql, sqlEventFilters, EventFilters } from "./helpers";
+import { natsQueryToSql, knexEventFilter, EventFilters } from "./helpers";
 import $error from "../../../utils/error";
 import $json from "../../../utils/json";
 import $event, { MercuriosEvent } from "../../event/event";
@@ -115,13 +115,26 @@ export default function (): StoreDriver {
             return $event(result);
         },
 
+        async latest(topic) {
+            let result = await $postgres
+                .table(TOPIC_TABLE)
+                .where({ topic })
+                .first();
+
+            if (!result) {
+                return undefined;
+            }
+
+            return result.seq;
+        },
+
         async filter(topic: MercuriosEvent["topic"], filters: EventFilters) {
             let query = $postgres
                 .table(EVENT_TABLE)
                 .select("*")
                 .where({ topic });
 
-            let result = await sqlEventFilters(query, filters);
+            let result = await knexEventFilter(query, filters);
 
             return result.map($event);
         },
@@ -136,10 +149,10 @@ export default function (): StoreDriver {
             let query: Knex.QueryBuilder;
 
             if (withEvents) {
-                query = $postgres.table("mercurios_events").distinct("topic");
-                sqlEventFilters(query, withEvents);
+                query = $postgres.table(EVENT_TABLE).distinct("topic");
+                knexEventFilter(query, withEvents);
             } else {
-                query = $postgres.table("mercurios_topics").select("topic");
+                query = $postgres.table(TOPIC_TABLE).select("topic");
             }
 
             if (like) {
