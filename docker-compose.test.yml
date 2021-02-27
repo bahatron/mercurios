@@ -1,12 +1,10 @@
 version: "3.5"
 
 x-mercurios-config: &mercurios-config
-    MERCURIOS_TEST_URL: http://mercurios-server:4254
+    MERCURIOS_TEST_URL: http://localhost:4254
     MERCURIOS_WORKERS: 4
     NATS_URL: nats://nats:4222
-    # MERCURIOS_DEBUG: 1
-    MERCURIOS_STORE_DRIVER: pg
-    # MERCURIOS_DRIVER: mysql
+    MERCURIOS_DEBUG: 1
 
 x-postgres-config: &postgres-config
     POSTGRES_PASSWORD: secret
@@ -41,21 +39,32 @@ services:
         image: nats
         container_name: nats
 
-    mercurios-server:
+    mercurios-mysql:
         image: mercurios-server
-        container_name: mercurios-server
+        container_name: mercurios-mysql
         command: sh -c "wait-for-it mysql:3306 -- npm start"
         environment:
+            MERCURIOS_STORE: mysql
             <<: *postgres-config
             <<: *mysql-config
             <<: *mercurios-config
         depends_on:
-            - postgres
-            - mysql
+            - nats
+
+    mercurios-postgres:
+        image: mercurios-server
+        container_name: mercurios-postgres
+        command: sh -c "wait-for-it postgres:3306 -- npm start"
+        environment:
+            MERCURIOS_STORE: pg
+            <<: *postgres-config
+            <<: *mysql-config
+            <<: *mercurios-config
+        depends_on:
             - nats
 
     mercurios-client:
         image: mercurios-client
         container_name: mercurios-client
         environment:
-            MERCURIOS_URL: http://mercurios-server:4254
+            MERCURIOS_URL: ${MERCURIOS_URL}

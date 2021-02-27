@@ -87,7 +87,7 @@ describe("GET /read/:topic/:seq", () => {
         });
     });
 
-    describe.only("Scenario: latest sequence", () => {
+    describe("Scenario: latest sequence", () => {
         const _topic = "server_read_latest_event_test";
 
         before(async () => {
@@ -101,7 +101,7 @@ describe("GET /read/:topic/:seq", () => {
         it("returns the latest event for a topic", async () => {
             let latestOnStream = await (await filterTopic(_topic)).pop();
             let latest = (await readEvent(_topic, "latest")).data;
-            
+
             expect(latest.seq).to.eq(latestOnStream?.seq);
         });
     });

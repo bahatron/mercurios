@@ -78,18 +78,11 @@ function runDev() {
         exit(0);
     }
 
-    exec(`tilt up --hud=true`);
-    shutDown();
+    exec(`echo "you must chose a driver, options: pg | mysql"`);
+    exit(1);
 }
 
 function runTest() {
-    shouldBuild();
-    shouldCleanUp();
-    exec(`docker-compose -f ${TEST_COMPOSE} up -d`);
-    exec(
-        `docker exec mercurios-server sh -c "wait-for-it mercurios-server:4254 -t 30 -- npm run test"`
-    );
-    exec(
-        `docker-compose -f ${TEST_COMPOSE} run mercurios-client sh -c "npm run test"`
-    );
+    exec(`echo "NOT YET IMPLEMENTED"`);
+    exit(0);
 }

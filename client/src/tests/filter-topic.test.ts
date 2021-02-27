@@ -4,7 +4,7 @@ import { $logger } from "../utils/logger";
 import { DateTime } from "luxon";
 import { expect } from "chai";
 
-describe.only("Feature: Filter topic", () => {
+describe("Feature: Filter topic", () => {
     let _client = connect({
         url: process.env.MERCURIOS_URL || "",
         id: "ping_event_test",
