@@ -1,6 +1,6 @@
 import { v4 } from "uuid";
-import { connect } from "..";
-import { $logger } from "../utils/logger";
+import { connect } from "../src";
+import { $logger } from "../src/utils/logger";
 import { DateTime } from "luxon";
 import { expect } from "chai";
 

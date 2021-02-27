@@ -1,4 +1,6 @@
+require("ts-node").register();
+
 module.exports = {
-    spec: "lib/**/*.test.js",
+    spec: "tests/**/*.test.ts",
     timeout: 5000,
 };
