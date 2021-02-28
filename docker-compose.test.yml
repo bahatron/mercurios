@@ -30,7 +30,7 @@ services:
             <<: *mysql-config
 
     postgres:
-        image: postgres
+        image: postgres:12
         container_name: postgres
         environment:
             <<: *postgres-config
