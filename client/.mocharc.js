@@ -1,6 +1,6 @@
 require("ts-node").register();
 
 module.exports = {
-    spec: "tests/**/*.test.ts",
+    spec: "src/**/*.test.ts",
     timeout: 5000,
 };
