@@ -11,31 +11,17 @@ describe("Feature: Unsubscribe to Topic", () => {
     it("can unsubscribe", async () => {
         let topic = "unsubscribe_topic_test";
 
-        let emitter = new EventEmitter();
-
-        let subscription = await new Promise<string>(async (resolve) => {
-            let sub: string = await _client.subscribe(topic, () => {
-                emitter.emit("event");
-                resolve(sub);
-            });
-
-            await _client.emit(topic);
-        });
-
         return new Promise<void>(async (resolve, reject) => {
-            await _client.unsubscribe(subscription);
-
-            emitter.on("event", () => {
-                reject(new Error("did not expected to receive a message"));
+            let sub = await _client.subscribe(topic, async () => {
+                console.log(`sub fired`);
+                reject("this should not happen");
             });
 
-            // resolve after waiting some time
-            setTimeout(() => {
-                expect(true).to.be.true;
-                resolve();
-            }, 500);
+            await _client.unsubscribe(sub);
 
-            await _client.emit(topic);
+            await _client.publish(topic);
+
+            setTimeout(resolve, 500);
         });
     });
 });
