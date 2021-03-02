@@ -17,10 +17,11 @@ describe("Feature: Subscribe To Topic", () => {
                 expect(msg.subject).to.deep.eq(topic);
                 expect(msg.event.topic).to.deep.eq(topic);
                 expect(msg.event.data).to.deep.eq(data);
+
                 resolve();
             });
 
-            await _client.emit(topic, { data });
+            await _client.publish(topic, { data });
         });
     });
 });
