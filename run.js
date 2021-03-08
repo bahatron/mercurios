@@ -11,6 +11,7 @@ const argsContains = (flag) => {
 
 const DEV_COMPOSE = "docker-compose.dev.yml";
 const TEST_COMPOSE = "docker-compose.test.yml";
+const TEST_TILT = "Tiltfile.test";
 
 if (argsContains("build")) {
     build();
@@ -64,25 +65,21 @@ function runDev() {
         `mercurios-playground`,
     ];
 
-    if (argsContains(["--mysql"])) {
-        services = [...services, "mercurios-mysql"];
-
-        exec(`MERCURIOS_STORE=mysql tilt up --hud=true ${services.join(" ")}`);
-        exit(0);
-    }
-
     if (argsContains(["--pg"])) {
         services = [...services, "mercurios-postgres"];
 
         exec(`MERCURIOS_STORE=pg tilt up --hud=true ${services.join(" ")}`);
         exit(0);
-    }
+    } else {
+        services = [...services, "mercurios-mysql"];
 
-    exec(`echo "you must chose a driver, options: pg | mysql"`);
-    exit(1);
+        exec(`MERCURIOS_STORE=mysql tilt up --hud=true ${services.join(" ")}`);
+        exit(0);
+    }
 }
 
 function runTest() {
-    exec(`echo "NOT YET IMPLEMENTED"`);
+    shouldCleanUp();
+    exec(`tilt up -f ${TEST_TILT} --hud=true`);
     exit(0);
 }

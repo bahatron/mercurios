@@ -1,6 +1,6 @@
 import ws, { ClientOptions } from "ws";
 import { $error } from "../utils/error";
-import { v4 } from "uuid";
+import { Logger } from "@bahatron/utils";
 import { $logger } from "../utils/logger";
 
 export interface MercuriosMessage {
@@ -32,7 +32,7 @@ interface QueuedHandler {
     (): void;
 }
 
-export function Connection(_url: string, _id: string = v4()) {
+export function Connection(_url: string, _id: string, _logger: Logger) {
     let _queue: Array<QueuedHandler> = [];
     let _completed: Set<QueuedHandler> = new Set();
     let _socket = connect();
@@ -41,20 +41,20 @@ export function Connection(_url: string, _id: string = v4()) {
 
     function Socket(): ws | WebSocket {
         try {
-            let url = new URL(_url);
-            url.search = url.search ? `${url.search}&id=${_id}` : `?id=${_id}`;
-
             if (typeof window === "undefined") {
-                return new ws(url, <ClientOptions>{});
+                return new ws(_url, <ClientOptions>{});
             }
 
-            // url.protocol = url.protocol === "http:" ? "ws:" : "wss:";
-            url.protocol = "ws:";
+            let url = new URL(_url);
+            let parsedUrl = `ws://${url.host}/${url.pathname}`;
 
-            return new WebSocket(<any>url);
+            _logger.debug(
+                { url, parsedUrl },
+                "creating websocket connection.."
+            );
+
+            return new WebSocket(parsedUrl, ["ws", "wss"]);
         } catch (err) {
-            $logger.error(err);
-
             throw $error.ConnectionError(
                 "error connecting to mercurios WS server",
                 {
@@ -67,61 +67,72 @@ export function Connection(_url: string, _id: string = v4()) {
     }
 
     function connect() {
-        $logger.debug(`connecting...`);
-        let socket = Socket();
+        try {
+            _logger.debug(`connecting...`);
+            let socket = Socket();
 
-        socket.onopen = async function onSocketOpen() {
-            $logger.debug("socket open");
+            socket.onopen = async function onSocketOpen() {
+                _logger.debug("socket open");
 
-            // recreate subscriptions on reconnect
-            _queue = _queue.concat(Array.from(_completed));
+                // recreate subscriptions on reconnect
+                _queue = _queue.concat(Array.from(_completed));
 
-            let action: QueuedHandler | undefined;
-            while ((action = _queue.pop())) {
-                await action();
-                _completed.add(action);
-            }
-        };
+                let action: QueuedHandler | undefined;
+                while ((action = _queue.pop())) {
+                    await action();
+                    _completed.add(action);
+                }
+            };
 
-        socket.onmessage = function onSocketMessage(message: any) {
-            let { subscription, subject, event } = JSON.parse(
-                (message.data ?? message).toString()
-            );
+            socket.onmessage = function onSocketMessage(message: any) {
+                let { subscription, subject, event } = JSON.parse(
+                    (message.data ?? message).toString()
+                );
 
-            connection.emit(subscription, { subscription, subject, event });
+                connection.emit(subscription, { subscription, subject, event });
 
-            $logger.debug({ subscription, subject, event }, "message received");
-        };
+                _logger.debug(
+                    { subscription, subject, event },
+                    "message received"
+                );
+            };
 
-        socket.onerror = async function onSocketError({ message, error }: any) {
-            $logger.debug(
-                {
-                    on: "onError",
-                    message,
-                    error,
-                },
-                "socket error"
-            );
+            socket.onerror = async function onSocketError({
+                message,
+                error,
+            }: any) {
+                _logger.error(
+                    {
+                        event: "error",
+                        message,
+                        error,
+                    },
+                    "socket error"
+                );
 
+                reconnect();
+            };
+
+            socket.onclose = function onSocketClose({ wasClean, code }: any) {
+                _logger.warning({ wasClean, code }, `socket closed`);
+
+                if (code == 1000) {
+                    return;
+                }
+
+                reconnect();
+            };
+
+            return socket;
+        } catch (err) {
+            $logger.error(err);
             reconnect();
-        };
-
-        socket.onclose = function onSocketClose({ wasClean, code }: any) {
-            $logger.debug({ wasClean, code }, `socket closed`);
-
-            if (code == 1000) {
-                return;
-            }
-
-            reconnect();
-        };
-
-        return socket;
+        }
     }
 
     async function reconnect() {
-        $logger.debug(`reconnecting...`);
-        if (_interval) {
+        _logger.debug(`reconnecting...`);
+        if (_interval !== undefined) {
             return;
         }
 
@@ -133,6 +144,10 @@ export function Connection(_url: string, _id: string = v4()) {
             }
 
             _socket = connect();
+
+            if (!_socket) {
+                _logger.warning("unsuccessful ws connection, retrying...");
+            }
         }, 1000);
     }
 
@@ -181,12 +196,15 @@ export function Connection(_url: string, _id: string = v4()) {
         },
 
         close() {
-            _socket.close(1000);
+            _socket?.close(1000);
             _completed.clear();
         },
 
         isOpen() {
-            return _socket.readyState === _socket.OPEN;
+            return (
+                _socket?.readyState === _socket?.OPEN &&
+                _socket?.readyState !== undefined
+            );
         },
 
         send(message: ServerMessage): Promise<void> {
@@ -202,7 +220,7 @@ export function Connection(_url: string, _id: string = v4()) {
 
                 try {
                     const action = () => {
-                        _socket.send(JSON.stringify(message));
+                        _socket?.send(JSON.stringify(message));
 
                         resolve();
                     };

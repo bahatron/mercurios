@@ -129,7 +129,7 @@ services:
         volumes:
             - ./client/lib:/app/client/lib
         environment:
-            MERCURIOS_URL: http://mercurios-server:4254
+            MERCURIOS_URL: ws://mercurios-server:4254
             MERCURIOS_DEV: 1
 
     mercurios-playground:

@@ -20,7 +20,7 @@
     </v-container>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from "vue";
 import EventList from "../components/event-list.vue";
 import ActionCard from "../components/action-card.vue";
@@ -39,7 +39,7 @@ export default Vue.extend({
         }, 1000);
 
         mercurios.subscribe(">", async (msg) => {
-            (this as Vue).$store.dispatch("storeEvent", msg.event);
+            this.$store.dispatch("storeEvent", msg.event);
         });
 
         return {

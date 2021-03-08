@@ -7,6 +7,7 @@ import { $http } from "../utils/axios";
 import { $error } from "../utils/error";
 import { AxiosError } from "axios";
 import { v4 } from "uuid";
+import { Logger } from "@bahatron/utils";
 
 export interface FilterOptions {
     from?: number;
@@ -36,14 +37,18 @@ export interface ConnectOptions {
 }
 
 export type MercuriosClient = ReturnType<typeof MercuriosClient>;
-export function MercuriosClient({ url: _url, id: _id }: ConnectOptions) {
-    let _socket = Connection(_url, _id);
+export function MercuriosClient({ url: _url, id: _id = v4() }: ConnectOptions) {
+    const _logger = Logger({
+        debug: false,
+        pretty: false,
+        id: `mercurios:client:${_id}`,
+    });
+
+    _logger.debug({ _url, _id }, "creating mercurios client...");
+
+    let _socket = Connection(_url, _id, _logger);
 
     return {
-        get socket() {
-            return _socket;
-        },
-
         async close() {
             await _socket.close();
         },
