@@ -31,7 +31,7 @@ export default async function publishEvent({
             .publish(`mercurios.topic.${topic}`, { event })
             .catch($logger.error);
 
-        $logger.debug(`event published`, {
+        $logger.info(`event published`, {
             key,
             expectedSeq,
             seq: event.seq,

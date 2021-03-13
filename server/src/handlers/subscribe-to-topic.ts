@@ -23,7 +23,7 @@ export default <WsRequestHandler>(
                         connection.logger.error(err, "error receiving message");
                         return;
                     }
-                    connection.logger.debug(`recieved message from dispatcher`);
+                    connection.logger.debug(`received message from dispatcher`);
 
                     connection.socket.send(
                         $json.stringify({

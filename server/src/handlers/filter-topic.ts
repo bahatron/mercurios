@@ -2,16 +2,15 @@ import { MercuriosEvent } from "../models/event/event";
 import { EventFilters } from "../models/store/drivers/helpers";
 import { $store } from "../models/store/store";
 import { Exception } from "../utils/error";
+import $logger from "../utils/logger";
 
 export default async function filterTopic(
     topic: string,
     query: EventFilters = {}
 ): Promise<MercuriosEvent[]> {
-    return await $store.filter(topic, query).catch((err: Exception) => {
-        if (err.httpCode === 404) {
-            return [];
-        }
+    let result = await $store.filter(topic, query);
 
-        throw err;
-    });
+    $logger.debug(`topic filtered`, { topic, query, result });
+
+    return result;
 }

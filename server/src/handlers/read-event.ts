@@ -6,9 +6,8 @@ export default async function readEvent(
     topic: string,
     seq: "latest" | number
 ): Promise<MercuriosEvent | undefined> {
+    $logger.debug(`reading event`, { topic, seq });
 
-    $logger.debug(`seq is: ${seq}`);
-    
     if (seq === "latest") {
         let result = await $store.latest(topic);
 
@@ -20,11 +19,7 @@ export default async function readEvent(
 
     let event = await $store.read(topic, seq);
 
-    $logger.debug(`fetched event - ${topic}`, {
-        topic,
-        seq,
-        found: Boolean(event),
-    });
+    $logger.debug(`fetched event`, event);
 
     return event;
 }
