@@ -15,6 +15,11 @@ export const POSTGRES_CONFIG: Config = {
         tableName: "mercurios_migrations",
         directory: resolve(__dirname, "./migrations"),
     },
+	pool: <any>{
+		min: 2,
+		max: 20,
+		propagateCreateError: false,
+	},
 };
 
 const $postgres = Knex(POSTGRES_CONFIG);
