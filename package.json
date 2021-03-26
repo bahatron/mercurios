@@ -1,0 +1,23 @@
+{
+    "name": "mercurios",
+    "version": "1.0.0",
+    "description": "HTTP based event sourcing and message broker",
+    "main": "run.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "bootstrap": "lerna bootstrap"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://gitlab.com/bahatron/mercurios.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://gitlab.com/bahatron/mercurios/issues"
+    },
+    "homepage": "https://gitlab.com/bahatron/mercurios#readme",
+    "dependencies": {
+        "lerna": "^4.0.0"
+    }
+}

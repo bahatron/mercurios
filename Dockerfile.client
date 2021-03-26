@@ -3,7 +3,6 @@ RUN apk add bash
 
 WORKDIR /app/client
 COPY ./client/package.json ./package.json
-COPY ./client/package-lock.json ./package-lock.json
 RUN npm install
 
 COPY ./client .

@@ -4,15 +4,13 @@ RUN npm i -g pm2
 
 RUN  wget https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem -O /etc/ssl/rds-combined-ca-bundle.pem
 
-ARG MERCURIOS_PORT=4254
-EXPOSE ${MERCURIOS_PORT}
+EXPOSE 4254
 ENV MERCURIOS_ENV=production
 
 COPY ./scripts/wait-for-it.sh /usr/bin/wait-for-it
 
 WORKDIR /app/server
 COPY ./server/package.json .
-COPY ./server/package-lock.json .
 RUN npm install
 
 COPY ./server .

@@ -32,6 +32,10 @@ if (argsContains("build")) {
     exit(0);
 }
 
+function runSetup() {
+    exec(`npm install && npm run bootstrap`);
+}
+
 function build() {
     exec(`docker-compose build --parallel`);
 }

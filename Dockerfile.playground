@@ -13,11 +13,11 @@ COPY ./playground/nginx/nginx.conf /etc/nginx/nginx.conf
 ARG VUE_APP_MERCURIOS_URL
 
 WORKDIR /app/playground
-COPY ./playground/package*.json ./
+COPY ./playground/package.json ./
 RUN npm install
 
 WORKDIR /app/client
-COPY ./client/package*.json ./
+COPY ./client/package.json ./
 RUN npm install
 COPY ./client .
 RUN npm run build
