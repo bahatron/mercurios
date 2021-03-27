@@ -23,14 +23,22 @@ describe("POST /emit/:topic", () => {
         let _message: any;
         let _response: AxiosResponse;
         before(async () => {
-            await $nats.subscribe(`mercurios.topic.${_topic}`, (err, msg) => {
-                $logger.info("msg", msg);
-                _message = msg.data;
+            return new Promise<void>(async (resolve) => {
+                await $nats.subscribe(
+                    `mercurios.topic.${_topic}`,
+                    (err, msg) => {
+                        $logger.info("msg", msg);
+                        _message = msg.data;
+                        resolve();
+                    }
+                );
+
+                await new Promise((resolve) => setTimeout(resolve, 50));
+
+                $logger.info(`emitting...`);
+                _response = await emitEvent(_topic, _data);
+                $logger.info(`emitted`);
             });
-
-            await new Promise((resolve) => setTimeout(resolve, 50));
-
-            _response = await emitEvent(_topic, _data);
         });
 
         it("responds with http 200", () => {

@@ -19,16 +19,12 @@ describe("GET /filter/:topic", () => {
     before(async () => {
         await $store.deleteStream(_topic);
 
-        await Promise.all(
-            Array(20)
-                .fill(null)
-                .map((value: any, index) =>
-                    publishEvent({
-                        topic: _topic,
-                        key: index >= 10 ? _key : undefined,
-                    })
-                )
-        );
+        for (let index = 0; index < 20; index++) {
+            await publishEvent({
+                topic: _topic,
+                key: index >= 10 ? _key : undefined,
+            });
+        }
     });
 
     it("returns the entire stream with no query params", async () => {
