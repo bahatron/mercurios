@@ -77,15 +77,11 @@ describe("POST /publish/:topic", () => {
             try {
                 await $store.deleteStream(_topic);
 
-                await Promise.all(
-                    Array(11)
-                        .fill(null)
-                        .map((val, index) => {
-                            return publishEventEndpoint(_topic, {
-                                data: index + 1,
-                            });
-                        })
-                );
+                for (let i = 0; i < 11; i++) {
+                    await publishEventEndpoint(_topic, {
+                        data: i + 1,
+                    });
+                }
             } catch (err) {
                 $logger.warning("error loading fixtures");
                 $logger.error(err);
