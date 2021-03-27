@@ -7,7 +7,7 @@ export {
     MercuriosEventHandler,
 } from "./client/connection";
 
-export function connect(params: { url: string; id?: string }) {
+export function connect(params: client.ConnectOptions) {
     return client.MercuriosClient(params);
 }
 

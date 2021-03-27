@@ -7,7 +7,7 @@ import { $http } from "../utils/http";
 import { $error } from "../utils/error";
 import { AxiosError } from "axios";
 import { v4 } from "uuid";
-import { Logger } from "@bahatron/utils";
+import { $json, Logger } from "@bahatron/utils";
 
 export interface FilterOptions {
     from?: number;
@@ -47,6 +47,7 @@ export function MercuriosClient({
         debug: _debug,
         pretty: false,
         id: `mercurios:client:${_id}`,
+        formatter: typeof window === undefined ? $json.stringify : undefined,
     });
 
     _logger.debug({ _url, _id }, "creating mercurios client...");
@@ -180,6 +181,8 @@ export function MercuriosClient({
                 action: "unsubscribe",
                 subscription,
             });
+
+            _logger.debug("removed subscription", subscription);
         },
     };
 }

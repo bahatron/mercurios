@@ -5,6 +5,7 @@ describe("Feature: Ping server", () => {
     let _client = connect({
         url: process.env.MERCURIOS_URL || "",
         id: "ping_event_test",
+        debug: true,
     });
 
     it("can ping the server", async () => {

@@ -13,7 +13,6 @@ describe("Feature: Filter topic", () => {
     let topic: string;
     let lapTimestamp: string;
     let initTimestamp: string;
-    let lastTimestamp: string;
 
     before(async () => {
         topic = v4();
@@ -38,8 +37,6 @@ describe("Feature: Filter topic", () => {
                 await _client.publish(topic, { data: number });
             })
         ).catch($logger.error);
-
-        lastTimestamp = DateTime.utc().toISO();
     });
 
     it("filters by key", async () => {

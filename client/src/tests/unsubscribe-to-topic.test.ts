@@ -4,6 +4,7 @@ describe("Feature: Unsubscribe to Topic", () => {
     let _client = connect({
         url: process.env.MERCURIOS_URL || "",
         id: "unsubscribe_topic_test",
+        debug: true,
     });
 
     it("can unsubscribe", async () => {

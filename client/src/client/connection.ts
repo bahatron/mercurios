@@ -91,7 +91,7 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
                 connection.emit(subscription, { subscription, subject, event });
 
                 _logger.debug(
-                    { subscription, subject, event },
+                    { subscription, subject, topic: event.topic },
                     "message received"
                 );
             };
