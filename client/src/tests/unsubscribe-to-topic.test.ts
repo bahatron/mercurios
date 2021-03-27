@@ -4,7 +4,7 @@ describe("Feature: Unsubscribe to Topic", () => {
     let _client = connect({
         url: process.env.MERCURIOS_URL || "",
         id: "unsubscribe_topic_test",
-        debug: true,
+        debug: Boolean(process.env.MERCURIOS_DEV),
     });
 
     it("can unsubscribe", async () => {
@@ -17,12 +17,12 @@ describe("Feature: Unsubscribe to Topic", () => {
 
             await _client.unsubscribe(sub);
 
-            // no ACK from ws
-            await new Promise((_resolve) => setTimeout(_resolve, 50));
+            await _client.subscribe(topic, async () => {
+                await new Promise((_resolve) => setTimeout(_resolve, 250));
+                resolve();
+            });
 
             await _client.publish(topic);
-
-            setTimeout(resolve, 500);
         });
     });
 });

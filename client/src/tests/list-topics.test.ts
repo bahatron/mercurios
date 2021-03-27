@@ -14,7 +14,7 @@ describe("Feature: List Topics", () => {
     let _client = connect({
         url: process.env.MERCURIOS_URL || "",
         id: "ping_event_test",
-        debug: true,
+        debug: Boolean(process.env.MERCURIOS_DEV),
     });
 
     before(async () => {

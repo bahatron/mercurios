@@ -8,6 +8,7 @@ describe("Feature: Filter topic", () => {
     let _client = connect({
         url: process.env.MERCURIOS_URL || "",
         id: "ping_event_test",
+        debug: Boolean(process.env.MERCURIOS_DEV),
     });
 
     let topic: string;

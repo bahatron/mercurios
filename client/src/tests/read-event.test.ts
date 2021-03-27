@@ -6,7 +6,7 @@ const _topic = "client_read_event_test";
 const _client = connect({
     url: process.env.MERCURIOS_URL || "",
     id: "client_read_event_test",
-    debug: true,
+    debug: Boolean(process.env.MERCURIOS_DEV),
 });
 
 describe("Feature: Read Event", () => {

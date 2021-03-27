@@ -21,3 +21,4 @@ push-api:
             - ".gitlab-ci.yml"
             - "server/**/*"
             - "Dockerfile.server"
+

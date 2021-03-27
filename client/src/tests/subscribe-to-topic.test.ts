@@ -5,7 +5,7 @@ describe("Feature: Subscribe To Topic", () => {
     let _client = connect({
         url: process.env.MERCURIOS_URL || "",
         id: "subscribe_topic_test",
-        debug: true,
+        debug: Boolean(process.env.MERCURIOS_DEV),
     });
 
     it("can subscribe to topics", async () => {

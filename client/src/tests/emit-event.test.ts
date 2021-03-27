@@ -5,7 +5,7 @@ describe("Feature: Emit Event", () => {
     let _client = connect({
         url: `${process.env.MERCURIOS_URL}` || "",
         id: "emit_event_test",
-        debug: true,
+        debug: Boolean(process.env.MERCURIOS_DEV),
     });
 
     it("can emit events", async () => {

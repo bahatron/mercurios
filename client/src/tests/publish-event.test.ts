@@ -5,7 +5,7 @@ describe("Feature: Publish Event", () => {
     let _client = connect({
         url: process.env.MERCURIOS_URL || "",
         id: "publish_event_test",
-        debug: true,
+        debug: Boolean(process.env.MERCURIOS_DEV),
     });
 
     it("can publish events", async () => {
