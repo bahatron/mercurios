@@ -16,6 +16,8 @@ describe("Feature: Unsubscribe to Topic", () => {
             });
 
             await _client.unsubscribe(sub);
+            // no ACK from ws
+            await new Promise((_resolve) => setTimeout(_resolve, 250));
 
             await _client.subscribe(topic, async () => {
                 await new Promise((_resolve) => setTimeout(_resolve, 250));

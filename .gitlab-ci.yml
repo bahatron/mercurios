@@ -3,7 +3,7 @@ default:
     services:
         - docker:dind
     before_script:
-      - apk update && apk add openssh git nodejs npm bash
+        - apk update && apk add openssh git nodejs npm bash
 
 stages:
     - build
@@ -17,8 +17,3 @@ push-api:
     only:
         refs:
             - master
-        changes:
-            - ".gitlab-ci.yml"
-            - "server/**/*"
-            - "Dockerfile.server"
-
