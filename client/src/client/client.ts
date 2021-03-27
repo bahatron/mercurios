@@ -3,7 +3,7 @@ import {
     MercuriosEvent,
     MercuriosEventHandler,
 } from "./connection";
-import { $http } from "../utils/axios";
+import { $http } from "../utils/http";
 import { $error } from "../utils/error";
 import { AxiosError } from "axios";
 import { v4 } from "uuid";
@@ -34,12 +34,17 @@ export interface SubscribeOptions {
 export interface ConnectOptions {
     url: string;
     id?: string;
+    debug?: boolean;
 }
 
 export type MercuriosClient = ReturnType<typeof MercuriosClient>;
-export function MercuriosClient({ url: _url, id: _id = v4() }: ConnectOptions) {
+export function MercuriosClient({
+    url: _url,
+    id: _id = v4(),
+    debug: _debug = false,
+}: ConnectOptions) {
     const _logger = Logger({
-        debug: false,
+        debug: _debug,
         pretty: false,
         id: `mercurios:client:${_id}`,
     });

@@ -51,10 +51,7 @@ export default function (): StoreDriver {
                     .table("mercurios_topics")
                     .insert({ topic, seq: 0 });
             } catch (err) {
-                if (
-                    err.message.includes("duplicate key value") ||
-                    err.code.includes("ER_DUP_ENTRY")
-                ) {
+                if (["ER_LOCK_DEADLOCK", "ER_DUP_ENTRY"].includes(err.code)) {
                     return;
                 }
 

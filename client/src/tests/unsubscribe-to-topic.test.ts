@@ -1,6 +1,4 @@
 import { connect } from "..";
-import { EventEmitter } from "events";
-import { expect } from "chai";
 
 describe("Feature: Unsubscribe to Topic", () => {
     let _client = connect({
@@ -13,11 +11,13 @@ describe("Feature: Unsubscribe to Topic", () => {
 
         return new Promise<void>(async (resolve, reject) => {
             let sub = await _client.subscribe(topic, async () => {
-                console.log(`sub fired`);
                 reject("this should not happen");
             });
 
             await _client.unsubscribe(sub);
+
+            // no ACK from ws
+            await new Promise((_resolve) => setTimeout(_resolve, 50));
 
             await _client.publish(topic);
 

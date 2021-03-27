@@ -50,25 +50,13 @@ describe("Feature: Filter topic", () => {
         }
     });
 
-    it("filtes by date", async () => {
+    it("filters by date", async () => {
         let events = await _client.filter(topic, {
             before: lapTimestamp,
             after: initTimestamp,
         });
 
         for (let event of events) {
-            $logger.debug(
-                {
-                    event,
-                    initTimestamp,
-                    lapTimestamp,
-                    validation:
-                        event.published_at >= initTimestamp &&
-                        event.published_at <= lapTimestamp,
-                },
-                "event"
-            );
-
             expect(
                 event.published_at >= initTimestamp &&
                     event.published_at <= lapTimestamp

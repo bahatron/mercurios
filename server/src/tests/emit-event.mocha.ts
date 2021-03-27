@@ -3,7 +3,6 @@ import env from "@bahatron/env";
 import { expect } from "chai";
 import $event from "../models/event/event";
 import $nats from "../services/nats";
-import $logger from "../utils/logger";
 
 const MERCURIOS_TEST_URL = env.get("MERCURIOS_TEST_URL");
 
@@ -27,17 +26,12 @@ describe("POST /emit/:topic", () => {
                 await $nats.subscribe(
                     `mercurios.topic.${_topic}`,
                     (err, msg) => {
-                        $logger.info("msg", msg);
                         _message = msg.data;
                         resolve();
                     }
                 );
 
-                await new Promise((resolve) => setTimeout(resolve, 50));
-
-                $logger.info(`emitting...`);
                 _response = await emitEvent(_topic, _data);
-                $logger.info(`emitted`);
             });
         });
 

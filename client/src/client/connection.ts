@@ -113,7 +113,7 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
             };
 
             socket.onclose = function onSocketClose({ wasClean, code }: any) {
-                _logger.warning({ wasClean, code }, `socket closed`);
+                _logger.debug({ wasClean, code }, `socket connection closed`);
 
                 if (code == 1000) {
                     return;
