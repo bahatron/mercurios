@@ -1,7 +1,6 @@
 import ws, { ClientOptions } from "ws";
 import { $error } from "../utils/error";
 import { Logger } from "@bahatron/utils";
-import { $logger } from "../utils/logger";
 
 export interface MercuriosMessage {
     subscription: string;
@@ -125,7 +124,7 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
 
             return socket;
         } catch (err) {
-            $logger.error(err);
+            _logger.error(err);
             reconnect();
         }
     }
