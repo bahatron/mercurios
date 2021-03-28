@@ -5,16 +5,15 @@ default:
     before_script:
         - apk update && apk add openssh git nodejs npm bash
 
-build-test-and-push:
+push:
     script:
         - docker-compose -f docker-compose.yml build mercurios-server mercurios-client || exit 1
         - ./scripts/test.sh
-        - docker-compose -f docker-compose.test.yml logs > mercurios-logs
-        - ./scripts/dockerhub-push.sh || exit 1
+        - ./scripts/dockerhub-push.sh
     only:
         refs:
             - master
     artifacts:
         paths:
-            - mercurios-logs
-        expire_in: 30 days
+            - mercurios-test-logs
+        expire_in: 7 days

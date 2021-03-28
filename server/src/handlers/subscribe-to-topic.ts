@@ -50,13 +50,9 @@ export default <WsRequestHandler>(
 
         connection.subscriptions.set(subscription, sub);
 
-        $logger.debug(
-            `subscribed to topic`,
-
-            {
-                subscription,
-                topic,
-            }
-        );
+        connection.logger.debug(`subscribed to topic`, {
+            subscription,
+            topic,
+        });
     }
 );

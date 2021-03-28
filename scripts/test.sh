@@ -1,5 +1,6 @@
-#!/bin/sh
-set -xe
+#!/bin/bash
+set -o pipefail
+
 export GITROOT=$(git rev-parse --show-toplevel)
 
 docker-compose -f ${GITROOT}/docker-compose.test.yml up -d
@@ -14,5 +15,7 @@ docker-compose -f ${GITROOT}/docker-compose.test.yml exec -T mercurios-mysql \
 MERCURIOS_URL=http://mercurios-postgres:4254 docker-compose -f ${GITROOT}/docker-compose.test.yml run -T mercurios-client \
     sh -c "npm run test"
 
-MERCURIOS_URL=http://mercurios-mysql:4254 docker-compose -f ${GITROOT}/docker-compose.test.yml run -T mercurios-client \
-    sh -c "npm run test"
+# MERCURIOS_URL=http://mercurios-mysql:4254 docker-compose -f ${GITROOT}/docker-compose.test.yml run -T mercurios-client \
+#     sh -c "npm run test"
+
+docker-compose -f ${GITROOT}/docker-compose.test.yml logs --no-color -t mercurios-postgres mercurios-mysql > mercurios-test-logs

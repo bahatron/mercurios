@@ -3,3 +3,4 @@ lib/
 node_modules/
 .env
 package-lock.json
+mercurios-test-logs
