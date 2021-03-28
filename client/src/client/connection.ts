@@ -55,7 +55,7 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
             return new WebSocket(parsedUrl, ["ws", "wss"]);
         } catch (err) {
             throw $error.ConnectionError(
-                "error connecting to mercurios WS server",
+                "error connecting to mercurios ws server",
                 {
                     url: _url,
                     id: _id,
@@ -91,8 +91,11 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
                 connection.emit(subscription, { subscription, subject, event });
 
                 _logger.debug(
-                    { subscription, subject, topic: event.topic },
-                    "message received"
+                    {
+                        subscription,
+                        topic: event.topic,
+                    },
+                    "ws message received"
                 );
             };
 
@@ -102,18 +105,23 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
             }: any) {
                 _logger.error(
                     {
-                        event: "error",
                         message,
                         error,
                     },
-                    "socket error"
+                    "ws error"
                 );
 
                 reconnect();
             };
 
             socket.onclose = function onSocketClose({ wasClean, code }: any) {
-                _logger.debug({ wasClean, code }, `socket connection closed`);
+                _logger.debug(
+                    {
+                        wasClean,
+                        code,
+                    },
+                    `ws connection closed`
+                );
 
                 if (code == 1000) {
                     return;
@@ -130,7 +138,6 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
     }
 
     async function reconnect() {
-        _logger.debug(`reconnecting...`);
         if (_interval !== undefined) {
             return;
         }

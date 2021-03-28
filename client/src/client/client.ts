@@ -47,7 +47,7 @@ export function MercuriosClient({
         debug: _debug,
         pretty: false,
         id: `mercurios:client:${_id}`,
-        formatter: typeof window === undefined ? $json.stringify : undefined,
+        formatter: $json.stringify,
     });
 
     _logger.debug({ _url, _id }, "creating mercurios client...");
