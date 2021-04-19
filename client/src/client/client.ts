@@ -173,6 +173,8 @@ export function MercuriosClient({
                 queue,
             });
 
+            _logger.debug({ topic }, `subscription request sent`);
+
             return subscription;
         },
 
@@ -182,7 +184,7 @@ export function MercuriosClient({
                 subscription,
             });
 
-            _logger.debug("removed subscription", subscription);
+            _logger.debug({ subscription }, "removed subscription");
         },
     };
 }

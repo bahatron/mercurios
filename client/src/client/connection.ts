@@ -71,7 +71,7 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
             let socket = Socket();
 
             socket.onopen = async function onSocketOpen() {
-                _logger.debug("socket open");
+                _logger.info("ws connection open");
 
                 // recreate subscriptions on reconnect
                 _queue = _queue.concat(Array.from(_completed));
@@ -115,7 +115,7 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
             };
 
             socket.onclose = function onSocketClose({ wasClean, code }: any) {
-                _logger.debug(
+                _logger.warning(
                     {
                         wasClean,
                         code,

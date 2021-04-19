@@ -1,12 +1,12 @@
 import { Router, RequestHandler } from "express";
-import publishEvent from "../handlers/publish-event";
-import emitEvent from "../handlers/emit-event";
-import readEvent from "../handlers/read-event";
-import listTopics from "../handlers/list-topics";
-import filterTopic from "../handlers/filter-topic";
+import publishEvent from "../controllers/publish-event";
+import emitEvent from "../controllers/emit-event";
+import readEvent from "../controllers/read-event";
+import listTopics from "../controllers/list-topics";
+import filterTopic from "../controllers/filter-topic";
 import { $validator } from "../utils/validator";
 import { $json } from "../utils/json";
-import { ping } from "../handlers/ping";
+import { ping } from "../controllers/ping";
 
 export function asyncRoute(handler: RequestHandler): RequestHandler {
     return async (req, res, next) => {
