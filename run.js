@@ -84,6 +84,7 @@ function runDev() {
 
 function runTest() {
     shouldCleanUp();
-    exec(`tilt up -f ${TEST_TILT} --hud=true`);
+    shouldBuild();
+    exec(`./scripts/test.sh`);
     exit(0);
 }

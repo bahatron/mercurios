@@ -1,7 +1,7 @@
 import $ws from "ws";
-import $logger from "@bahatron/logger";
 import { publishEventEndpoint } from "./publish-event.mocha";
 import { $config } from "../utils/config";
+import $logger from "../utils/logger";
 
 const MERCURIOS_TEST_URL = $config.test_url;
 
@@ -37,7 +37,7 @@ describe("WS action: unsubscribe", () => {
 
                 (err) => {
                     if (err) {
-                        $logger.warning(`wsc error`, err);
+                        $logger.warning(err, `wsc error`);
                     }
 
                     publishEventEndpoint(_topic);
@@ -59,7 +59,7 @@ describe("WS action: unsubscribe", () => {
 
                 (err) => {
                     if (err) {
-                        $logger.warning(`wsc error`, err);
+                        $logger.warning(err, `wsc error`);
                     }
 
                     publishEventEndpoint(_topic);

@@ -1,9 +1,9 @@
 import ws from "ws";
-import $logger from "@bahatron/logger";
 import { publishEventEndpoint } from "./publish-event.mocha";
 import uuid from "uuid";
 import { $config } from "../utils/config";
 import $json from "../utils/json";
+import $logger from "../utils/logger";
 
 const MERCURIOS_TEST_URL = $config.test_url;
 
