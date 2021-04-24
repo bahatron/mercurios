@@ -34,8 +34,9 @@ export default function createWsServer(httpServer: Server): ws.Server {
 
     wss.on("connection", (socket, request) => {
         try {
+            /**@todo: update deprecated library */
             let query = url.parse(request.url ?? "", true).query;
-            $logger.debug("received ws connection request", { query });
+            $logger.debug({ query }, "received ws connection request");
 
             let id = typeof query.id === "string" ? query.id : v4();
 
@@ -56,5 +57,5 @@ export default function createWsServer(httpServer: Server): ws.Server {
 async function removeConnection(conn: Connection) {
     await conn.close();
     _clients.delete(conn);
-    $logger.debug("connection killed", { id: conn.id });
+    $logger.debug({ id: conn.id }, "connection killed");
 }

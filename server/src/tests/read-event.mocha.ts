@@ -1,5 +1,4 @@
 import $http, { AxiosResponse } from "axios";
-import env from "@bahatron/env";
 import { expect } from "chai";
 import $logger from "@bahatron/logger";
 import { publishEventEndpoint } from "./publish-event.mocha";
@@ -8,19 +7,20 @@ import { $validator } from "../utils/validator";
 import { EventSchema } from "../models/event/event.schema";
 import publishEvent from "../controllers/publish-event";
 import filterTopic from "../controllers/filter-topic";
+import { $config } from "../utils/config";
 
-const MERCURIOS_MERCURIOS_TEST_URL = env.get("MERCURIOS_TEST_URL");
+const MERCURIOS_MERCURIOS_TEST_URL = $config.test_url;
+
+async function readEvent(
+    topic: string,
+    seq: "latest" | number
+): Promise<AxiosResponse> {
+    return $http
+        .get(`${MERCURIOS_MERCURIOS_TEST_URL}/read/${topic}/${seq}`)
+        .catch((err) => err.response);
+}
 
 describe("GET /read/:topic/:seq", () => {
-    async function readEvent(
-        topic: string,
-        seq: "latest" | number
-    ): Promise<AxiosResponse> {
-        return $http
-            .get(`${MERCURIOS_MERCURIOS_TEST_URL}/read/${topic}/${seq}`)
-            .catch((err) => err.response);
-    }
-
     describe("Scenario: topic does not exist", () => {
         const _topic = `non_existent_topic`;
         before(async () => {

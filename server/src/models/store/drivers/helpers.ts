@@ -11,14 +11,14 @@ export interface EventFilters {
 }
 
 export function natsQueryToSql(filter: string): string {
-    let splitted = filter.split(".");
-    let index = splitted.indexOf(">");
+    let split = filter.split(".");
+    let index = split.indexOf(">");
 
     if (index >= 0) {
-        splitted.splice(index, splitted.length, "%");
+        split.splice(index, split.length, "%");
     }
 
-    return splitted
+    return split
         .map((item) => (item === "*" ? "%" : item))
         .reduceRight((carry, value, index, arr) => {
             if (value === "%" && arr[index - 1] === "%") {
@@ -37,7 +37,7 @@ export function knexEventFilter(
 ): Knex.QueryBuilder {
     let { from, to, key, before, after } = filters;
 
-    $logger.debug("filters", filters);
+    $logger.debug(filters, "filters");
 
     if (from) {
         builder.where("seq", ">=", from);

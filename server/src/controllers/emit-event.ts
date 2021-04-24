@@ -15,7 +15,7 @@ export default async function emitEvent({
 
     await $nats.publish(`mercurios.topic.${topic}`, { event });
 
-    $logger.debug(`event emitted`, event);
+    $logger.debug({ event }, `event emitted`);
 
     return event;
 }

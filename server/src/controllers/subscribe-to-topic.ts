@@ -2,7 +2,6 @@ import { WsRequestHandler } from "../server/websocket/ws-connection";
 import $json from "../utils/json";
 import { v4 } from "uuid";
 import { Subscription } from "ts-nats";
-import $logger from "../utils/logger";
 
 export default <WsRequestHandler>(
     async function subscribeToTopic({
@@ -50,9 +49,12 @@ export default <WsRequestHandler>(
 
         connection.subscriptions.set(subscription, sub);
 
-        connection.logger.debug(`subscribed to topic`, {
-            subscription,
-            topic,
-        });
+        connection.logger.debug(
+            {
+                subscription,
+                topic,
+            },
+            `subscribed to topic`
+        );
     }
 );

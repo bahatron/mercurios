@@ -35,7 +35,7 @@ export async function isHealthy(): Promise<boolean> {
             _client.subscribe(
                 "mercurios_ping",
                 (msg) => {
-                    $logger.debug("ping message", msg);
+                    $logger.debug(msg, "ping message");
                     resolve();
                 },
                 <nats.SubscriptionOptions>{

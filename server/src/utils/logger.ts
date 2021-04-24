@@ -1,17 +1,26 @@
-import { createLogger, Logger, Handler } from "@bahatron/logger";
+import { Logger } from "@bahatron/utils";
+import httpContext from "express-http-context";
+import { CORRELATION_ID } from "../server/middleware/request-id";
 import { $config } from "./config";
 
-const $logger: Logger = createLogger({
-    debug: $config.debug,
-    id: `mercurios`,
-    colours: $config.dev_mode,
-    formatter: $config.dev_mode ? undefined : JSON.stringify,
-});
+export const LOGGER_ID = `mercurios:server:${process.pid}`;
 
-const inspectEntry: Handler = ({ context }) => {
-    if (context !== undefined) {
-        $logger.inspect(context);
-    }
+const getId = () => {
+    let id = httpContext.get(CORRELATION_ID) ?? LOGGER_ID;
+
+    // console.log({
+    //     correlationId: httpContext.get(CORRELATION_ID),
+    //     loggerId: LOGGER_ID,
+    //     id,
+    // });
+
+    return id;
 };
+export const $logger: Logger.Logger = Logger.Logger({
+    debug: $config.debug,
+    id: getId,
+    pretty: $config.dev_mode,
+    formatter: JSON.stringify,
+});
 
 export default $logger;

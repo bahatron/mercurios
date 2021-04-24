@@ -1,12 +1,12 @@
 import $http, { AxiosResponse } from "axios";
-import env from "@bahatron/env";
 import { expect } from "chai";
 import $logger from "@bahatron/logger";
 import $nats from "../services/nats";
 import { MercuriosEvent } from "../models/event/event";
 import { $store } from "../models/store/store";
+import { $config } from "../utils/config";
 
-const MERCURIOS_MERCURIOS_TEST_URL = env.get("MERCURIOS_TEST_URL");
+const MERCURIOS_MERCURIOS_TEST_URL = $config.test_url;
 
 export async function publishEventEndpoint(
     topic: string,

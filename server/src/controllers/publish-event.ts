@@ -31,12 +31,15 @@ export default async function publishEvent({
             .publish(`mercurios.topic.${topic}`, { event })
             .catch($logger.error);
 
-        $logger.info(`event published`, {
-            key,
-            expectedSeq,
-            seq: event.seq,
-            topic,
-        });
+        $logger.info(
+            {
+                key,
+                expectedSeq,
+                seq: event.seq,
+                topic,
+            },
+            `event published`
+        );
 
         return event;
     } catch (err) {

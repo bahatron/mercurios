@@ -6,28 +6,39 @@ import { $config } from "../utils/config";
 import $logger from "../utils/logger";
 
 process.on("uncaughtException", async (err) => {
-    await $logger.error(err, "uncaught expection");
+    await $logger.error(err, "uncaught exception");
     process.exit(-1);
 });
 
 process.on("unhandledRejection", async (reason, promise) => {
-    await $logger.error({ reason }, "unhlanded rejection");
+    await $logger.error({ reason }, "unhandled rejection");
     process.exit(-1);
 });
 
-$logger.info("starting mercurios server", {
-    dev_mode: $config.dev_mode,
-    debug: $config.debug,
-    store: $config.store_driver,
-    pid: process.pid,
-});
+$logger.info(
+    {
+        dev_mode: $config.dev_mode,
+        debug: $config.debug,
+        store: $config.store_driver,
+        pid: process.pid,
+    },
+    "starting mercurios server"
+);
 
 $store.setup().then(() => {
-    $logger.info("store service initialised", {
-        pid: process.pid,
-    });
+    $logger.info(
+        {
+            pid: process.pid,
+        },
+        "store service initialized"
+    );
 
     server.listen(4254, () => {
-        $logger.info(`Server listening on port 4254`, { pid: process.pid });
+        $logger.info(
+            {
+                pid: process.pid,
+            },
+            `Server listening on port 4254`
+        );
     });
 });

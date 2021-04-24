@@ -8,7 +8,7 @@ export default async function listTopics(params: {
 }) {
     let topics = await $store.topics(params);
 
-    $logger.debug("fetched topics", { params });
+    $logger.debug({ params }, "topic search result");
 
     return topics;
 }

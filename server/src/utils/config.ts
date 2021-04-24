@@ -1,35 +1,35 @@
-import $env from "@bahatron/env";
-import $lodash from "lodash";
+import { getenv } from "@bahatron/utils/lib/env";
+import { cloneDeep } from "lodash";
 
 export const $config = new Proxy(
     {
-        test_url: $env.get("MERCURIOS_TEST_URL", `http://localhost:4254`),
-        dev_mode: Boolean($env.get("MERCURIOS_DEV", "") === "1"),
-        debug: Boolean($env.get("MERCURIOS_DEBUG", "") === "1"),
-        store_driver: $env.get(
+        test_url: getenv("MERCURIOS_TEST_URL", `http://localhost:4254`),
+        dev_mode: Boolean(getenv("MERCURIOS_DEV", "") === "1"),
+        debug: Boolean(getenv("MERCURIOS_DEBUG", "") === "1"),
+        store_driver: getenv(
             "MERCURIOS_STORE",
-            $env.get("MERCURIOS_DRIVER", "mysql") // backwards compatability
+            getenv("MERCURIOS_DRIVER", "mysql") // backwards compatability
         ),
-        mercurios_ping_interval: $env.get("MERCURIOS_PING_INTERVAL", "30000"),
-        mercurios_workers: $env.get("MERCURIOS_WORKERS", "1"),
-        nats_url: $env.get("NATS_URL"),
+        mercurios_ping_interval: getenv("MERCURIOS_PING_INTERVAL", "30000"),
+        mercurios_workers: getenv("MERCURIOS_WORKERS", "1"),
+        nats_url: getenv("NATS_URL"),
 
-        mysql_host: $env.get("MYSQL_HOST", ""),
-        mysql_port: parseInt($env.get("MYSQL_PORT", "")),
-        mysql_user: $env.get("MYSQL_USER", ""),
-        mysql_password: $env.get("MYSQL_PASSWORD", ""),
-        mysql_database: $env.get("MYSQL_DATABASE", ""),
-        mysql_rds_ssl: $env.get("MYSQL_RDS_SSL", "0"),
+        mysql_host: getenv("MYSQL_HOST", ""),
+        mysql_port: parseInt(getenv("MYSQL_PORT", "")),
+        mysql_user: getenv("MYSQL_USER", ""),
+        mysql_password: getenv("MYSQL_PASSWORD", ""),
+        mysql_database: getenv("MYSQL_DATABASE", ""),
+        mysql_rds_ssl: getenv("MYSQL_RDS_SSL", "0"),
 
-        postgre_host: $env.get("POSTGRES_HOST", ""),
-        postgre_port: $env.get("POSTGRES_PORT", ""),
-        postgre_database: $env.get("POSTGRES_DB", ""),
-        postgre_user: $env.get("POSTGRES_USER", ""),
-        postgre_password: $env.get("POSTGRES_PASSWORD", ""),
+        postgre_host: getenv("POSTGRES_HOST", ""),
+        postgre_port: getenv("POSTGRES_PORT", ""),
+        postgre_database: getenv("POSTGRES_DB", ""),
+        postgre_user: getenv("POSTGRES_USER", ""),
+        postgre_password: getenv("POSTGRES_PASSWORD", ""),
     },
     {
         get<T>(_object: T, attribute: keyof T) {
-            return $lodash.cloneDeep(_object[attribute]);
+            return cloneDeep(_object[attribute]);
         },
     }
 );

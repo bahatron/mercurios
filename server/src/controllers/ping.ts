@@ -14,7 +14,7 @@ export async function ping() {
         nats: { result: natsResult },
     } as const;
 
-    $logger.debug(`ping result`, result);
+    $logger.debug(result, `ping result`);
 
     if (!storeResult || !natsResult) {
         throw $error.InternalError("health check failed", result);

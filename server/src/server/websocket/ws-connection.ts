@@ -36,7 +36,7 @@ export function Connection(_id: string, _socket: ws) {
     let _subscriptions: Map<string, Subscription> = new Map();
 
     let _dispatcher = $nats.connect(clientName).then((client) => {
-        _logger.debug("dispatcher connection stablished");
+        _logger.debug("dispatcher connection established");
         return client;
     });
 
@@ -73,7 +73,7 @@ export function Connection(_id: string, _socket: ws) {
             conn.logger.debug(`PING`);
 
             if (conn.socket.readyState !== conn.socket.OPEN) {
-                throw new Error("already_closed");
+                throw new Error("Connection closed");
             }
 
             await new Promise<void>((resolve, reject) => {
@@ -98,12 +98,15 @@ export function Connection(_id: string, _socket: ws) {
                 subscription,
             }: MercuriosClientMessage = $json.parse(data);
 
-            _logger.debug(`ws message received`, {
-                action,
-                topic,
-                queue,
-                subscription,
-            });
+            _logger.debug(
+                {
+                    action,
+                    topic,
+                    queue,
+                    subscription,
+                },
+                `ws message received`
+            );
 
             await ACTIONS[action]?.({
                 connection: conn,
@@ -117,7 +120,7 @@ export function Connection(_id: string, _socket: ws) {
     });
 
     _socket.on("unexpected-response", (req, res) => {
-        _logger.warning(`unexpected response`, req);
+        _logger.warning(req, `unexpected response`);
     });
 
     _socket.on("close", async () => {
