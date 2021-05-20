@@ -1,6 +1,6 @@
 import autocannon, { Options, Result } from "autocannon";
 import yargs from "yargs";
-import BIG_JSON from "../tests/fixtures/big_json";
+import BIG_JSON from "../tests/big-json.fixture";
 import $json from "../utils/json";
 import $http from "../utils/http";
 import { $config } from "../utils/config";
