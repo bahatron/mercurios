@@ -1,6 +1,7 @@
-import ws, { ClientOptions } from "ws";
+import $ws, { ClientOptions } from "ws";
 import { $error } from "../utils/error";
 import { Logger } from "@bahatron/utils";
+import { $logger } from "../utils/logger";
 
 export interface MercuriosMessage {
     subscription: string;
@@ -35,13 +36,136 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
     let _queue: Array<QueuedHandler> = [];
     let _completed: Set<QueuedHandler> = new Set();
     let _socket = connect();
-    let _interval: any;
+    let _reconnectInterval: any;
     let _listeners: Record<string, Set<MercuriosEventHandler>> = {};
 
-    function Socket(): ws | WebSocket {
+    let intervalSleep = 18000000;
+    let _intervalRefresh = setInterval(() => {
+        $logger.debug(
+            {
+                intervalSleep: intervalSleep / 1000,
+                unit: "seconds",
+            },
+            `refreshing connection after interval`
+        );
+
+        _socket?.close(1000);
+        _socket = connect();
+    }, intervalSleep);
+
+    let connection = {
+        emit(event: string, message?: MercuriosMessage): void {
+            if (!_listeners[event]) {
+                return;
+            }
+
+            _listeners[event].forEach((listener) =>
+                listener(message as MercuriosMessage)
+            );
+        },
+
+        once(event: string, handler: MercuriosEventHandler): void {
+            new Promise<void>((resolve) => {
+                connection.on(event, async (msg) => {
+                    await handler(msg);
+                    connection.off(event, handler);
+                    return resolve();
+                });
+            });
+        },
+
+        on(event: string, handler: MercuriosEventHandler): void {
+            if (!_listeners[event]) {
+                _listeners[event] = new Set();
+            } else if (_listeners[event].has(handler)) {
+                return;
+            }
+
+            _listeners[event].add(handler);
+        },
+
+        off(event: string, handler?: MercuriosEventHandler): void {
+            if (!_listeners[event]) {
+                return;
+            } else if (!handler) {
+                _listeners[event].clear();
+                return;
+            } else if (_listeners[event].has(handler)) {
+                _listeners[event].delete(handler);
+            }
+
+            return;
+        },
+
+        close() {
+            _socket?.close(1000);
+            _completed.clear();
+            clearInterval(_intervalRefresh);
+        },
+
+        isOpen() {
+            return (
+                _socket?.readyState === _socket?.OPEN &&
+                _socket?.readyState !== undefined
+            );
+        },
+
+        send(message: ServerMessage): Promise<void> {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    reject(
+                        $error.ConnectionError(
+                            "timeout reached while sending message"
+                        )
+                    );
+                }, 5000);
+
+                try {
+                    const action = () => {
+                        _socket?.send(JSON.stringify(message));
+
+                        resolve();
+                    };
+
+                    if (connection.isOpen()) {
+                        action();
+                    } else {
+                        _queue.push(action);
+                    }
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        },
+    } as const;
+
+    function Socket(): $ws | WebSocket {
         try {
             if (typeof window === "undefined") {
-                return new ws(_url, <ClientOptions>{});
+                let ws = new $ws(_url, <ClientOptions>{});
+                let _timeout: NodeJS.Timeout | undefined;
+                let _interval = setInterval(ping, 30000);
+
+                function ping() {
+                    /** @todo: is this a good idea? */
+                    if (ws.readyState === ws.CLOSED) {
+                        clearInterval(_interval);
+                        return;
+                    }
+
+                    _timeout = setTimeout(() => {
+                        /** @todo: maybe a different error type? */
+                        throw $error.ConnectionError("ping timeout");
+                    }, 1000);
+                    $logger.debug(`pinging server...`);
+                }
+
+                ws.on("pong", () => {
+                    clearTimeout(_timeout!);
+                    $logger.debug(`pong received`);
+                });
+
+                return ws;
             }
 
             let url = new URL(_url);
@@ -115,6 +239,10 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
             };
 
             socket.onclose = function onSocketClose({ wasClean, code }: any) {
+                if (code == 1000 && wasClean) {
+                    return;
+                }
+
                 _logger.warning(
                     {
                         wasClean,
@@ -122,10 +250,6 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
                     },
                     `ws connection closed`
                 );
-
-                if (code == 1000) {
-                    return;
-                }
 
                 reconnect();
             };
@@ -138,14 +262,14 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
     }
 
     async function reconnect() {
-        if (_interval !== undefined) {
+        if (_reconnectInterval !== undefined) {
             return;
         }
 
-        _interval = setInterval(async () => {
+        _reconnectInterval = setInterval(async () => {
             if (_socket && _socket.readyState === _socket.OPEN) {
-                clearInterval(_interval);
-                _interval = undefined;
+                clearInterval(_reconnectInterval);
+                _reconnectInterval = undefined;
                 return;
             }
 
@@ -156,92 +280,6 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
             }
         }, 1000);
     }
-
-    let connection = {
-        emit(event: string, message?: MercuriosMessage): void {
-            if (!_listeners[event]) {
-                return;
-            }
-
-            _listeners[event].forEach((listener) =>
-                listener(message as MercuriosMessage)
-            );
-        },
-
-        once(event: string, handler: MercuriosEventHandler): void {
-            new Promise<void>((resolve) => {
-                connection.on(event, async (msg) => {
-                    await handler(msg);
-                    connection.off(event, handler);
-                    return resolve();
-                });
-            });
-        },
-
-        on(event: string, handler: MercuriosEventHandler): void {
-            if (!_listeners[event]) {
-                _listeners[event] = new Set();
-            } else if (_listeners[event].has(handler)) {
-                return;
-            }
-
-            _listeners[event].add(handler);
-        },
-
-        off(event: string, handler?: MercuriosEventHandler): void {
-            if (!_listeners[event]) {
-                return;
-            } else if (!handler) {
-                _listeners[event].clear();
-                return;
-            } else if (_listeners[event].has(handler)) {
-                _listeners[event].delete(handler);
-            }
-
-            return;
-        },
-
-        close() {
-            _socket?.close(1000);
-            _completed.clear();
-        },
-
-        isOpen() {
-            return (
-                _socket?.readyState === _socket?.OPEN &&
-                _socket?.readyState !== undefined
-            );
-        },
-
-        send(message: ServerMessage): Promise<void> {
-            return new Promise((resolve, reject) => {
-                /** @todo: maybe this is part of the connect logic, not send? */
-                setTimeout(() => {
-                    reject(
-                        $error.ConnectionError(
-                            "timeout reached while sending message"
-                        )
-                    );
-                }, 5000);
-
-                try {
-                    const action = () => {
-                        _socket?.send(JSON.stringify(message));
-
-                        resolve();
-                    };
-
-                    if (connection.isOpen()) {
-                        action();
-                    } else {
-                        _queue.push(action);
-                    }
-                } catch (err) {
-                    reject(err);
-                }
-            });
-        },
-    } as const;
 
     return connection;
 }

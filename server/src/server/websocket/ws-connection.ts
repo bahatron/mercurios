@@ -91,12 +91,8 @@ export function Connection(_id: string, _socket: ws) {
 
     _socket.on("message", async (data) => {
         try {
-            let {
-                action,
-                topic,
-                queue,
-                subscription,
-            }: MercuriosClientMessage = $json.parse(data);
+            let { action, topic, queue, subscription }: MercuriosClientMessage =
+                $json.parse(data);
 
             _logger.debug(
                 {
