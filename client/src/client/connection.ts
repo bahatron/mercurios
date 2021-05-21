@@ -144,15 +144,9 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
             if (typeof window === "undefined") {
                 let ws = new $ws(_url, <ClientOptions>{});
                 let _timeout: NodeJS.Timeout | undefined;
-                let _interval = setInterval(ping, 30000);
+                let _interval: NodeJS.Timeout;
 
                 function ping() {
-                    /** @todo: is this a good idea? */
-                    if (ws.readyState === ws.CLOSED) {
-                        clearInterval(_interval);
-                        return;
-                    }
-
                     _timeout = setTimeout(() => {
                         /** @todo: maybe a different error type? */
                         throw $error.ConnectionError("ping timeout");
@@ -163,6 +157,14 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
                 ws.on("pong", () => {
                     clearTimeout(_timeout!);
                     $logger.debug(`pong received`);
+                });
+
+                ws.on("open", () => {
+                    _interval = setInterval(ping, 30000);
+                });
+
+                ws.on("close", () => {
+                    clearInterval(_interval);
                 });
 
                 return ws;
@@ -235,7 +237,7 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
                     "ws error"
                 );
 
-                reconnect();
+                setTimeout(reconnect, 1000);
             };
 
             socket.onclose = function onSocketClose({ wasClean, code }: any) {
