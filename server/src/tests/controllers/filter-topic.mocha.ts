@@ -1,10 +1,10 @@
-import $http from "../utils/http";
-import { $config } from "../utils/config";
-import { $store } from "../models/store/store";
-import publishEvent from "../controllers/publish-event";
+import $http from "../../utils/http";
+import { $config } from "../../utils/config";
+import { $store } from "../../models/store/store";
+import publishEvent from "../../controllers/publish-event";
 import { expect } from "chai";
-import { MercuriosEvent } from "../models/event/event";
-import { EventFilters } from "../models/store/drivers/helpers";
+import { MercuriosEvent } from "../../models/event/event";
+import { EventFilters } from "../../models/store/drivers/helpers";
 
 async function filterTopicEndpoint(topic: string, query: EventFilters = {}) {
     return $http.get<MercuriosEvent[]>(`${$config.test_url}/filter/${topic}`, {

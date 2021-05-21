@@ -1,13 +1,13 @@
 import $http, { AxiosResponse } from "axios";
 import { expect } from "chai";
 import { publishEventEndpoint } from "./publish-event.mocha";
-import { $store } from "../models/store/store";
-import { $validator } from "../utils/validator";
-import { EventSchema } from "../models/event/event.schema";
-import publishEvent from "../controllers/publish-event";
-import filterTopic from "../controllers/filter-topic";
-import { $config } from "../utils/config";
-import $logger from "../utils/logger";
+import { $store } from "../../models/store/store";
+import { $validator } from "../../utils/validator";
+import { EventSchema } from "../../models/event/event.schema";
+import publishEvent from "../../controllers/publish-event";
+import filterTopic from "../../controllers/filter-topic";
+import { $config } from "../../utils/config";
+import $logger from "../../utils/logger";
 
 const MERCURIOS_MERCURIOS_TEST_URL = $config.test_url;
 

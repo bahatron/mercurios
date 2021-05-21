@@ -1,8 +1,8 @@
 import $http, { AxiosResponse } from "axios";
 import { expect } from "chai";
-import $event from "../models/event/event";
-import $nats from "../services/nats";
-import { $config } from "../utils/config";
+import $event from "../../models/event/event";
+import $nats from "../../services/nats";
+import { $config } from "../../utils/config";
 
 const MERCURIOS_TEST_URL = $config.test_url;
 
