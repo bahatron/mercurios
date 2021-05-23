@@ -141,3 +141,4 @@ services:
             - 8081:8081
         environment:
             VUE_APP_MERCURIOS_URL: http://localhost:4254
+            MERCURIOS_URL: http://mercurios-server:4254
