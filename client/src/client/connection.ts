@@ -143,30 +143,7 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
         try {
             if (typeof window === "undefined") {
                 let ws = new $ws(_url, <ClientOptions>{});
-                let _timeout: NodeJS.Timeout | undefined;
-                let _interval: NodeJS.Timeout;
-
-                function ping() {
-                    _timeout = setTimeout(() => {
-                        /** @todo: maybe a different error type? */
-                        throw $error.ConnectionError("ping timeout");
-                    }, 1000);
-                    $logger.debug(`pinging server...`);
-                }
-
-                ws.on("pong", () => {
-                    clearTimeout(_timeout!);
-                    $logger.debug(`pong received`);
-                });
-
-                ws.on("open", () => {
-                    _interval = setInterval(ping, 30000);
-                });
-
-                ws.on("close", () => {
-                    clearInterval(_interval);
-                });
-
+                
                 return ws;
             }
 
