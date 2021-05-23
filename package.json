@@ -1,6 +1,6 @@
 {
     "name": "mercurios",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "HTTP based event sourcing and message broker",
     "main": "run.js",
     "scripts": {
