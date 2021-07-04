@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "declaration": true,
+        "incremental": true,
+        "sourceMap": true,
+        "outDir": "dist",
+        "baseUrl": ".",
+        "paths": {
+            "@bahatron/mercurios": [
+                "./client/src"
+            ],
+            "@bahatron/example": [
+                "./example"
+            ]
+        },
+        "strict": true,
+    },
+    "exclude": [
+        "**/*.test.*",
+        "./server/*",
+        "./playground/*",
+        "dist"
+    ]
+}

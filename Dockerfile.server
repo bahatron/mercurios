@@ -9,11 +9,11 @@ ENV MERCURIOS_ENV=production
 
 COPY ./scripts/wait-for-it.sh /usr/bin/wait-for-it
 
-WORKDIR /app/server
-COPY ./server/package.json .
+COPY ./server/package.json /app
 RUN npm install
 
-COPY ./server .
+COPY ./server /app
 RUN npm run build:clean
 
+WORKDIR /app
 CMD ["npm", "start"]

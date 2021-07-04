@@ -6,7 +6,7 @@ async function main() {
         debug: true,
     });
 
-    client.subscribe("heartbeat", async msg => {
+    client.subscribe("heartbeat", async (msg) => {
         console.log(`================== got heartbeat`);
     });
 }

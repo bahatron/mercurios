@@ -1,9 +1,12 @@
 {
-    "name": "@bahatron/mercurios",
+    "name": "chupita",
     "version": "2.3.4",
     "description": "mercurios client",
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
+    "files": [
+        "lib"
+    ],
     "scripts": {
         "preversion": "npm run prepublishOnly",
         "prepublishOnly": "npm run build:clean && npm run test",
