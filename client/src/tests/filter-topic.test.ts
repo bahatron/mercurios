@@ -1,6 +1,5 @@
 import { v4 } from "uuid";
 import { connect } from "..";
-import { $logger } from "../utils/logger";
 import { DateTime } from "luxon";
 import { expect } from "chai";
 
@@ -29,7 +28,7 @@ describe("Feature: Filter topic", () => {
                     key,
                 });
             })
-        ).catch($logger.error);
+        ).catch(console.error);
 
         lapTimestamp = DateTime.utc().toISO();
 
@@ -37,7 +36,7 @@ describe("Feature: Filter topic", () => {
             [6, 7, 8, 9, 10].map(async (number) => {
                 await _client.publish(topic, { data: number });
             })
-        ).catch($logger.error);
+        ).catch(console.error);
     });
 
     it("filters by key", async () => {

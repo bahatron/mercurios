@@ -1,16 +1,7 @@
-FROM nginx as src
-
-RUN apt-get update
-RUN apt-get install curl -y
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
-RUN apt-get install nodejs -y
-RUN npm install -g @vue/cli
+FROM node:lts-slim as src
 
 EXPOSE 8080
-EXPOSE 8081
 COPY ./scripts/wait-for-it.sh /usr/bin/wait-for-it
-COPY ./playground/nginx/nginx.conf /etc/nginx/nginx.conf
-ARG VUE_APP_MERCURIOS_URL
 
 WORKDIR /app/playground
 COPY ./playground/package.json .

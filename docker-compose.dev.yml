@@ -137,8 +137,7 @@ services:
         container_name: mercurios-playground
         command: sh -c "wait-for-it mercurios-server:4254 -- npm run dev:docker"
         ports:
-            - 8080:8080
-            - 8081:8081
+            - 3000:3000
         environment:
-            VUE_APP_MERCURIOS_URL: http://localhost:4254
             MERCURIOS_URL: http://mercurios-server:4254
+            # MERCURIOS_URL: http://178.128.45.189:8080/mercurios
