@@ -11,7 +11,6 @@ const argsContains = (flag) => {
 
 const DEV_COMPOSE = "docker-compose.dev.yml";
 const TEST_COMPOSE = "docker-compose.test.yml";
-const TEST_TILT = "Tiltfile.test";
 
 if (argsContains("build")) {
     build();

@@ -1,38 +1,20 @@
 {
 	"compilerOptions": {
-		"target": "esnext",
-		"module": "commonjs",
-		"strict": true,
-		"jsx": "preserve",
-		"importHelpers": true,
+		"target": "es6",
+		"module": "CommonJS",
 		"moduleResolution": "node",
 		"esModuleInterop": true,
-		"noImplicitThis": false,
-		"noImplicitAny": false,
-		"sourceMap": true,
+		"declaration": true,
 		"incremental": true,
-		"baseUrl": ".",
-		"types": [
-			"webpack-env"
-		],
-		"paths": {
-			"@/*": [
-				"src/*"
-			]
-		},
-		"lib": [
-			"esnext",
-			"dom",
-			"dom.iterable",
-			"scripthost"
-		]
+		"sourceMap": true,
+		"outDir": "lib",
+		"strict": true,
 	},
 	"include": [
-		"src/**/*.ts",
-		"src/**/*.vue",
-		"tests/**/*.ts",
+		"src",
 	],
 	"exclude": [
-		"node_modules"
+		"node_modules",
+		"lib"
 	]
 }
