@@ -14,7 +14,12 @@
       ]
     },
   },
+  "include": [
+    "../client/src",
+    "./src"
+  ],
   "exclude": [
-    "dist"
+    "dist",
+    "**/*.test.*"
   ],
 }

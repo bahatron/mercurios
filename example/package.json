@@ -12,8 +12,11 @@
     "license": "ISC",
     "dependencies": {
         "@bahatron/utils": "^1.1.2",
+        "@types/mocha": "^8.2.2",
         "@types/node": "^16.0.0",
+        "fastify": "^3.19.0",
         "luxon": "^1.27.0",
+        "mocha": "^9.0.2",
         "typescript": "^4.3.5"
     }
 }

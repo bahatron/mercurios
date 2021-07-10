@@ -12,8 +12,8 @@ COPY ./scripts/wait-for-it.sh /usr/bin/wait-for-it
 COPY ./server/package.json /app
 RUN npm install
 
-COPY ./server /app
+WORKDIR /app
+COPY ./server .
 RUN npm run build:clean
 
-WORKDIR /app
 CMD ["npm", "start"]

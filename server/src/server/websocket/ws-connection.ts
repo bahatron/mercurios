@@ -73,7 +73,7 @@ export function Connection(_id: string, _socket: ws) {
             conn.logger.debug(`PING`);
 
             if (conn.socket.readyState !== conn.socket.OPEN) {
-                throw new Error("Connection closed");
+                throw new Error("connection_closed");
             }
 
             await new Promise<void>((resolve, reject) => {

@@ -35,23 +35,9 @@ interface QueuedHandler {
 export function Connection(_url: string, _id: string, _logger: Logger) {
     let _queue: Array<QueuedHandler> = [];
     let _completed: Set<QueuedHandler> = new Set();
-    let _socket = connect();
+    let _socket = Socket();
     let _reconnectInterval: any;
     let _listeners: Record<string, Set<MercuriosEventHandler>> = {};
-
-    let intervalSleep = 18000000;
-    let _intervalRefresh = setInterval(() => {
-        $logger.debug(
-            {
-                intervalSleep: intervalSleep / 1000,
-                unit: "seconds",
-            },
-            `refreshing connection after interval`
-        );
-
-        _socket?.close(1000);
-        _socket = connect();
-    }, intervalSleep);
 
     let connection = {
         emit(event: string, message?: MercuriosMessage): void {
@@ -100,7 +86,6 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
         close() {
             _socket?.close(1000);
             _completed.clear();
-            clearInterval(_intervalRefresh);
         },
 
         isOpen() {
@@ -139,44 +124,32 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
         },
     } as const;
 
-    function Socket(): $ws | WebSocket {
+    function Socket() {
         try {
-            if (typeof window === "undefined") {
-                let ws = new $ws(_url, <ClientOptions>{});
-                
-                return ws;
-            }
+            let socket = new $ws(_url, <ClientOptions>{});
 
-            let url = new URL(_url);
-            let parsedUrl = `ws://${url.host}/${url.pathname}`;
-
-            _logger.debug(
-                { url, parsedUrl },
-                "creating websocket connection.."
-            );
-
-            return new WebSocket(parsedUrl, ["ws", "wss"]);
-        } catch (err) {
-            throw $error.ConnectionError(
-                "error connecting to mercurios ws server",
-                {
-                    url: _url,
-                    id: _id,
-                    error: err,
+            setInterval(async () => {
+                if (socket.readyState !== socket.OPEN) {
+                    throw new Error("connection_closed");
                 }
-            );
-        }
-    }
 
-    function connect() {
-        try {
-            _logger.debug(`connecting...`);
-            let socket = Socket();
+                await new Promise<void>((resolve, reject) => {
+                    setTimeout(() => reject(new Error("timeout")), 1000);
 
-            socket.onopen = async function onSocketOpen() {
+                    socket.once("pong", () => {
+                        $logger.debug(`PONG`);
+                        resolve();
+                    });
+
+                    socket.ping();
+                });
+            }, 10000);
+
+            socket.on("open", async function onSocketOpen() {
                 _logger.info("ws connection open");
 
-                // recreate subscriptions on reconnect
+                // this also recreates subscriptions on reconnect
+                
                 _queue = _queue.concat(Array.from(_completed));
 
                 let action: QueuedHandler | undefined;
@@ -184,9 +157,9 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
                     await action();
                     _completed.add(action);
                 }
-            };
+            });
 
-            socket.onmessage = function onSocketMessage(message: any) {
+            socket.on("message", function onSocketMessage(message: any) {
                 let { subscription, subject, event } = JSON.parse(
                     (message.data ?? message).toString()
                 );
@@ -200,22 +173,13 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
                     },
                     "ws message received"
                 );
-            };
+            });
 
-            socket.onerror = async function onSocketError({
-                message,
-                error,
-            }: any) {
-                _logger.error(
-                    {
-                        message,
-                        error,
-                    },
-                    "ws error"
-                );
+            socket.on("error", async function onSocketError(err) {
+                _logger.error(err, "ws error");
 
                 setTimeout(reconnect, 1000);
-            };
+            });
 
             socket.onclose = function onSocketClose({ wasClean, code }: any) {
                 if (code == 1000 && wasClean) {
@@ -252,7 +216,7 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
                 return;
             }
 
-            _socket = connect();
+            _socket = Socket();
 
             if (!_socket) {
                 _logger.warning("unsuccessful ws connection, retrying...");
