@@ -28,6 +28,7 @@ export const $config = new Proxy(
         postgre_password: getenv("POSTGRES_PASSWORD", ""),
 
         mongo_url: getenv("MONGO_URL", ""),
+        mongo_set: getenv("MONGO_REPLICA_SET", ""),
     },
     {
         get<T>(_object: T, attribute: keyof T) {

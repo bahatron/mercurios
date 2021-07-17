@@ -14,7 +14,8 @@ x-mercurios-config: &mercurios-config
     MERCURIOS_DEBUG: 1
     MERCURIOS_DEV: 1
     MERCURIOS_SWAGGER: 1
-    MONGO_URL: mongodb://mercurios-mongo:27017/local
+    MONGO_URL: mongodb://mercurios-mongo:27017/mercurios
+    MONGO_REPLICA_SET: rs0
 
 x-postgres-config: &postgres-config
     POSTGRES_PASSWORD: secret
@@ -104,6 +105,10 @@ services:
     mercurios-mongo:
         image: mongo
         container_name: mercurios-mongo
+        command: ["--bind_ip_all", "--replSet", "rs0"]
+        healthcheck:
+            test: test $$(echo "rs.initiate().ok || rs.status().ok" | mongo --port 27017 --quiet) -eq 1
+            interval: 10s
         ports:
             - 27017:27017
 

@@ -1,9 +1,10 @@
 import $error from "../../utils/error";
 import { MercuriosEvent } from "../event/event";
 import { EventFilters } from "./drivers/helpers";
-import pgDriver from "./drivers/postgres.store";
-import mysqlDriver from "./drivers/mysql.store";
+import { pgDriver } from "./drivers/postgres.store";
+import { mysqlDriver } from "./drivers/mysql.store";
 import { $config } from "../../utils/config";
+import { mongoDriver } from "./drivers/mongo.store";
 
 export interface StoreDriver {
     // driver management
@@ -32,8 +33,13 @@ switch ($config.store_driver) {
     case "mysql":
         driver = mysqlDriver();
         break;
+    case "mongo":
+        driver = mongoDriver();
+        break;
     default:
-        throw $error.InternalError("invalid mercurios store driver");
+        throw $error.InternalError("invalid mercurios store driver", {
+            driver: $config.store_driver,
+        });
 }
 
 export const $store = driver;

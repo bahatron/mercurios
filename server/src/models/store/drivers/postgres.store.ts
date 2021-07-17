@@ -13,7 +13,7 @@ const EVENT_TABLE = "mercurios_events";
 const TOPIC_TABLE = "mercurios_topics";
 const STORE_PROCEDURE = "store_event";
 
-export default function (): StoreDriver {
+export function pgDriver(): StoreDriver {
     return {
         async isHealthy() {
             try {
@@ -86,7 +86,7 @@ export default function (): StoreDriver {
                         "Conflict with expected sequence",
                         {
                             code: "ERR_CONFLICT",
-                            expected_seq,
+                            expectedSeq: expected_seq,
                         }
                     );
                 } else if ((err.message as string).includes("ERR_NO_STREAM")) {

@@ -10,7 +10,7 @@ import $logger from "../../../utils/logger";
 const EVENT_TABLE = "mercurios_events";
 const TOPIC_TABLE = "mercurios_topics";
 
-export default function (): StoreDriver {
+export function mysqlDriver(): StoreDriver {
     return {
         async isHealthy() {
             try {
