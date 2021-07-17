@@ -78,6 +78,8 @@ function runDev() {
         services = [...services, "mercurios-mysql"];
         exec(`MERCURIOS_STORE=mysql tilt up --hud=true ${services.join(" ")}`);
     }
+
+    shutDown();
     exit(0);
 }
 
