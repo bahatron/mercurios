@@ -1,7 +1,7 @@
 import ws from "ws";
 import { Subscription } from "ts-nats";
-import subscribe_to_topic from "../../controllers/subscribe-to-topic";
-import unsubscribe_to_topic from "../../controllers/unsubscribe-to-topic";
+import subscribe_to_topic from "../../handlers/subscribe-to-topic";
+import unsubscribe_to_topic from "../../handlers/unsubscribe-to-topic";
 import $nats from "../../services/nats";
 import $logger from "../../utils/logger";
 import $json from "../../utils/json";

@@ -1,7 +1,7 @@
 import $http from "../../utils/http";
 import { $config } from "../../utils/config";
 import { $store } from "../../models/store/store";
-import publishEvent from "../../controllers/publish-event";
+import publishEvent from "../../handlers/publish-event";
 import { expect } from "chai";
 import { MercuriosEvent } from "../../models/event/event";
 import { EventFilters } from "../../models/store/drivers/helpers";
