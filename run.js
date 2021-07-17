@@ -40,9 +40,9 @@ function build() {
 }
 
 function shutDown() {
+    exec(`test $(command -v tilt) && tilt down`);
     exec(`docker-compose -f ${DEV_COMPOSE} down --remove-orphans`);
     exec(`docker-compose -f ${TEST_COMPOSE} down --remove-orphans`);
-    exec(`test $(command -v tilt) && tilt down`);
 }
 
 function shouldCleanUp() {
@@ -70,15 +70,15 @@ function runDev() {
 
     if (argsContains(["--pg"])) {
         services = [...services, "mercurios-postgres"];
-
         exec(`MERCURIOS_STORE=pg tilt up --hud=true ${services.join(" ")}`);
-        exit(0);
+    } else if (argsContains(["--mongo"])) {
+        services = [...services, "mercurios-mongo"];
+        exec(`MERCURIOS_STORE=mongo tilt up --hud=true ${services.join(" ")}`);
     } else {
         services = [...services, "mercurios-mysql"];
-
         exec(`MERCURIOS_STORE=mysql tilt up --hud=true ${services.join(" ")}`);
-        exit(0);
     }
+    exit(0);
 }
 
 function runTest() {

@@ -1,5 +1,3 @@
-#!/usr/bin/node
-
 import { $store } from "../models/store/store";
 import { server } from "../server/server";
 import { $config } from "../utils/config";

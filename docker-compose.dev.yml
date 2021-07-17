@@ -14,6 +14,7 @@ x-mercurios-config: &mercurios-config
     MERCURIOS_DEBUG: 1
     MERCURIOS_DEV: 1
     MERCURIOS_SWAGGER: 1
+    MONGO_URL: mongodb://mercurios-mongo:27017/local
 
 x-postgres-config: &postgres-config
     POSTGRES_PASSWORD: secret
@@ -90,7 +91,6 @@ services:
             - 3306:3306
         environment:
             <<: *mysql-config
-        # command: --default-authentication-plugin=mysql_native_password
 
     mercurios-postgres:
         image: postgres
@@ -100,6 +100,12 @@ services:
         environment:
             <<: *postgres-config
         command: -c 'max_connections=500'
+
+    mercurios-mongo:
+        image: mongo
+        container_name: mercurios-mongo
+        ports:
+            - 27017:27017
 
     mercurios-nats:
         image: nats
@@ -139,5 +145,4 @@ services:
         ports:
             - 3000:3000
         environment:
-            MERCURIOS_URL: http://mercurios-server:4254
-            # MERCURIOS_URL: http://178.128.45.189:8080/mercurios
+            MERCURIOS_URL: ${MERCURIOS_URL:-http://mercurios-server:4254}
