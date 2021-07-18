@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import moment from "moment";
-import $logger from "../../utils/logger";
+import { $logger } from "../../utils/logger";
 
 export const requestLogger: RequestHandler = function (req, res, next) {
     let start = moment();

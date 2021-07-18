@@ -5,7 +5,7 @@ import $json from "../../../utils/json";
 import $event, { MercuriosEvent } from "../../event/event";
 import Knex from "knex";
 import { $store, StoreDriver } from "../store";
-import $logger from "../../../utils/logger";
+import { $logger } from "../../../utils/logger";
 
 const EVENT_TABLE = "mercurios_events";
 const TOPIC_TABLE = "mercurios_topics";

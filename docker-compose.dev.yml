@@ -15,6 +15,7 @@ x-mercurios-config: &mercurios-config
     MERCURIOS_DEV: 1
     MERCURIOS_SWAGGER: 1
     MONGO_URL: mongodb://mercurios-mongo:27017/mercurios
+    # not necessary if url if mongodb+srv
     MONGO_REPLICA_SET: rs0
 
 x-postgres-config: &postgres-config

@@ -1,9 +1,9 @@
 import ws from "ws";
 import { publishEventEndpoint } from "./publish-event.mocha";
-import uuid from "uuid";
+import { v4 } from "uuid";
 import { $config } from "../../utils/config";
 import $json from "../../utils/json";
-import $logger from "../../utils/logger";
+import { $logger } from "../../utils/logger";
 
 const MERCURIOS_TEST_URL = $config.test_url;
 
@@ -34,7 +34,7 @@ describe("WS action: subscribe", () => {
                 $json.stringify({
                     action: "subscribe",
                     topic: _topic,
-                    subscription: uuid.v4(),
+                    subscription: v4(),
                 }),
                 (err) => {
                     if (err) {

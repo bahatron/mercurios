@@ -1,7 +1,7 @@
 import { WsRequestHandler } from "../server/websocket/ws-connection";
 import $json from "../utils/json";
-import { v4 } from "uuid";
 import { Subscription } from "ts-nats";
+import { v4 } from "uuid";
 
 export default <WsRequestHandler>(
     async function subscribeToTopic({
@@ -14,7 +14,9 @@ export default <WsRequestHandler>(
             return;
         }
 
-        let sub: Subscription = await (await connection.dispatcher).subscribe(
+        let sub: Subscription = await (
+            await connection.dispatcher
+        ).subscribe(
             `mercurios.topic.${topic}`,
             (err, msg) => {
                 return new Promise<void>((resolve) => {

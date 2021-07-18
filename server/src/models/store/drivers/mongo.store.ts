@@ -4,7 +4,7 @@ import {
     MONGO_EVENT_COLLECTION,
 } from "../../../services/mongo";
 import $error from "../../../utils/error";
-import $logger from "../../../utils/logger";
+import { $logger } from "../../../utils/logger";
 import { MercuriosEvent } from "../../event/event";
 import { StoreDriver } from "../store";
 

@@ -4,7 +4,7 @@ import BIG_JSON from "../tests/big-json.fixture";
 import $json from "../utils/json";
 import $http from "../utils/http";
 import { $config } from "../utils/config";
-import $logger from "../utils/logger";
+import { $logger } from "../utils/logger";
 
 const MERCURIOS_TEST_URL = $config.test_url;
 

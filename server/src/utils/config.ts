@@ -1,4 +1,4 @@
-import { getenv } from "@bahatron/utils/lib/env";
+import { getenv } from "@bahatron/utils/lib/helpers/env";
 import { cloneDeep } from "lodash";
 
 export const $config = new Proxy(

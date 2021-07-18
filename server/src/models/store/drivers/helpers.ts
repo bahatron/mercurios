@@ -1,5 +1,5 @@
 import Knex from "knex";
-import $logger from "../../../utils/logger";
+import { $logger } from "../../../utils/logger";
 import { $validator } from "../../../utils/validator";
 
 export interface EventFilters {

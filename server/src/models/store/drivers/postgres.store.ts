@@ -7,7 +7,7 @@ import $postgres, {
     POSTGRES_CONFIG,
 } from "../../../services/postgres/postgres";
 import { StoreDriver } from "../store";
-import $logger from "../../../utils/logger";
+import { $logger } from "../../../utils/logger";
 
 const EVENT_TABLE = "mercurios_events";
 const TOPIC_TABLE = "mercurios_topics";

@@ -1,6 +1,5 @@
 import $nats from "../services/nats";
-import $logger from "../utils/logger";
-import moment from "moment";
+import { $logger } from "../utils/logger";
 import { $store } from "../models/store/store";
 import $event, { MercuriosEvent } from "../models/event/event";
 import { Exception } from "../utils/error";
@@ -19,7 +18,7 @@ export default async function publishEvent({
     try {
         let event = await $store.append(
             $event({
-                published_at: moment().toISOString(),
+                published_at: new Date().toISOString(),
                 seq: expectedSeq,
                 key: key,
                 topic,

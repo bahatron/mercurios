@@ -1,5 +1,5 @@
 import { Response, Request, NextFunction } from "express";
-import $logger from "../../utils/logger";
+import { $logger } from "../../utils/logger";
 import { Exception } from "../../utils/error";
 
 export default function errorHandler(

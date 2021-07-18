@@ -3,7 +3,7 @@ import { Server } from "http";
 import { Connection } from "./ws-connection";
 import url from "url";
 import { v4 } from "uuid";
-import $logger from "../../utils/logger";
+import { $logger } from "../../utils/logger";
 import { $config } from "../../utils/config";
 
 const PING_INTERVAl = parseInt($config.mercurios_ping_interval);

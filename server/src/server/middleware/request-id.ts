@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import httpContext from "express-http-context";
 import { v4 } from "uuid";
-import $logger from "../../utils/logger";
+import { $logger } from "../../utils/logger";
 
 export const CORRELATION_ID = "correlationId";
 

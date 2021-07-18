@@ -3,7 +3,7 @@ import { Subscription } from "ts-nats";
 import subscribe_to_topic from "../../handlers/subscribe-to-topic";
 import unsubscribe_to_topic from "../../handlers/unsubscribe-to-topic";
 import $nats from "../../services/nats";
-import $logger from "../../utils/logger";
+import { createLogger } from "../../utils/logger";
 import $json from "../../utils/json";
 
 export interface MercuriosClientMessage {
@@ -32,7 +32,7 @@ const ACTIONS: Record<string, WsRequestHandler> = {
 export type Connection = ReturnType<typeof Connection>;
 export function Connection(_id: string, _socket: ws) {
     let clientName = `mercurios:wsc:${_id}`;
-    let _logger = $logger.id(clientName);
+    let _logger = createLogger(clientName);
     let _subscriptions: Map<string, Subscription> = new Map();
 
     let _dispatcher = $nats.connect(clientName).then((client) => {

@@ -2,7 +2,7 @@ import { sortBy } from "lodash";
 import { MercuriosEvent } from "../models/event/event";
 import { EventFilters } from "../models/store/drivers/helpers";
 import { $store } from "../models/store/store";
-import $logger from "../utils/logger";
+import { $logger } from "../utils/logger";
 
 export default async function filterTopic(
     topic: string,

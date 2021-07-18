@@ -1,7 +1,7 @@
 import * as nats from "ts-nats";
 import { $config } from "../utils/config";
 import $error from "../utils/error";
-import $logger from "../utils/logger";
+import { $logger } from "../utils/logger";
 
 const NATS_URL = $config.nats_url;
 

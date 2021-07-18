@@ -1,7 +1,7 @@
 import { $store } from "../models/store/store";
 import { server } from "../server/server";
 import { $config } from "../utils/config";
-import $logger from "../utils/logger";
+import { $logger } from "../utils/logger";
 
 process.on("uncaughtException", async (err) => {
     await $logger.error(err, "uncaught exception");

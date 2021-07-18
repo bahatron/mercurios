@@ -4,7 +4,7 @@ import $nats from "../../services/nats";
 import { MercuriosEvent } from "../../models/event/event";
 import { $store } from "../../models/store/store";
 import { $config } from "../../utils/config";
-import $logger from "../../utils/logger";
+import { $logger } from "../../utils/logger";
 
 const MERCURIOS_MERCURIOS_TEST_URL = $config.test_url;
 

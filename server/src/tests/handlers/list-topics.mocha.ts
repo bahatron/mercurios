@@ -3,7 +3,7 @@ import { $config } from "../../utils/config";
 import { $store } from "../../models/store/store";
 import publishEvent from "../../handlers/publish-event";
 import { expect } from "chai";
-import $logger from "../../utils/logger";
+import { $logger } from "../../utils/logger";
 
 describe("GET /topics", () => {
     async function listTopicsEndpoint() {
