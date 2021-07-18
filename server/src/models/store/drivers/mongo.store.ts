@@ -13,29 +13,22 @@ export function mongoDriver(): StoreDriver {
         async setup() {
             let mongo = await $mongo.db();
 
-            await mongo.collection(MONGO_TOPIC_COLLECTION).createIndexes([
-                {
-                    key: { topic: 1 },
-                },
-                {
-                    key: { seq: 1 },
-                },
-            ]);
-
             await mongo.collection(MONGO_EVENT_COLLECTION).createIndexes([
                 {
                     key: { published_at: 1 },
                 },
                 {
-                    key: { topic: 1 },
-                },
-                {
                     key: { key: 1 },
                 },
-                {
-                    key: { seq: 1 },
-                },
             ]);
+
+            await mongo.collection(MONGO_EVENT_COLLECTION).createIndex(
+                {
+                    topic: 1,
+                    seq: 1,
+                },
+                { unique: true }
+            );
         },
 
         async isHealthy() {
