@@ -5,7 +5,8 @@ default:
     before_script:
         - apk update && apk add openssh git nodejs npm bash
 
-push:
+pipeline:
+    stage: build
     script:
         - docker-compose -f docker-compose.yml build mercurios-server mercurios-client || exit 1
         - ./.ops/test.sh

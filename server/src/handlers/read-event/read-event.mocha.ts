@@ -20,7 +20,7 @@ async function readEvent(
         .catch((err) => err.response);
 }
 
-describe.only("GET /read/:topic/:seq", () => {
+describe("GET /read/:topic/:seq", () => {
     describe("Scenario: topic does not exist", () => {
         const _topic = `non_existent_topic`;
         before(async () => {
@@ -59,7 +59,7 @@ describe.only("GET /read/:topic/:seq", () => {
         });
     });
 
-    describe.only("Scenario: topic and event exists", () => {
+    describe("Scenario: topic and event exists", () => {
         const _topic = `server_read_event_test`;
         let _event: any;
 
@@ -78,13 +78,8 @@ describe.only("GET /read/:topic/:seq", () => {
 
         it("responds with an event", async () => {
             let response = await readEvent(_topic, _event.seq);
-
-            expect(response.data).to.deep.eq(_event);
-        });
-
-        it("has the expected schema", async () => {
             expect(() =>
-                $validator.schema(_event, MercuriosEventSchema)
+                $validator.schema(response.data, MercuriosEventSchema)
             ).not.to.throw();
         });
     });

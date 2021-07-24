@@ -43,8 +43,5 @@ export function MercuriosEvent({
 
     $validator.schema(event, MercuriosEventSchema);
 
-    return pickBy(
-        event,
-        (value) => value !== undefined || value !== null
-    ) as any;
+    return event;
 }

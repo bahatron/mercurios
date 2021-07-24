@@ -8,6 +8,7 @@ import { $logger } from "../../utils/logger";
 import { MercuriosEvent } from "../../models/event";
 import { StoreDriver } from "../store";
 import { COLLECTION } from "../store.helpers";
+import { pickBy } from "lodash";
 
 export function mongoDriver(): StoreDriver {
     return {
@@ -93,8 +94,6 @@ export function mongoDriver(): StoreDriver {
                 .collection(COLLECTION.EVENTS)
                 .findOne({ topic, seq: Number(seq) });
 
-            console.log(event);
-            
             if (!event) {
                 return undefined;
             }
