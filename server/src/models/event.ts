@@ -1,6 +1,5 @@
-import { $date } from "../../utils/date";
-import $json from "../../utils/json";
-import { $validator } from "../../utils/validator";
+import $json from "../utils/json";
+import { $validator } from "../utils/validator";
 
 export interface MercuriosEvent {
     seq?: number;
@@ -10,7 +9,7 @@ export interface MercuriosEvent {
     topic: string;
 }
 
-export default function $event({
+export function MercuriosEvent({
     topic,
     published_at,
     seq,
@@ -20,7 +19,8 @@ export default function $event({
     return {
         topic: $validator.string(topic),
         published_at:
-            $validator.optionalIsoDate(published_at) ?? $date.isoString(),
+            $validator.optionalIsoDate(published_at) ??
+            new Date().toISOString(),
         seq: $validator.optionalInt(seq),
         key: $validator.optionalString(key),
         data: $json.parse(data),

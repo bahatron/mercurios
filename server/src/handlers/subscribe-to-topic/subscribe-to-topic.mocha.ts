@@ -1,5 +1,5 @@
 import ws from "ws";
-import { publishEventEndpoint } from "./publish-event.mocha";
+import { publishEventEndpoint } from "../publish-event/publish-event.mocha";
 import { v4 } from "uuid";
 import { $config } from "../../utils/config";
 import $json from "../../utils/json";

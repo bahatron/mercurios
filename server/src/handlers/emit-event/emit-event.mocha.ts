@@ -1,6 +1,6 @@
 import $http, { AxiosResponse } from "axios";
 import { expect } from "chai";
-import $event from "../../models/event/event";
+import { MercuriosEvent } from "../../models/event";
 import $nats from "../../services/nats";
 import { $config } from "../../utils/config";
 
@@ -41,7 +41,7 @@ describe("POST /emit/:topic", () => {
 
         it("emits a MercuriosEvent", async () => {
             expect(_message.event).to.exist;
-            expect(() => $event(_message.event)).not.to.throw();
+            expect(() => MercuriosEvent(_message.event)).not.to.throw();
         });
     });
 });

@@ -1,11 +1,11 @@
-import { $mysql, MYSQL_CONFIG } from "../../../services/mysql/mysql";
-import { natsQueryToSql, knexEventFilter, EventFilters } from "./helpers";
-import $error from "../../../utils/error";
-import $json from "../../../utils/json";
-import $event, { MercuriosEvent } from "../../event/event";
+import { $mysql, MYSQL_CONFIG } from "../../services/mysql/mysql";
+import { natsQueryToSql, knexEventFilter } from "../store.helpers";
+import $error from "../../utils/error";
+import $json from "../../utils/json";
+import { MercuriosEvent } from "../../models/event";
 import Knex from "knex";
-import { $store, StoreDriver } from "../store";
-import { $logger } from "../../../utils/logger";
+import { StoreDriver } from "../store";
+import { $logger } from "../../utils/logger";
 
 const EVENT_TABLE = "mercurios_events";
 const TOPIC_TABLE = "mercurios_topics";
@@ -45,25 +45,11 @@ export function mysqlDriver(): StoreDriver {
             throw $error.InternalError("MigrationLocked", { driver: "mysql" });
         },
 
-        async createStream(topic) {
-            try {
-                await $mysql
-                    .table("mercurios_topics")
-                    .insert({ topic, seq: 0 });
-            } catch (err) {
-                if (["ER_LOCK_DEADLOCK", "ER_DUP_ENTRY"].includes(err.code)) {
-                    return;
-                }
-
-                throw err;
-            }
-        },
-
         async append(event: MercuriosEvent) {
             try {
                 let newSeq = await appendTransaction(event);
 
-                return $event({
+                return MercuriosEvent({
                     ...event,
                     seq: newSeq,
                 });
@@ -101,7 +87,7 @@ export function mysqlDriver(): StoreDriver {
                 return undefined;
             }
 
-            return $event(result);
+            return MercuriosEvent(result);
         },
 
         async latest(topic) {
@@ -122,7 +108,7 @@ export function mysqlDriver(): StoreDriver {
 
             let result = await knexEventFilter(query, filters);
 
-            return result.map($event);
+            return result.map(MercuriosEvent);
         },
 
         async topics({ like, withEvents }) {
@@ -179,7 +165,8 @@ async function appendTransaction({
             ).shift()?.seq + 1;
 
         if (nextSeq === null || isNaN(nextSeq)) {
-            throw new Error("ERR_NO_STREAM");
+            await trx.table(TOPIC_TABLE).insert({ topic, seq: 0 });
+            nextSeq = 1;
         } else if (expectedSeq && expectedSeq !== nextSeq) {
             throw new Error("ERR_CONFLICT");
         }

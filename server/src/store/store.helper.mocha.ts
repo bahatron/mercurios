@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { natsQueryToSql } from "../models/store/drivers/helpers";
+import { natsQueryToSql } from "./store.helpers";
 
 describe("Helper: NATs to SQL query transformation", () => {
     it("ignores everything after >", () => {

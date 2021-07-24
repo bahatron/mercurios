@@ -12,6 +12,8 @@ export default function errorHandler(
 
     if (code >= 500) {
         $logger.error(err);
+    } else {
+        $logger.debug(err);
     }
 
     return res

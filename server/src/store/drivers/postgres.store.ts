@@ -1,13 +1,15 @@
-import { natsQueryToSql, knexEventFilter, EventFilters } from "./helpers";
-import $error from "../../../utils/error";
-import $json from "../../../utils/json";
-import $event, { MercuriosEvent } from "../../event/event";
+import {
+    natsQueryToSql,
+    knexEventFilter,
+    EventFilters,
+} from "../store.helpers";
+import $error from "../../utils/error";
+import $json from "../../utils/json";
+import { MercuriosEvent } from "../../models/event";
 import Knex from "knex";
-import $postgres, {
-    POSTGRES_CONFIG,
-} from "../../../services/postgres/postgres";
+import $postgres, { POSTGRES_CONFIG } from "../../services/postgres/postgres";
 import { StoreDriver } from "../store";
-import { $logger } from "../../../utils/logger";
+import { $logger } from "../../utils/logger";
 
 const EVENT_TABLE = "mercurios_events";
 const TOPIC_TABLE = "mercurios_topics";
@@ -35,23 +37,6 @@ export function pgDriver(): StoreDriver {
             await $postgres.migrate.latest();
         },
 
-        async createStream(topic) {
-            try {
-                await $postgres
-                    .table("mercurios_topics")
-                    .insert({ topic, seq: 0 });
-            } catch (err) {
-                if (
-                    err.message.includes("duplicate key value") ||
-                    err.code.includes("ER_DUP_ENTRY")
-                ) {
-                    return;
-                }
-
-                throw err;
-            }
-        },
-
         async append({
             topic,
             published_at,
@@ -73,7 +58,7 @@ export function pgDriver(): StoreDriver {
 
                 let procedureResult = result.rows.shift();
 
-                return $event({
+                return MercuriosEvent({
                     topic: procedureResult.v_topic,
                     key: procedureResult.v_key,
                     seq: procedureResult.v_seq,
@@ -81,7 +66,16 @@ export function pgDriver(): StoreDriver {
                     data: procedureResult.v_data,
                 });
             } catch (err) {
-                if ((err.message as string).includes("ERR_CONFLICT")) {
+                if ((err.message as string).includes("ERR_NO_STREAM")) {
+                    await createStream(topic);
+                    return this.append({
+                        topic,
+                        published_at,
+                        data,
+                        seq: expected_seq,
+                        key,
+                    });
+                } else if ((err.message as string).includes("ERR_CONFLICT")) {
                     throw $error.ExpectationFailed(
                         "Conflict with expected sequence",
                         {
@@ -89,10 +83,6 @@ export function pgDriver(): StoreDriver {
                             expectedSeq: expected_seq,
                         }
                     );
-                } else if ((err.message as string).includes("ERR_NO_STREAM")) {
-                    throw $error.NotFound(`Stream for topic not found`, {
-                        topic,
-                    });
                 } else {
                     throw $error.InternalError(
                         "Postgres error appending event",
@@ -112,7 +102,7 @@ export function pgDriver(): StoreDriver {
                 return undefined;
             }
 
-            return $event(result);
+            return MercuriosEvent(result);
         },
 
         async latest(topic) {
@@ -136,7 +126,7 @@ export function pgDriver(): StoreDriver {
 
             let result = await knexEventFilter(query, filters);
 
-            return result.map($event);
+            return result.map(MercuriosEvent);
         },
 
         async topics({
@@ -180,4 +170,19 @@ export function pgDriver(): StoreDriver {
             ]);
         },
     };
+}
+
+async function createStream(topic: string) {
+    try {
+        await $postgres.table("mercurios_topics").insert({ topic, seq: 0 });
+    } catch (err) {
+        if (
+            err.message.includes("duplicate key value") ||
+            err.code.includes("ER_DUP_ENTRY")
+        ) {
+            return;
+        }
+
+        throw err;
+    }
 }

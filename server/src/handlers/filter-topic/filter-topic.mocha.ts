@@ -1,18 +1,18 @@
-import $http from "../../utils/http";
+import { $axios } from "../../utils/axios";
 import { $config } from "../../utils/config";
-import { $store } from "../../models/store/store";
-import publishEvent from "../../handlers/publish-event";
+import { $store } from "../../store/store";
+import publishEvent from "../publish-event/publish-event";
 import { expect } from "chai";
-import { MercuriosEvent } from "../../models/event/event";
-import { EventFilters } from "../../models/store/drivers/helpers";
+import { MercuriosEvent } from "../../models/event";
+import { EventFilters } from "../../store/store.helpers";
 
 async function filterTopicEndpoint(topic: string, query: EventFilters = {}) {
-    return $http.get<MercuriosEvent[]>(`${$config.test_url}/filter/${topic}`, {
+    return $axios.get<MercuriosEvent[]>(`${$config.test_url}/filter/${topic}`, {
         params: query,
     });
 }
 
-describe("GET /filter/:topic", () => {
+describe.only("GET /filter/:topic", () => {
     let _topic = "filter_topic_test";
     let _key = "index_over_10";
 
@@ -54,12 +54,7 @@ describe("GET /filter/:topic", () => {
         expect(result.data.length).to.eq(6);
 
         expect(result.data.map((event) => event.seq).sort()).to.deep.eq([
-            10,
-            5,
-            6,
-            7,
-            8,
-            9,
+            10, 5, 6, 7, 8, 9,
         ]);
     });
 });

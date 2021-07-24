@@ -1,8 +1,8 @@
-import { $store } from "../models/store/store";
-import $nats from "../services/nats";
-import { $config } from "../utils/config";
-import $error from "../utils/error";
-import { $logger } from "../utils/logger";
+import { $store } from "../../store/store";
+import $nats from "../../services/nats";
+import { $config } from "../../utils/config";
+import $error from "../../utils/error";
+import { $logger } from "../../utils/logger";
 
 export async function ping() {
     let checks = [$store.isHealthy(), $nats.isHealthy()];

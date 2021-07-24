@@ -1,11 +1,11 @@
 import $http, { AxiosResponse } from "axios";
 import { expect } from "chai";
-import { publishEventEndpoint } from "./publish-event.mocha";
-import { $store } from "../../models/store/store";
+import { publishEventEndpoint } from "../publish-event/publish-event.mocha";
+import { $store } from "../../store/store";
 import { $validator } from "../../utils/validator";
-import { EventSchema } from "../../models/event/event.schema";
-import publishEvent from "../../handlers/publish-event";
-import filterTopic from "../../handlers/filter-topic";
+import { EventSchema } from "../../models/event.schema";
+import publishEvent from "../publish-event/publish-event";
+import filterTopic from "../filter-topic/filter-topic";
 import { $config } from "../../utils/config";
 import { $logger } from "../../utils/logger";
 

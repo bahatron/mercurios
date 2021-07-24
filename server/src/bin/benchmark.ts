@@ -2,9 +2,9 @@ import autocannon, { Options, Result } from "autocannon";
 import yargs from "yargs";
 import BIG_JSON from "../tests/big-json.fixture";
 import $json from "../utils/json";
-import $http from "../utils/http";
 import { $config } from "../utils/config";
 import { $logger } from "../utils/logger";
+import { $axios } from "../utils/axios";
 
 const MERCURIOS_TEST_URL = $config.test_url;
 
@@ -130,7 +130,7 @@ async function dataWriteBench() {
 async function readBench() {
     let topic = "readBench";
 
-    await $http.post(`${MERCURIOS_TEST_URL}/publish/${topic}`, {
+    await $axios.post(`${MERCURIOS_TEST_URL}/publish/${topic}`, {
         data: {
             rick: "sanchez",
         },

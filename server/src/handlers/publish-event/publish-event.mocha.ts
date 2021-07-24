@@ -1,8 +1,8 @@
 import $http, { AxiosResponse } from "axios";
 import { expect } from "chai";
 import $nats from "../../services/nats";
-import { MercuriosEvent } from "../../models/event/event";
-import { $store } from "../../models/store/store";
+import { MercuriosEvent } from "../../models/event";
+import { $store } from "../../store/store";
 import { $config } from "../../utils/config";
 import { $logger } from "../../utils/logger";
 

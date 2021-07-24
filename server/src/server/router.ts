@@ -1,12 +1,12 @@
 import { Router, RequestHandler } from "express";
-import publishEvent from "../handlers/publish-event";
-import emitEvent from "../handlers/emit-event";
-import readEvent from "../handlers/read-event";
-import listTopics from "../handlers/list-topics";
-import filterTopic from "../handlers/filter-topic";
+import publishEvent from "../handlers/publish-event/publish-event";
+import emitEvent from "../handlers/emit-event/emit-event";
+import readEvent from "../handlers/read-event/read-event";
+import listTopics from "../handlers/list-topics/list-topics";
+import filterTopic from "../handlers/filter-topic/filter-topic";
 import { $validator } from "../utils/validator";
 import { $json } from "../utils/json";
-import { ping } from "../handlers/ping";
+import { ping } from "../handlers/ping/ping";
 
 export function asyncRoute(handler: RequestHandler): RequestHandler {
     return async (req, res, next) => {
@@ -82,7 +82,7 @@ const routes: Route[] = [
 
             if (seq !== "latest" && isNaN(parseInt(seq))) {
                 return res.status(400).json({
-                    error: `Invalid sequence, must be either 'latest' or a number, recieved: ${seq}`,
+                    error: `Invalid sequence, must be either 'latest' or a number, received: ${seq}`,
                 });
             }
 

@@ -1,9 +1,9 @@
-import $error from "../../utils/error";
-import { MercuriosEvent } from "../event/event";
-import { EventFilters } from "./drivers/helpers";
+import $error from "../utils/error";
+import { MercuriosEvent } from "../models/event";
+import { EventFilters } from "./store.helpers";
 import { pgDriver } from "./drivers/postgres.store";
 import { mysqlDriver } from "./drivers/mysql.store";
-import { $config } from "../../utils/config";
+import { $config } from "../utils/config";
 import { mongoDriver } from "./drivers/mongo.store";
 
 export interface StoreDriver {
@@ -16,7 +16,6 @@ export interface StoreDriver {
     filter(topic: string, query: EventFilters): Promise<MercuriosEvent[]>;
     latest(topic: string): Promise<number | undefined>;
     // stream repository?
-    createStream(topic: string): Promise<void>;
     deleteStream(topic: string): Promise<void>;
     streamExists(topic: string): Promise<boolean>;
     topics(params: {

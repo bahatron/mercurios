@@ -9,7 +9,7 @@ volumes:
 x-mercurios-config: &mercurios-config
     NATS_URL: nats://mercurios-nats:4222
     MERCURIOS_TEST_URL: http://mercurios-server:4254
-    MERCURIOS_STORE: ${MERCURIOS_STORE}
+    MERCURIOS_STORE: ${MERCURIOS_STORE:-mysql}
     MERCURIOS_WORKERS: ${MERCURIOS_WORKERS:-2}
     MERCURIOS_DEBUG: 1
     MERCURIOS_DEV: 1

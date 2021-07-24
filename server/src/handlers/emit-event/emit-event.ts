@@ -1,13 +1,13 @@
-import $nats from "../services/nats";
-import $event, { MercuriosEvent } from "../models/event/event";
-import { $logger } from "../utils/logger";
+import $nats from "../../services/nats";
+import { MercuriosEvent } from "../../models/event";
+import { $logger } from "../../utils/logger";
 
 export default async function emitEvent({
     topic,
     data,
     key,
 }: Partial<MercuriosEvent>): Promise<MercuriosEvent> {
-    let event = $event({
+    let event = MercuriosEvent({
         topic,
         data,
         key,

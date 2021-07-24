@@ -1,13 +1,13 @@
-import $http from "../../utils/http";
+import { $axios } from "../../utils/axios";
 import { $config } from "../../utils/config";
-import { $store } from "../../models/store/store";
-import publishEvent from "../../handlers/publish-event";
+import { $store } from "../../store/store";
+import publishEvent from "../publish-event/publish-event";
 import { expect } from "chai";
 import { $logger } from "../../utils/logger";
 
 describe("GET /topics", () => {
     async function listTopicsEndpoint() {
-        return $http
+        return $axios
             .get(`${$config.test_url}/topics`)
             .catch((err) => err.response || $logger.error(err));
     }

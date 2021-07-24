@@ -1,4 +1,4 @@
-import { WsRequestHandler } from "../server/websocket/ws-connection";
+import { WsRequestHandler } from "../../server/websocket/ws-connection";
 import { Subscription } from "ts-nats";
 
 export default <WsRequestHandler>(

@@ -1,6 +1,11 @@
 import Knex from "knex";
-import { $logger } from "../../../utils/logger";
-import { $validator } from "../../../utils/validator";
+import { $logger } from "../utils/logger";
+import { $validator } from "../utils/validator";
+
+export const COLLECTION = {
+    EVENTS: `mercurios_events`,
+    TOPICS: `mercurios_topics`,
+};
 
 export interface EventFilters {
     from?: number;

@@ -4,9 +4,6 @@ import { $logger } from "../../utils/logger";
 
 export const requestLogger: RequestHandler = function (req, res, next) {
     let start = moment();
-    $logger.debug(
-        `${req.method} ${req.originalUrl} - ${res.statusCode} - request received`
-    );
 
     res.once("finish", () => {
         let time = moment().diff(start, "millisecond", true);
