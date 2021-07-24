@@ -24,13 +24,11 @@ x-mysql-config: &mysql-config
 services:
     mysql:
         image: mysql:5.7
-        container_name: mysql
         environment:
             <<: *mysql-config
 
     postgres:
         image: postgres:12
-        container_name: postgres
         environment:
             <<: *postgres-config
 
@@ -55,7 +53,7 @@ services:
     mercurios-postgres:
         image: mercurios-server
         container_name: mercurios-postgres
-        command: sh -c "wait-for-it postgres:3306 -- npm start"
+        command: sh -c "wait-for-it postgres:5432 -- npm start"
         environment:
             MERCURIOS_STORE: pg
             <<: *postgres-config

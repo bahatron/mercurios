@@ -7,7 +7,8 @@ RUN  wget https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem -O /
 EXPOSE 4254
 ENV MERCURIOS_ENV=production
 
-COPY .ops/wait-for-it.sh /usr/bin/wait-for-it
+COPY scripts/wait-for-it.sh /usr/bin/wait-for-it
+RUN chmod 777 /usr/bin/wait-for-it
 
 WORKDIR /app/server
 COPY ./server/package.json .

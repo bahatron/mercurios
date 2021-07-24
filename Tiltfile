@@ -4,10 +4,11 @@ docker_compose(['./docker-compose.dev.yml'])
 docker_build('mercurios-server', '.', dockerfile = 'Dockerfile.server',
     live_update=[
         sync('./server', '/app/server'),
+        sync("./scripts", '/app/scripts')
     ],
     only=[
         './server',
-        './.ops'
+        './scripts'
     ]
 )
 

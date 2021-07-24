@@ -18,7 +18,3 @@ RUN npm run build
 WORKDIR /app/playground
 COPY ./playground .
 EXPOSE 8080
-
-FROM src as prod
-RUN npm run build
-CMD ["npm", "run", "start"]

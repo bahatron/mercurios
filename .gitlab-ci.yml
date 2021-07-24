@@ -9,8 +9,8 @@ pipeline:
     stage: build
     script:
         - docker-compose -f docker-compose.yml build mercurios-server mercurios-client || exit 1
-        - ./.ops/test.sh
-        - BRANCH=${CI_COMMIT_BRANCH} ./.ops/dockerhub-push.sh
+        - ./scripts/test.sh || exit 1
+        - BRANCH=${CI_COMMIT_BRANCH} ./scripts/dockerhub-push.sh
     # only:
     #     refs:
     #         - master
