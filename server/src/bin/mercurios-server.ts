@@ -1,5 +1,5 @@
 import { $store } from "../store/store";
-import { server } from "../server/app";
+import { server } from "../http/app";
 import { $config } from "../utils/config";
 import { $logger } from "../utils/logger";
 

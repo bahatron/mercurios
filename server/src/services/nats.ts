@@ -50,9 +50,8 @@ export async function isHealthy(): Promise<boolean> {
             setTimeout(
                 () =>
                     reject(
-                        $error.Error(
-                            "timeout exceeded waiting while waiting for nats ping response",
-                            500
+                        $error.InternalError(
+                            "timeout exceeded waiting while waiting for nats ping response"
                         )
                     ),
                 1000

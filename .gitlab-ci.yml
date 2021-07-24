@@ -8,12 +8,13 @@ default:
 push:
     script:
         - docker-compose -f docker-compose.yml build mercurios-server mercurios-client || exit 1
-        - ./scripts/test.sh
-        - ./scripts/dockerhub-push.sh
-    only:
-        refs:
-            - master
+        - ./.ops/test.sh
+        - BRANCH=${CI_COMMIT_BRANCH} ./.ops/dockerhub-push.sh
+    # only:
+    #     refs:
+    #         - master
     artifacts:
+        when: always
         paths:
             - mercurios-test-logs
         expire_in: 7 days

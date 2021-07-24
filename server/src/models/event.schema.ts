@@ -1,6 +1,6 @@
 import { Schema } from "jsonschema";
 
-export const EventSchema: Schema = {
+export const MercuriosEventSchema: Schema = {
     type: "object",
     additionalProperties: false,
     required: ["published_at", "topic"],
@@ -8,15 +8,15 @@ export const EventSchema: Schema = {
         topic: {
             type: "string",
         },
+        seq: {
+            type: "integer",
+        },
         published_at: {
             type: "string",
             format: "date-time",
         },
         key: {
             type: "string",
-        },
-        seq: {
-            type: "integer",
         },
         data: {},
     },

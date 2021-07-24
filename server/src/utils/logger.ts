@@ -1,6 +1,6 @@
 import { CreateLoggerParams, Logger } from "@bahatron/utils/lib/logger";
 import httpContext from "express-http-context";
-import { REQUEST_ID } from "../server/middleware/request-id";
+import { REQUEST_ID } from "../http/middleware/request-id";
 import { $config } from "./config";
 
 const getId = () => {

@@ -23,7 +23,7 @@ export const $mongo = {
         return _client;
     },
 
-    db() {
+    get db() {
         return $mongo.client().db();
     },
 };

@@ -12,7 +12,7 @@ async function filterTopicEndpoint(topic: string, query: EventFilters = {}) {
     });
 }
 
-describe.only("GET /filter/:topic", () => {
+describe("GET /filter/:topic", () => {
     let _topic = "filter_topic_test";
     let _key = "index_over_10";
 
@@ -35,7 +35,7 @@ describe.only("GET /filter/:topic", () => {
         expect(result.data.length).to.eq(20);
     });
 
-    it("returns all events by key if submitted", async () => {
+    it("filters by key", async () => {
         let result = await filterTopicEndpoint(_topic, {
             key: _key,
         });
@@ -45,7 +45,7 @@ describe.only("GET /filter/:topic", () => {
         });
     });
 
-    it("returns only events in the specified range", async () => {
+    it("filters by sequence range", async () => {
         let result = await filterTopicEndpoint(_topic, {
             from: 5,
             to: 10,

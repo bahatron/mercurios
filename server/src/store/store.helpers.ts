@@ -57,19 +57,11 @@ export function knexEventFilter(
     }
 
     if (before) {
-        builder.where(
-            "published_at",
-            "<",
-            $validator.isoDate(before, `Invalid date format: ${before}`)
-        );
+        builder.where("published_at", "<=", before);
     }
 
     if (after) {
-        builder.where(
-            "published_at",
-            ">=",
-            $validator.isoDate(after, `Invalid date format: ${after}`)
-        );
+        builder.where("published_at", ">=", after);
     }
 
     return builder;

@@ -147,7 +147,7 @@ services:
     mercurios-playground:
         image: mercurios-playground
         container_name: mercurios-playground
-        command: sh -c "wait-for-it mercurios-server:4254 -- npm run dev:docker"
+        command: sh -c "npm run dev:docker"
         ports:
             - 3000:3000
         environment:

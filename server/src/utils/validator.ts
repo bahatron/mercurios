@@ -1,14 +1,23 @@
 import moment = require("moment");
 import $error from "./error";
-import $jsonschema, { Schema } from "jsonschema";
+import jsonschema, { Schema } from "jsonschema";
 
-const _validator = new $jsonschema.Validator();
+const _validator = new jsonschema.Validator();
 
 export const $validator = {
-    jsonSchema(val: any, schema: Schema) {
+    /**
+     * @description
+     *
+     * Validates using json schema, throws validation error on failure
+     */
+    schema(val: any, schema: Schema) {
         let { errors } = _validator.validate(val, schema);
 
-        return errors;
+        if (errors.length) {
+            throw $error.ValidationFailed(`json schema validation failed`, {
+                errors,
+            });
+        }
     },
 
     string(val: any, message?: string): string {
@@ -58,27 +67,5 @@ export const $validator = {
         }
 
         return parseFloat(val);
-    },
-
-    isoDate(val: any, message?: string): string {
-        if (val && moment(val).isValid()) {
-            return moment(val).toISOString();
-        }
-
-        throw $error.ValidationFailed(
-            message || `${val} not a valid date string`
-        );
-    },
-
-    optionalIsoDate(val: any): string | undefined {
-        if (val && moment(val).isValid()) {
-            return moment(val).toISOString();
-        }
-
-        return undefined;
-    },
-
-    isIsoDate(val: any): boolean {
-        return Boolean(val && moment(val).isValid());
     },
 };

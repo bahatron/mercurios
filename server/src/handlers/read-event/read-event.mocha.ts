@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { publishEventEndpoint } from "../publish-event/publish-event.mocha";
 import { $store } from "../../store/store";
 import { $validator } from "../../utils/validator";
-import { EventSchema } from "../../models/event.schema";
+import { MercuriosEventSchema } from "../../models/event.schema";
 import publishEvent from "../publish-event/publish-event";
 import filterTopic from "../filter-topic/filter-topic";
 import { $config } from "../../utils/config";
@@ -20,7 +20,7 @@ async function readEvent(
         .catch((err) => err.response);
 }
 
-describe("GET /read/:topic/:seq", () => {
+describe.only("GET /read/:topic/:seq", () => {
     describe("Scenario: topic does not exist", () => {
         const _topic = `non_existent_topic`;
         before(async () => {
@@ -59,7 +59,7 @@ describe("GET /read/:topic/:seq", () => {
         });
     });
 
-    describe("Scenario: topic and event exists", () => {
+    describe.only("Scenario: topic and event exists", () => {
         const _topic = `server_read_event_test`;
         let _event: any;
 
@@ -83,7 +83,9 @@ describe("GET /read/:topic/:seq", () => {
         });
 
         it("has the expected schema", async () => {
-            expect($validator.jsonSchema(_event, EventSchema).length).to.eq(0);
+            expect(() =>
+                $validator.schema(_event, MercuriosEventSchema)
+            ).not.to.throw();
         });
     });
 

@@ -1,6 +1,6 @@
+import { Exception } from "@bahatron/utils/lib/error";
 import { Response, Request, NextFunction } from "express";
 import { $logger } from "../../utils/logger";
-import { Exception } from "../../utils/error";
 
 export default function errorHandler(
     err: Exception,
@@ -8,7 +8,7 @@ export default function errorHandler(
     res: Response,
     next: NextFunction
 ) {
-    let code = err.httpCode || 500;
+    let code = err.code || 500;
 
     if (code >= 500) {
         $logger.error(err);

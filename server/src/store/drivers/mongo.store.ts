@@ -12,7 +12,7 @@ import { COLLECTION } from "../store.helpers";
 export function mongoDriver(): StoreDriver {
     return {
         async setup() {
-            let mongo = await $mongo.client().db();
+            let mongo = await $mongo.db;
 
             await mongo.collection(MONGO_EVENT_COLLECTION).createIndexes([
                 {
@@ -33,11 +33,10 @@ export function mongoDriver(): StoreDriver {
         },
 
         async isHealthy() {
-            return await $mongo.client().db().slaveOk;
+            return await $mongo.db.slaveOk;
         },
 
         async append(event) {
-            let mongo = $mongo.client().db();
             let session = await $mongo.client().startSession();
 
             try {
@@ -46,7 +45,7 @@ export function mongoDriver(): StoreDriver {
                 await session.withTransaction(async () => {
                     let {
                         value: { seq: nextSeq },
-                    }: any = await mongo
+                    }: any = await $mongo.db
                         .collection(MONGO_TOPIC_COLLECTION)
                         .findOneAndUpdate(
                             { _id: event.topic },
@@ -69,12 +68,12 @@ export function mongoDriver(): StoreDriver {
                         );
                     }
 
-                    result = {
+                    result = MercuriosEvent({
                         ...event,
                         seq: event.seq || nextSeq,
-                    };
+                    });
 
-                    await mongo
+                    await $mongo.db
                         .collection(COLLECTION.EVENTS)
                         .insertOne({ ...result }, { session });
                 });
@@ -92,7 +91,13 @@ export function mongoDriver(): StoreDriver {
 
             let event: any = await mongo
                 .collection(COLLECTION.EVENTS)
-                .findOne({ topic, seq });
+                .findOne({ topic, seq: Number(seq) });
+
+            console.log(event);
+            
+            if (!event) {
+                return undefined;
+            }
 
             return MercuriosEvent(event);
         },
@@ -100,21 +105,45 @@ export function mongoDriver(): StoreDriver {
         async filter(topic, filters) {
             let query: Record<string, any> = {
                 topic,
-                seq: {
-                    $gt: filters.from,
-                    $lt: filters.key,
-                },
-                published_at: {
-                    $gt: filters.after,
-                    $lt: filters.before,
-                },
-                key: filters.key,
             };
 
+            if (filters.key) {
+                query.key = RegExp(filters.key);
+            }
+
+            if (filters.from) {
+                query.seq = {
+                    ...(query.seq ?? {}),
+                    $gte: Number(filters.from),
+                };
+            }
+
+            if (filters.to) {
+                query.seq = {
+                    ...(query.seq ?? {}),
+                    $lte: Number(filters.to),
+                };
+            }
+
+            if (filters.after) {
+                query.published_at = {
+                    ...(query.published_at ?? {}),
+                    $gte: filters.after,
+                };
+            }
+
+            if (filters.before) {
+                query.published_at = {
+                    ...(query.published_at ?? {}),
+                    $lte: filters.before,
+                };
+            }
+
+            $logger.debug(query, "filter query");
+            console.log(query);
+
             return (
-                await $mongo
-                    .client()
-                    .db()
+                await $mongo.db
                     .collection(COLLECTION.EVENTS)
                     .find(query)
                     .toArray()
@@ -122,9 +151,7 @@ export function mongoDriver(): StoreDriver {
         },
 
         async latest(topic) {
-            let topicIndex = await $mongo
-                .client()
-                .db()
+            let topicIndex = await $mongo.db
                 .collection(COLLECTION.TOPICS)
                 .findOne({ _id: topic });
 
@@ -152,9 +179,7 @@ export function mongoDriver(): StoreDriver {
         },
 
         async streamExists(topic) {
-            let result = await $mongo
-                .client()
-                .db()
+            let result = await $mongo.db
                 .collection(COLLECTION.TOPICS)
                 .findOne({ _id: topic });
 
@@ -169,8 +194,7 @@ export function mongoDriver(): StoreDriver {
             $logger.debug({ like, parsedLike }, "nats to mongo translation");
 
             return (
-                await $mongo
-                    .db()
+                await $mongo.db
                     .collection(COLLECTION.TOPICS)
                     .find({ _id: new RegExp(parsedLike) })
                     .toArray()

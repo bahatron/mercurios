@@ -17,7 +17,7 @@ export default async function publishEvent({
         MercuriosEvent({
             published_at: new Date().toISOString(),
             seq: expectedSeq,
-            key: key,
+            key,
             topic,
             data,
         })
@@ -25,15 +25,8 @@ export default async function publishEvent({
 
     $nats.publish(`mercurios.topic.${topic}`, { event }).catch($logger.error);
 
-    $logger.info(
-        {
-            key,
-            expectedSeq,
-            seq: event.seq,
-            topic,
-        },
-        `event published`
-    );
+    $logger.debug(event, `event published`);
+    console.log(event);
 
     return event;
 }

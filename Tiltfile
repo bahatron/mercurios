@@ -7,7 +7,7 @@ docker_build('mercurios-server', '.', dockerfile = 'Dockerfile.server',
     ],
     only=[
         './server',
-        './scripts'
+        './.ops'
     ]
 )
 
@@ -28,7 +28,6 @@ docker_build('mercurios-playground', '.', dockerfile = 'Dockerfile.playground',
     ],
     only=[
         './playground',
-        './scripts',
         './client'
     ],
 )
