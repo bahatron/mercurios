@@ -122,13 +122,22 @@ describe("POST /publish/:topic", () => {
             const topic = "optimistic_locking_test";
             await $store.deleteStream(topic);
 
-            let responses = await Promise.all(
-                Array(10)
-                    .fill(null)
-                    .map(async () =>
-                        publishEventEndpoint(topic, { expectedSeq: 1 })
-                    )
-            );
+            // let responses = await Promise.all(
+            //     Array(10)
+            //         .fill(null)
+            //         .map(async () =>
+            //             publishEventEndpoint(topic, { expectedSeq: 1 })
+            //         )
+            // );
+
+            let responses = [];
+
+            for (let i of Array(10).fill(null)) {
+                responses.push(
+                    await publishEventEndpoint(topic, { expectedSeq: 1 })
+                );
+            }
+
             expect(
                 responses.filter((response) => response.status === 201).length
             ).to.eq(1);
