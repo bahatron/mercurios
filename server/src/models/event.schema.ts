@@ -16,7 +16,7 @@ export const MercuriosEventSchema: Schema = {
             format: "date-time",
         },
         key: {
-            type: ["string", "null"],
+            type: "string",
         },
         data: {},
     },

@@ -2,6 +2,8 @@ import $nats from "../../services/nats";
 import { $logger } from "../../utils/logger";
 import { $store } from "../../store/store";
 import { MercuriosEvent } from "../../models/event";
+import { $json } from "../../utils/json";
+
 export default async function publishEvent({
     data,
     key,
@@ -19,14 +21,11 @@ export default async function publishEvent({
             seq: expectedSeq,
             key,
             topic,
-            data,
+            data: $json.parse(data),
         })
     );
 
     $nats.publish(`mercurios.topic.${topic}`, { event }).catch($logger.error);
-
-    $logger.debug(event, `event published`);
-    console.log(event);
 
     return event;
 }

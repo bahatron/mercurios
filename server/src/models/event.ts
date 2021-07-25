@@ -1,4 +1,5 @@
-import { omit, omitBy, pickBy, values } from "lodash";
+import { pickBy } from "lodash";
+import { $json } from "../utils/json";
 import { $validator } from "../utils/validator";
 import { MercuriosEventSchema } from "./event.schema";
 
@@ -10,22 +11,6 @@ export interface MercuriosEvent {
     topic: string;
 }
 
-// export function MercuriosEvent({
-//     topic,
-//     published_at,
-//     seq,
-//     data,
-//     key,
-// }: Partial<MercuriosEvent>): MercuriosEvent {
-//     return {
-//         topic: $validator.string(topic),
-//         published_at: $validator.string(published_at),
-//         seq: $validator.optionalInt(seq),
-//         key: $validator.optionalString(key),
-//         data: $json.parse(data),
-//     };
-// }
-
 export function MercuriosEvent({
     topic,
     published_at = new Date().toISOString(),
@@ -33,13 +18,16 @@ export function MercuriosEvent({
     data,
     key,
 }: Partial<MercuriosEvent> = {}): MercuriosEvent {
-    let event: any = {
-        topic,
-        published_at,
-        seq,
-        data,
-        key,
-    };
+    let event: any = pickBy(
+        {
+            topic,
+            published_at,
+            seq,
+            data: $json.parse(data),
+            key,
+        },
+        (val) => val !== null
+    );
 
     $validator.schema(event, MercuriosEventSchema);
 

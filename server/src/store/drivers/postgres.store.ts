@@ -4,7 +4,7 @@ import {
     EventFilters,
 } from "../store.helpers";
 import $error from "../../utils/error";
-import $json from "../../utils/json";
+import { $json } from "../../utils/json";
 import { MercuriosEvent } from "../../models/event";
 import Knex from "knex";
 import $postgres, { POSTGRES_CONFIG } from "../../services/postgres/postgres";

@@ -24,11 +24,13 @@ x-mysql-config: &mysql-config
 services:
     mysql:
         image: mysql:5.7
+        container_name: mysql
         environment:
             <<: *mysql-config
 
     postgres:
         image: postgres:12
+        container_name: postgres
         environment:
             <<: *postgres-config
 
@@ -36,9 +38,9 @@ services:
         image: nats
         container_name: nats
 
-    mercurios-mysql:
+    mercurios-mysql-driver:
         image: mercurios-server
-        container_name: mercurios-mysql
+        container_name: mercurios-mysql-driver
         command: sh -c "wait-for-it mysql:3306 -- npm start"
         ports:
             - 4254:4254
@@ -50,9 +52,9 @@ services:
         depends_on:
             - nats
 
-    mercurios-postgres:
+    mercurios-postgres-driver:
         image: mercurios-server
-        container_name: mercurios-postgres
+        container_name: mercurios-postgres-driver
         command: sh -c "wait-for-it postgres:5432 -- npm start"
         environment:
             MERCURIOS_STORE: pg

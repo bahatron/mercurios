@@ -1,5 +1,5 @@
 import { WsRequestHandler } from "../../http/websocket/ws-connection";
-import $json from "../../utils/json";
+import { $json } from "../../utils/json";
 import { Subscription } from "ts-nats";
 import { v4 } from "uuid";
 

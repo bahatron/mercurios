@@ -4,10 +4,10 @@ import subscribe_to_topic from "../../handlers/subscribe-to-topic/subscribe-to-t
 import unsubscribe_to_topic from "../../handlers/unsubscribe-to-topic/unsubscribe-to-topic";
 import $nats from "../../services/nats";
 import { createLogger } from "../../utils/logger";
-import $json from "../../utils/json";
+import { $json } from "../../utils/json";
 
 export interface MercuriosClientMessage {
-    action: string;
+    action?: string;
     topic?: string;
     queue?: string;
     subscription?: string;
@@ -92,7 +92,7 @@ export function Connection(_id: string, _socket: ws) {
     _socket.on("message", async (data) => {
         try {
             let { action, topic, queue, subscription }: MercuriosClientMessage =
-                $json.parse(data);
+                $json.parse(data) as any;
 
             _logger.debug(
                 {
@@ -104,7 +104,7 @@ export function Connection(_id: string, _socket: ws) {
                 `ws message received`
             );
 
-            await ACTIONS[action]?.({
+            await ACTIONS[action!]?.({
                 connection: conn,
                 topic,
                 subscription,

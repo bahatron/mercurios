@@ -1,7 +1,7 @@
 import { $mysql, MYSQL_CONFIG } from "../../services/mysql/mysql";
 import { natsQueryToSql, knexEventFilter } from "../store.helpers";
 import $error from "../../utils/error";
-import $json from "../../utils/json";
+import { $json } from "../../utils/json";
 import { MercuriosEvent } from "../../models/event";
 import Knex from "knex";
 import { StoreDriver } from "../store";

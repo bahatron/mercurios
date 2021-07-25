@@ -2,7 +2,7 @@ import ws from "ws";
 import { publishEventEndpoint } from "../publish-event/publish-event.mocha";
 import { v4 } from "uuid";
 import { $config } from "../../utils/config";
-import $json from "../../utils/json";
+import { $json } from "../../utils/json";
 import { $logger } from "../../utils/logger";
 
 const MERCURIOS_TEST_URL = $config.test_url;

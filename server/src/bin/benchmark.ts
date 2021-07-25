@@ -1,7 +1,7 @@
 import autocannon, { Options, Result } from "autocannon";
 import yargs from "yargs";
 import BIG_JSON from "../tests/big-json.fixture";
-import $json from "../utils/json";
+import { $json } from "../utils/json";
 import { $config } from "../utils/config";
 import { $logger } from "../utils/logger";
 import { $axios } from "../utils/axios";

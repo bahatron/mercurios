@@ -36,7 +36,7 @@ const routes: Route[] = [
             return res.status(200).json(
                 await listTopics({
                     like: $validator.optionalString(like),
-                    withEvents: $json.parse(withEvents),
+                    withEvents: $json.parse(withEvents) ?? {} as any,
                 })
             );
         }),
