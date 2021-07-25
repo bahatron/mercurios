@@ -1,6 +1,12 @@
 #!/bin/sh
 set -e
 
+if [ ${BRANCH:-"local"} != "master" ]; then
+	echo "Skipping push...";
+	exit 0;
+fi
+
+
 aws configure set aws_access_key_id "${AWS_KEY_SERVICE_ECR}"
 aws configure set aws_secret_access_key "${AWS_SECRET_SERVICE_ECR}"
 aws configure set default.region "${ECR_REGION}"
