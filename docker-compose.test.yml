@@ -22,7 +22,7 @@ x-mysql-config: &mysql-config
     MYSQL_PORT: 3306
 
 x-mongo-config: &mongo-config
-    MONGO_URL: mongodb://mercurios-mongo:27017/mercurios
+    MONGO_URL: mongodb://mongo:27017/mercurios
     MONGO_REPLICA_SET: rs0
 
 services:
@@ -54,7 +54,7 @@ services:
         image: mercurios-client
         container_name: mercurios-client
         environment:
-            MERCURIOS_URL: ${MERCURIOS_URL:-http://localhost:4254}
+            MERCURIOS_URL: ${MERCURIOS_URL:-http://mercurios-mysql-driver:4254}
 
     mercurios-mysql-driver:
         image: mercurios-server

@@ -1,11 +1,5 @@
 version: "3.5"
 
-volumes:
-    mercurios-yb-master-data:
-        driver: "local"
-    mercurios-yb-tserver-data:
-        driver: "local"
-
 x-mercurios-config: &mercurios-config
     NATS_URL: nats://mercurios-nats:4222
     MERCURIOS_TEST_URL: http://mercurios-server:4254
@@ -14,6 +8,8 @@ x-mercurios-config: &mercurios-config
     MERCURIOS_DEBUG: 1
     MERCURIOS_DEV: 1
     MERCURIOS_SWAGGER: 1
+
+x-mongo-config: &mongo-config
     MONGO_URL: mongodb://mercurios-mongo:27017/mercurios
     # not necessary if url if mongodb+srv
     MONGO_REPLICA_SET: rs0
@@ -35,56 +31,53 @@ x-mysql-config: &mysql-config
     # rds ssl cert will be present at /etc/ssl/rds-combined-ca-bundle.pem
     MYSQL_RDS_SSL: 0
 
-# todo: create store driver
-x-yugabyte-config: &yugabyte-config
-    YUGABYTE_USER: postgres
-    YUGABYTE_DB: postgres
-    YUGABYTE_HOST: mercurios-yb-tserver
-    YUGABYTE_PORT: 5433
+# # todo: create store driver
+# x-yugabyte-config: &yugabyte-config
+#     YUGABYTE_USER: postgres
+#     YUGABYTE_DB: postgres
+#     YUGABYTE_HOST: mercurios-yb-tserver
+#     YUGABYTE_PORT: 5433
 
 services:
-    mercurios-yb-master:
-        image: yugabytedb/yugabyte:latest
-        container_name: mercurios-yb-master
-        volumes:
-            - mercurios-yb-master-data:/mnt/master
-        command:
-            [
-                "/home/yugabyte/bin/yb-master",
-                "--fs_data_dirs=/mnt/master",
-                "--master_addresses=mercurios-yb-master:7100",
-                "--rpc_bind_addresses=mercurios-yb-master:7100",
-                "--replication_factor=1",
-            ]
+    mercurios-server:
+        image: mercurios-server
+        container_name: mercurios-server
         ports:
-            - "7000:7000"
+            - 4254:4254
+            - 9230:9230
+        command: sh -c "npm run dev"
         environment:
-            SERVICE_7000_NAME: mercurios-yb-master
+            <<: *mercurios-config
+            <<: *mysql-config
+            <<: *postgres-config
+            <<: *yugabyte-config
+            <<: *mongo-config
 
-    mercurios-yb-tserver:
-        image: yugabytedb/yugabyte:latest
-        container_name: mercurios-yb-tserver
+    mercurios-client:
+        image: mercurios-client
+        container_name: mercurios-client
+        command: sh -c "npm run dev"
         volumes:
-            - mercurios-yb-tserver-data:/mnt/tserver
-        command:
-            [
-                "/home/yugabyte/bin/yb-tserver",
-                "--fs_data_dirs=/mnt/tserver",
-                "--start_pgsql_proxy",
-                "--rpc_bind_addresses=mercurios-yb-tserver:9100",
-                "--tserver_master_addrs=mercurios-yb-master:7100",
-            ]
-        ports:
-            - "9042:9042"
-            - "5433:5433"
-            - "9000:9000"
+            - ./client/lib:/app/client/lib
         environment:
-            SERVICE_5433_NAME: ysql
-            SERVICE_9042_NAME: ycql
-            SERVICE_6379_NAME: yedis
-            SERVICE_9000_NAME: mercurios-yb-tserver
-        depends_on:
-            - mercurios-yb-master
+            MERCURIOS_URL: ws://mercurios-server:4254
+            MERCURIOS_DEV: 1
+
+    mercurios-playground:
+        image: mercurios-playground
+        container_name: mercurios-playground
+        command: sh -c "npm run dev:docker"
+        ports:
+            - 3000:3000
+        environment:
+            MERCURIOS_URL: ${MERCURIOS_URL:-http://mercurios-server:4254}
+
+    mercurios-nats:
+        image: nats
+        container_name: mercurios-nats
+        command: ["-V"]
+        ports:
+            - 4222:4222
 
     mercurios-mysql:
         image: mysql:5.7
@@ -112,43 +105,3 @@ services:
             interval: 10s
         ports:
             - 27017:27017
-
-    mercurios-nats:
-        image: nats
-        container_name: mercurios-nats
-        command: ["-V", "-m=8222"]
-        ports:
-            - 4222:4222
-            - 8222:8222
-
-    mercurios-server:
-        image: mercurios-server
-        container_name: mercurios-server
-        ports:
-            - 4254:4254
-            - 9230:9230
-        command: sh -c "npm run dev"
-        environment:
-            <<: *mercurios-config
-            <<: *mysql-config
-            <<: *postgres-config
-            <<: *yugabyte-config
-
-    mercurios-client:
-        image: mercurios-client
-        container_name: mercurios-client
-        command: sh -c "npm run dev"
-        volumes:
-            - ./client/lib:/app/client/lib
-        environment:
-            MERCURIOS_URL: ws://mercurios-server:4254
-            MERCURIOS_DEV: 1
-
-    mercurios-playground:
-        image: mercurios-playground
-        container_name: mercurios-playground
-        command: sh -c "npm run dev:docker"
-        ports:
-            - 3000:3000
-        environment:
-            MERCURIOS_URL: ${MERCURIOS_URL:-http://mercurios-server:4254}
