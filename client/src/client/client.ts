@@ -8,34 +8,13 @@ import { $error } from "../utils/error";
 import { AxiosError } from "axios";
 import { v4 } from "uuid";
 import { $json, Logger } from "@bahatron/utils";
-
-export interface FilterOptions {
-    from?: number;
-    to?: number;
-    key?: string;
-    after?: string;
-    before?: string;
-}
-
-export interface PublishOptions {
-    data?: any;
-    expectedSeq?: number;
-    key?: string;
-}
-
-export interface EmitOptions {
-    data?: any;
-}
-
-export interface SubscribeOptions {
-    queue?: string;
-}
-
-export interface ConnectOptions {
-    url: string;
-    id?: string;
-    debug?: boolean;
-}
+import {
+    ConnectOptions,
+    FilterOptions,
+    PublishOptions,
+    SubscribeOptions,
+    EmitOptions,
+} from "./interfaces";
 
 export type MercuriosClient = ReturnType<typeof MercuriosClient>;
 export function MercuriosClient({

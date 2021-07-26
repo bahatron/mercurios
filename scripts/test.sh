@@ -19,4 +19,4 @@ docker exec mercurios-mongo-driver sh -c "wait-for-it localhost:4254 -t 60 -- np
 echo "mongo driver test completed"
 
 
-docker exec mercurios-client sh -c "npm run test"
+# docker run mercurios-client sh -c "npm run test"
