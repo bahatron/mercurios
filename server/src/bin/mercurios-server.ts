@@ -1,42 +1,27 @@
-#!/usr/bin/node
-
-import { $store } from "../models/store/store";
-import { server } from "../server/server";
+import { $store } from "../store/store";
+import { server } from "../http/app";
 import { $config } from "../utils/config";
-import $logger from "../utils/logger";
+import { $logger } from "../utils/logger";
 
 process.on("uncaughtException", async (err) => {
-    await $logger.error(err, "uncaught exception");
+    $logger.error(err, "uncaught exception");
     process.exit(-1);
 });
 
 process.on("unhandledRejection", async (reason, promise) => {
-    await $logger.error({ reason }, "unhandled rejection");
+    $logger.error({ reason }, "unhandled rejection");
     process.exit(-1);
 });
 
-$logger.info(
-    {
-        dev_mode: $config.dev_mode,
-        debug: $config.debug,
-        store: $config.store_driver,
-        pid: process.pid,
-    },
-    "starting mercurios server"
-);
-
 $store.setup().then(() => {
-    $logger.info(
-        {
-            pid: process.pid,
-        },
-        "store service initialized"
-    );
+    $logger.info("store service initialized");
 
     server.listen(4254, () => {
         $logger.info(
             {
                 pid: process.pid,
+                dev_mode: $config.dev_mode,
+                store: $config.store_driver,
             },
             `Server listening on port 4254`
         );

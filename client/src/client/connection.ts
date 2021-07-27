@@ -1,31 +1,12 @@
 import $ws, { ClientOptions } from "ws";
 import { $error } from "../utils/error";
 import { Logger } from "@bahatron/utils";
-
-export interface MercuriosMessage {
-    subscription: string;
-    subject: string;
-    event: MercuriosEvent;
-}
-
-export interface MercuriosEvent {
-    topic: string;
-    seq?: number;
-    key?: string;
-    published_at: string;
-    data: any;
-}
-
-export interface MercuriosEventHandler {
-    (message: MercuriosMessage): void;
-}
-
-export interface ServerMessage {
-    action: "subscribe" | "unsubscribe";
-    topic?: string;
-    subscription?: string;
-    queue?: string;
-}
+import {
+    MercuriosMessage,
+    MercuriosEvent,
+    MercuriosEventHandler,
+    ServerMessage,
+} from "./interfaces";
 
 interface QueuedHandler {
     (): void;

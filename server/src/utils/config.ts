@@ -1,4 +1,4 @@
-import { getenv } from "@bahatron/utils/lib/env";
+import { getenv } from "@bahatron/utils/lib/helpers/env";
 import { cloneDeep } from "lodash";
 
 export const $config = new Proxy(
@@ -8,7 +8,7 @@ export const $config = new Proxy(
         debug: Boolean(getenv("MERCURIOS_DEBUG", "") === "1"),
         store_driver: getenv(
             "MERCURIOS_STORE",
-            getenv("MERCURIOS_DRIVER", "mysql") // backwards compatability
+            getenv("MERCURIOS_DRIVER", "mysql") // backwards compatibility
         ),
         mercurios_ping_interval: getenv("MERCURIOS_PING_INTERVAL", "30000"),
         mercurios_workers: getenv("MERCURIOS_WORKERS", "1"),
@@ -26,6 +26,9 @@ export const $config = new Proxy(
         postgre_database: getenv("POSTGRES_DB", ""),
         postgre_user: getenv("POSTGRES_USER", ""),
         postgre_password: getenv("POSTGRES_PASSWORD", ""),
+
+        mongo_url: getenv("MONGO_URL", ""),
+        mongo_set: getenv("MONGO_REPLICA_SET", ""),
     },
     {
         get<T>(_object: T, attribute: keyof T) {

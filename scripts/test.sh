@@ -6,16 +6,17 @@ export GITROOT=$(git rev-parse --show-toplevel)
 docker-compose -f ${GITROOT}/docker-compose.test.yml up -d
 
 # run tests for mysql driver
-docker-compose -f ${GITROOT}/docker-compose.test.yml exec -T mercurios-postgres \
-    sh -c "wait-for-it mercurios-postgres:4254 -t 30 -- npm run test"
+echo "testing postgres driver..."
+docker exec mercurios-postgres-driver sh -c "wait-for-it localhost:4254 -t 60 -- npm run test"
+echo "postgres driver test completed"
 
-docker-compose -f ${GITROOT}/docker-compose.test.yml exec -T mercurios-mysql \
-    sh -c "wait-for-it mercurios-mysql:4254 -t 30 -- npm run test"
+echo "testing mysql driver..."
+docker exec mercurios-mysql-driver sh -c "wait-for-it localhost:4254 -t 60 -- npm run test"
+echo "mysql driver test completed"
 
-MERCURIOS_URL=http://mercurios-postgres:4254 docker-compose -f ${GITROOT}/docker-compose.test.yml run -T mercurios-client \
-    sh -c "npm run test"
+echo "testing mongo driver..."
+docker exec mercurios-mongo-driver sh -c "wait-for-it localhost:4254 -t 60 -- npm run test"
+echo "mongo driver test completed"
 
-# MERCURIOS_URL=http://mercurios-mysql:4254 docker-compose -f ${GITROOT}/docker-compose.test.yml run -T mercurios-client \
-#     sh -c "npm run test"
 
-docker-compose -f ${GITROOT}/docker-compose.test.yml logs --no-color -t mercurios-postgres mercurios-mysql > mercurios-test-logs
+# docker run mercurios-client sh -c "npm run test"

@@ -1,8 +1,5 @@
 FROM node:lts-slim as src
 
-EXPOSE 8080
-COPY ./scripts/wait-for-it.sh /usr/bin/wait-for-it
-
 WORKDIR /app/playground
 COPY ./playground/package.json .
 
@@ -20,7 +17,4 @@ RUN npm run build
 
 WORKDIR /app/playground
 COPY ./playground .
-
-FROM src as prod
-RUN npm run build
-CMD ["npm", "run", "start"]
+EXPOSE 8080

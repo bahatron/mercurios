@@ -1,7 +1,7 @@
 import * as nats from "ts-nats";
 import { $config } from "../utils/config";
 import $error from "../utils/error";
-import $logger from "../utils/logger";
+import { $logger } from "../utils/logger";
 
 const NATS_URL = $config.nats_url;
 
@@ -50,9 +50,8 @@ export async function isHealthy(): Promise<boolean> {
             setTimeout(
                 () =>
                     reject(
-                        $error.Error(
-                            "timeout exceeded waiting while waiting for nats ping response",
-                            500
+                        $error.InternalError(
+                            "timeout exceeded waiting while waiting for nats ping response"
                         )
                     ),
                 1000
