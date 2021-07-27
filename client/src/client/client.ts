@@ -1,8 +1,4 @@
-import {
-    Connection,
-    MercuriosEvent,
-    MercuriosEventHandler,
-} from "./connection";
+import { Connection } from "./connection";
 import { $http } from "../utils/http";
 import { $error } from "../utils/error";
 import { AxiosError } from "axios";
@@ -14,6 +10,8 @@ import {
     PublishOptions,
     SubscribeOptions,
     EmitOptions,
+    MercuriosEvent,
+    MercuriosEventHandler,
 } from "./interfaces";
 
 export type MercuriosClient = ReturnType<typeof MercuriosClient>;

@@ -1,13 +1,10 @@
 import * as client from "./client/client";
-
 export * from "./client/client";
-export {
-    MercuriosMessage,
-    MercuriosEvent,
-    MercuriosEventHandler,
-} from "./client/connection";
 
-export function connect(params: client.ConnectOptions) {
+import * as interfaces from "./client/interfaces";
+export * from "./client/interfaces";
+
+export function connect(params: interfaces.ConnectOptions) {
     return client.MercuriosClient(params);
 }
 
