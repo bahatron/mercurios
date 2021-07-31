@@ -50,7 +50,7 @@ services:
             <<: *mercurios-config
             <<: *mysql-config
             <<: *postgres-config
-            <<: *yugabyte-config
+            # <<: *yugabyte-config
             <<: *mongo-config
 
     mercurios-client:

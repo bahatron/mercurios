@@ -8,7 +8,6 @@ import { $logger } from "../../utils/logger";
 import { MercuriosEvent } from "../../models/event";
 import { StoreDriver } from "../store";
 import { COLLECTION } from "../store.helpers";
-import { pickBy } from "lodash";
 
 export function mongoDriver(): StoreDriver {
     return {
@@ -34,7 +33,7 @@ export function mongoDriver(): StoreDriver {
         },
 
         async isHealthy() {
-            return await $mongo.db.slaveOk;
+            return Boolean(await $mongo.db.listCollections());
         },
 
         async append(event) {
