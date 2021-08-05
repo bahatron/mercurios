@@ -57,7 +57,7 @@ export function knexEventFilter(
     }
 
     if (before) {
-        builder.where("published_at", "<=", before);
+        builder.where("published_at", "<", before);
     }
 
     if (after) {

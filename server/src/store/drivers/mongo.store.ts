@@ -133,7 +133,7 @@ export function mongoDriver(): StoreDriver {
             if (filters.before) {
                 query.published_at = {
                     ...(query.published_at ?? {}),
-                    $lte: filters.before,
+                    $lt: filters.before,
                 };
             }
 
@@ -157,7 +157,7 @@ export function mongoDriver(): StoreDriver {
                 return undefined;
             }
 
-            return topicIndex?.seq;
+            return this.read(topic, topicIndex?.seq);
         },
 
         async deleteStream(topic) {

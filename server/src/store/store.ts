@@ -14,7 +14,7 @@ export interface StoreDriver {
     append(event: MercuriosEvent): Promise<MercuriosEvent>;
     read(topic: string, seq: number): Promise<MercuriosEvent | undefined>;
     filter(topic: string, query: EventFilters): Promise<MercuriosEvent[]>;
-    latest(topic: string): Promise<number | undefined>;
+    latest(topic: string): Promise<MercuriosEvent | undefined>;
     // stream repository?
     deleteStream(topic: string): Promise<void>;
     streamExists(topic: string): Promise<boolean>;

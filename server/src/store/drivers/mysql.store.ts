@@ -100,7 +100,7 @@ export function mysqlDriver(): StoreDriver {
                 return undefined;
             }
 
-            return result.seq;
+            return this.read(topic, result.seq);
         },
 
         async filter(topic, filters) {

@@ -92,7 +92,7 @@ export function pgDriver(): StoreDriver {
             }
         },
 
-        async read(topic: MercuriosEvent["topic"], seq: MercuriosEvent["seq"]) {
+        async read(topic, seq) {
             let result = await $postgres
                 .table(EVENT_TABLE)
                 .where({ topic, seq })
@@ -106,16 +106,14 @@ export function pgDriver(): StoreDriver {
         },
 
         async latest(topic) {
-            let result = await $postgres
-                .table(TOPIC_TABLE)
-                .where({ topic })
-                .first();
+            let query = $postgres.raw(
+                `select * from ${EVENT_TABLE} where topic = ? and seq = (select seq from ${TOPIC_TABLE} where topic = ?)`,
+                [topic, topic]
+            );
 
-            if (!result) {
-                return undefined;
-            }
+            let result = await query;
 
-            return result.seq;
+            return MercuriosEvent(result.rows.shift());
         },
 
         async filter(topic: MercuriosEvent["topic"], filters: EventFilters) {

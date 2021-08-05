@@ -5,6 +5,7 @@ import { $json } from "../utils/json";
 import { $config } from "../utils/config";
 import { $logger } from "../utils/logger";
 import { $axios } from "../utils/axios";
+import { execute } from "@bahatron/utils/lib/helpers";
 
 const MERCURIOS_TEST_URL = $config.test_url;
 
@@ -147,6 +148,26 @@ async function readBench() {
     );
 }
 
+async function latestBench() {
+    let topic = "latestBench";
+
+    await $axios.post(`${MERCURIOS_TEST_URL}/publish/${topic}`, {
+        data: {
+            rick: "sanchez",
+        },
+    });
+
+    breakdown(
+        await autocannon({
+            title: "read latest event in topic",
+            connections: _connections,
+            pipelining: _pipelining,
+            duration: _duration,
+            url: `${MERCURIOS_TEST_URL}/read/${topic}/latest`,
+        })
+    );
+}
+
 async function conflictiveWrites() {
     let topic = "conflictiveBench";
     await Promise.all([
@@ -251,6 +272,10 @@ async function main() {
         await readBench();
     }
 
+    if (yargs.argv.latest === true) {
+        await latestBench();
+    }
+
     if (yargs.argv.ping === true) {
         await pingBench();
     }
@@ -264,6 +289,4 @@ async function main() {
     }
 }
 
-main()
-    .catch((err) => $logger.error(err))
-    .finally(process.exit);
+execute(main);
