@@ -41,9 +41,7 @@ export const up = async function (knex: Knex) {
                 ) + 1;
 
             IF (next_seq IS NULL) THEN
-                INSERT INTO mercurios_topics (topic, seq) VALUES (v_topic, 1);
-                next_seq = 1;
-
+                RAISE 'ERR_NO_STREAM';
             ELSIF v_seq IS NOT NULL AND next_seq != v_seq THEN
                 RAISE 'ERR_CONFLICT';
             END IF;

@@ -180,7 +180,7 @@ async function createStream(topic: string) {
     } catch (err) {
         if (
             err.message.includes("duplicate key value") ||
-            err.code.includes("ER_DUP_ENTRY")
+            err.code === "23505"
         ) {
             return;
         }
