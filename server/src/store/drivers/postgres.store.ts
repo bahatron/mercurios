@@ -106,14 +106,18 @@ export function pgDriver(): StoreDriver {
         },
 
         async latest(topic) {
-            let query = $postgres.raw(
+            let query = await $postgres.raw(
                 `select * from ${EVENT_TABLE} where topic = ? and seq = (select seq from ${TOPIC_TABLE} where topic = ?)`,
                 [topic, topic]
             );
 
-            let result = await query;
+            let result = query.rows.shift();
 
-            return MercuriosEvent(result.rows.shift());
+            if (!result) {
+                return undefined;
+            }
+
+            return MercuriosEvent(result);
         },
 
         async filter(topic: MercuriosEvent["topic"], filters: EventFilters) {
