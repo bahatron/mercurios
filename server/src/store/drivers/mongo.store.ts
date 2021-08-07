@@ -137,8 +137,7 @@ export function mongoDriver(): StoreDriver {
                 };
             }
 
-            $logger.debug(query, "filter query");
-            console.log(query);
+            $logger.debug(query, "mongo filter query");
 
             return (
                 await $mongo.db
@@ -184,17 +183,56 @@ export function mongoDriver(): StoreDriver {
             return Boolean(result);
         },
 
-        async topics({ like = "", withEvents }) {
+        async topics({ like = "", withEvents, limit, offset }) {
             let parsedLike = like.includes(`.>`)
                 ? `${like.slice(0, like.indexOf(".>") ?? undefined)}\\.`
                 : like;
 
             $logger.debug({ like, parsedLike }, "nats to mongo translation");
 
+            if (withEvents) {
+                let query = {
+                    topic: new RegExp(parsedLike),
+                    seq: {
+                        $lte: withEvents.from,
+                        $gte: withEvents.from,
+                    },
+                    published_at: {
+                        $lt: withEvents.before,
+                        $gte: withEvents.after,
+                    },
+                    key: withEvents.key,
+                };
+
+                $logger.debug(query, "mongo store: querying topics");
+
+                return (
+                    await $mongo.db
+                        .collection(COLLECTION.EVENTS)
+                        .find(
+                            { $query: query, $orderBy: { topic: 1 } },
+                            {
+                                limit: limit ?? undefined,
+                                skip: offset ?? undefined,
+                            }
+                        )
+                        .toArray()
+                ).map((record) => record.topic);
+            }
+
             return (
                 await $mongo.db
                     .collection(COLLECTION.TOPICS)
-                    .find({ _id: new RegExp(parsedLike) })
+                    .find(
+                        {
+                            $query: { _id: new RegExp(parsedLike) },
+                            $orderBy: { topic: 1 },
+                        },
+                        {
+                            limit: limit ?? undefined,
+                            skip: offset ?? undefined,
+                        }
+                    )
                     .toArray()
             ).map((record) => record._id);
         },

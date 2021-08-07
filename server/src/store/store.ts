@@ -6,6 +6,13 @@ import { mysqlDriver } from "./drivers/mysql.store";
 import { $config } from "../utils/config";
 import { mongoDriver } from "./drivers/mongo.store";
 
+export interface ListTopicsOptions {
+    like?: string;
+    withEvents?: EventFilters;
+    limit?: number;
+    offset?: number;
+}
+
 export interface StoreDriver {
     // driver management
     setup(): Promise<void>;
@@ -18,10 +25,7 @@ export interface StoreDriver {
     // stream repository?
     deleteStream(topic: string): Promise<void>;
     streamExists(topic: string): Promise<boolean>;
-    topics(params: {
-        like?: string;
-        withEvents: EventFilters;
-    }): Promise<string[]>;
+    topics(params: ListTopicsOptions): Promise<string[]>;
 }
 
 let driver: StoreDriver;

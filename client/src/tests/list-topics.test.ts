@@ -21,7 +21,7 @@ describe("Feature: List Topics", () => {
         await Promise.all(TEST_TOPICS.map((topic) => _client.publish(topic)));
     });
 
-    it("behaves the same was as the server", async () => {
+    it("behaves the same way as the server", async () => {
         let queries = [
             "test&",
             "test*",

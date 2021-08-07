@@ -259,6 +259,24 @@ export const swaggerDocs = {
                             before: "2030",
                         }),
                     },
+                    {
+                        name: "limit",
+                        in: "query",
+                        required: false,
+                        description: "limit of topics to receive",
+                        type: {
+                            type: "integer",
+                        },
+                    },
+                    {
+                        name: "offset",
+                        in: "query",
+                        required: false,
+                        description: "offset",
+                        type: {
+                            type: "integer",
+                        },
+                    },
                 ],
                 responses: {
                     200: {

@@ -131,24 +131,33 @@ export function pgDriver(): StoreDriver {
             return result.map(MercuriosEvent);
         },
 
-        async topics({
-            like,
-            withEvents,
-        }: {
-            like?: string;
-            withEvents: EventFilters;
-        }): Promise<string[]> {
+        async topics({ like, withEvents, limit, offset }): Promise<string[]> {
             let query: Knex.QueryBuilder;
 
             if (withEvents) {
-                query = $postgres.table(EVENT_TABLE).distinct("topic");
+                query = $postgres
+                    .table(EVENT_TABLE)
+                    .distinct("topic")
+                    .orderBy("topic", "asc");
+
                 knexEventFilter(query, withEvents);
             } else {
-                query = $postgres.table(TOPIC_TABLE).select("topic");
+                query = $postgres
+                    .table(TOPIC_TABLE)
+                    .select("topic")
+                    .orderBy("topic", "asc");
             }
 
             if (like) {
                 query.where(`topic`, "like", natsQueryToSql(like));
+            }
+
+            if (limit) {
+                query.limit(limit);
+            }
+
+            if (offset) {
+                query.offset(offset);
             }
 
             return (await query).map((record) => record.topic);

@@ -32,11 +32,13 @@ const routes: Route[] = [
         method: "get",
         path: "/topics",
         handler: asyncRoute(async (req, res) => {
-            let { like, withEvents } = req.query;
+            let { like, withEvents, limit, offset } = req.query;
             return res.status(200).json(
                 await listTopics({
                     like: $validator.optionalString(like),
-                    withEvents: $json.parse(withEvents) ?? {} as any,
+                    withEvents: $json.parse(withEvents) ?? ({} as any),
+                    limit: $validator.optionalInt(limit),
+                    offset: $validator.optionalInt(offset),
                 })
             );
         }),

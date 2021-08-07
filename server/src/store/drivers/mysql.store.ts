@@ -111,18 +111,33 @@ export function mysqlDriver(): StoreDriver {
             return result.map(MercuriosEvent);
         },
 
-        async topics({ like, withEvents }) {
+        async topics({ like, withEvents, limit, offset }) {
             let query: Knex.QueryBuilder;
 
             if (withEvents) {
-                query = $mysql.table("mercurios_events").distinct("topic");
+                query = $mysql
+                    .table("mercurios_events")
+                    .distinct("topic")
+                    .orderBy("topic", "asc");
+
                 knexEventFilter(query, withEvents);
             } else {
-                query = $mysql.table("mercurios_topics").select("topic");
+                query = $mysql
+                    .table("mercurios_topics")
+                    .select("topic")
+                    .orderBy("topic", "asc");
             }
 
             if (like) {
                 query.where(`topic`, "like", natsQueryToSql(like));
+            }
+
+            if (limit) {
+                query.limit(limit);
+            }
+
+            if (offset) {
+                query.offset(offset);
             }
 
             return (await query).map((record) => record.topic);

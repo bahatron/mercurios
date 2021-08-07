@@ -45,21 +45,17 @@ export function MercuriosClient({
             }
         },
 
-        async topics({
-            like,
-            withEvents,
-        }: {
-            like?: string;
-            withEvents?: FilterOptions;
-        } = {}): Promise<string[]> {
+        async topics(
+            params: {
+                like?: string;
+                withEvents?: FilterOptions;
+                limit?: number;
+                offset?: number;
+            } = {}
+        ): Promise<string[]> {
             try {
                 let response = await $http.get(`${_url}/topics`, {
-                    params: {
-                        like,
-                        withEvents: withEvents
-                            ? JSON.stringify(withEvents)
-                            : undefined,
-                    },
+                    params,
                 });
 
                 return response.data;
