@@ -42,8 +42,6 @@ export function knexEventFilter(
 ): Knex.QueryBuilder {
     let { from, to, key, before, after } = filters;
 
-    $logger.debug(filters, "filters");
-
     if (from) {
         builder.where("seq", ">=", from);
     }
@@ -65,4 +63,42 @@ export function knexEventFilter(
     }
 
     return builder;
+}
+
+export function mongoEventFilters(filters: EventFilters) {
+    let query: Record<string, any> = {};
+
+    if (filters.key) {
+        query.key = filters.key;
+    }
+
+    if (filters.from) {
+        query.seq = {
+            ...(query.seq ?? {}),
+            $gte: Number(filters.from),
+        };
+    }
+
+    if (filters.to) {
+        query.seq = {
+            ...(query.seq ?? {}),
+            $lte: Number(filters.to),
+        };
+    }
+
+    if (filters.after) {
+        query.published_at = {
+            ...(query.published_at ?? {}),
+            $gte: filters.after,
+        };
+    }
+
+    if (filters.before) {
+        query.published_at = {
+            ...(query.published_at ?? {}),
+            $lt: filters.before,
+        };
+    }
+
+    return query;
 }

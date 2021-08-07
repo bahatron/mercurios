@@ -2,15 +2,15 @@ import { EventFilters } from "../../store/store.helpers";
 import { $store } from "../../store/store";
 import { $logger } from "../../utils/logger";
 
-export default async function listTopics(params: {
+export default async function listTopics(query: {
     like?: string;
-    withEvents: EventFilters;
+    withEvents?: EventFilters;
     limit?: number;
     offset?: number;
 }) {
-    $logger.debug(params, "listing topics...");
+    let result = await $store.topics(query);
 
-    let topics = await $store.topics(params);
+    $logger.debug({ query, result }, "listing topics result");
 
-    return topics;
+    return result;
 }

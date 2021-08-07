@@ -7,6 +7,7 @@ import filterTopic from "../handlers/filter-topic/filter-topic";
 import { $validator } from "../utils/validator";
 import { $json } from "../utils/json";
 import { ping } from "../handlers/ping/ping";
+import { EventFilters } from "../store/store.helpers";
 
 export function asyncRoute(handler: RequestHandler): RequestHandler {
     return async (req, res, next) => {
@@ -36,7 +37,7 @@ const routes: Route[] = [
             return res.status(200).json(
                 await listTopics({
                     like: $validator.optionalString(like),
-                    withEvents: $json.parse(withEvents) ?? ({} as any),
+                    withEvents: $json.parse(withEvents) as EventFilters,
                     limit: $validator.optionalInt(limit),
                     offset: $validator.optionalInt(offset),
                 })

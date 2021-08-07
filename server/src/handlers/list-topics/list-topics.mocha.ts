@@ -90,7 +90,8 @@ describe("GET /topics", () => {
                 withEvents: { before: _timeStamp },
             });
 
-            expect(response.length).to.eq(0);
+            expect(_topics.every((topic) => !response.includes(topic))).to.be
+                .true;
         });
     });
 });

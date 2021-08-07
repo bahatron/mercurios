@@ -7,7 +7,7 @@ import $error from "../../utils/error";
 import { $logger } from "../../utils/logger";
 import { MercuriosEvent } from "../../models/event";
 import { StoreDriver } from "../store";
-import { COLLECTION } from "../store.helpers";
+import { COLLECTION, mongoEventFilters } from "../store.helpers";
 
 export function mongoDriver(): StoreDriver {
     return {
@@ -101,48 +101,13 @@ export function mongoDriver(): StoreDriver {
         },
 
         async filter(topic, filters) {
-            let query: Record<string, any> = {
-                topic,
-            };
-
-            if (filters.key) {
-                query.key = RegExp(filters.key);
-            }
-
-            if (filters.from) {
-                query.seq = {
-                    ...(query.seq ?? {}),
-                    $gte: Number(filters.from),
-                };
-            }
-
-            if (filters.to) {
-                query.seq = {
-                    ...(query.seq ?? {}),
-                    $lte: Number(filters.to),
-                };
-            }
-
-            if (filters.after) {
-                query.published_at = {
-                    ...(query.published_at ?? {}),
-                    $gte: filters.after,
-                };
-            }
-
-            if (filters.before) {
-                query.published_at = {
-                    ...(query.published_at ?? {}),
-                    $lt: filters.before,
-                };
-            }
-
-            $logger.debug(query, "mongo filter query");
-
             return (
                 await $mongo.db
                     .collection(COLLECTION.EVENTS)
-                    .find(query)
+                    .find({
+                        topic,
+                        ...mongoEventFilters(filters),
+                    })
                     .toArray()
             ).map(MercuriosEvent);
         },
@@ -188,49 +153,40 @@ export function mongoDriver(): StoreDriver {
                 ? `${like.slice(0, like.indexOf(".>") ?? undefined)}\\.`
                 : like;
 
-            $logger.debug({ like, parsedLike }, "nats to mongo translation");
-
             if (withEvents) {
-                let query = {
-                    topic: new RegExp(parsedLike),
-                    seq: {
-                        $lte: withEvents.from,
-                        $gte: withEvents.from,
-                    },
-                    published_at: {
-                        $lt: withEvents.before,
-                        $gte: withEvents.after,
-                    },
-                    key: withEvents.key,
-                };
+                let result = await $mongo.db
+                    .collection(COLLECTION.EVENTS)
+                    .find(
+                        {
+                            topic: new RegExp(parsedLike),
+                            ...mongoEventFilters(withEvents),
+                        },
+                        {
+                            sort: { topic: 1 },
+                            skip: offset,
+                            limit: limit,
+                            projection: {
+                                topic: 1,
+                            },
+                        }
+                    )
+                    .toArray();
 
-                $logger.debug(query, "mongo store: querying topics");
-
-                return (
-                    await $mongo.db
-                        .collection(COLLECTION.EVENTS)
-                        .find(
-                            { $query: query, $orderBy: { topic: 1 } },
-                            {
-                                limit: limit ?? undefined,
-                                skip: offset ?? undefined,
-                            }
-                        )
-                        .toArray()
-                ).map((record) => record.topic);
+                return Array.from(
+                    new Set(result.map((record) => record.topic))
+                );
             }
 
             return (
                 await $mongo.db
                     .collection(COLLECTION.TOPICS)
                     .find(
+                        { _id: new RegExp(parsedLike) },
                         {
-                            $query: { _id: new RegExp(parsedLike) },
-                            $orderBy: { topic: 1 },
-                        },
-                        {
-                            limit: limit ?? undefined,
-                            skip: offset ?? undefined,
+                            projection: { _id: 1 },
+                            sort: { _id: 1 },
+                            skip: offset,
+                            limit: limit,
                         }
                     )
                     .toArray()

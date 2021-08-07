@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "dev:docker": "nodemon --config nodemon.json src/index.ts"
+        "dev": "nodemon --config nodemon.json src/index.ts"
     },
     "dependencies": {
         "@bahatron/mercurios": "file:../client",
