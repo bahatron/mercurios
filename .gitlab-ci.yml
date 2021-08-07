@@ -2,6 +2,8 @@ default:
     image: docker/compose
     services:
         - docker:dind
+    before_script:
+        - apk update && apk add git
 
 pipeline:
     stage: build
