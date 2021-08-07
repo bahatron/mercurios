@@ -50,11 +50,11 @@ services:
             test: test $$(echo "rs.initiate().ok || rs.status().ok" | mongo --port 27017 --quiet) -eq 1
             interval: 10s
 
-    mercurios-client:
-        image: mercurios-client
-        container_name: mercurios-client
-        environment:
-            MERCURIOS_URL: ${MERCURIOS_URL:-http://mercurios-mysql-driver:4254}
+    # mercurios-client:
+    #     image: mercurios-client
+    #     container_name: mercurios-client
+    #     environment:
+    #         MERCURIOS_URL: ${MERCURIOS_URL:-http://mercurios-mysql-driver:4254}
 
     mercurios-mysql-driver:
         image: mercurios-server
