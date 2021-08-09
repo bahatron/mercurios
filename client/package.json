@@ -1,6 +1,6 @@
 {
     "name": "@bahatron/mercurios",
-    "version": "2.4.0",
+    "version": "2.4.1",
     "description": "mercurios client",
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
