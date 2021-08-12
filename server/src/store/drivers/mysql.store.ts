@@ -63,9 +63,8 @@ export function mysqlDriver(): StoreDriver {
                         }
                     );
                 } else if ((err.message as string).includes("ERR_NO_STREAM")) {
-                    throw $error.NotFound(`stream not found`, {
-                        topic: event.topic,
-                    });
+                    await createStream(event.topic);
+                    return this.append(event);
                 } else {
                     $logger.error(err);
 
@@ -163,6 +162,21 @@ export function mysqlDriver(): StoreDriver {
     };
 }
 
+async function createStream(topic: string) {
+    try {
+        await $mysql.table("mercurios_topics").insert({ topic, seq: 0 });
+    } catch (err) {
+        if (
+            err.message.includes("duplicate key value") ||
+            err.code === "23505"
+        ) {
+            return;
+        }
+
+        throw err;
+    }
+}
+
 async function appendTransaction({
     topic,
     published_at,
@@ -180,8 +194,7 @@ async function appendTransaction({
             ).shift()?.seq + 1;
 
         if (nextSeq === null || isNaN(nextSeq)) {
-            await trx.table(TOPIC_TABLE).insert({ topic, seq: 0 });
-            nextSeq = 1;
+            throw new Error("ERR_NO_STREAM");
         } else if (expectedSeq && expectedSeq !== nextSeq) {
             throw new Error("ERR_CONFLICT");
         }
