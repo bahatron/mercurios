@@ -10,9 +10,7 @@ x-mercurios-config: &mercurios-config
     MERCURIOS_SWAGGER: 1
 
 x-mongo-config: &mongo-config
-    MONGO_URL: mongodb://mercurios-mongo:27017/mercurios
-    # not necessary if url if mongodb+srv
-    MONGO_REPLICA_SET: rs0
+    MONGO_URL: mongodb://mercurios-mongo:27017/mercurios?replicaSet=rs0
 
 x-postgres-config: &postgres-config
     POSTGRES_PASSWORD: secret
@@ -66,7 +64,7 @@ services:
     mercurios-playground:
         image: mercurios-playground
         container_name: mercurios-playground
-        command: sh -c "npm run dev"
+        command: npm run dev
         ports:
             - 3000:3000
         environment:

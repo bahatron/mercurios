@@ -22,6 +22,6 @@ server.route({
     },
 });
 
-server.listen(3000, "0.0.0.0", () => {
+server.listen(4250, "0.0.0.0", () => {
     console.log(`playground server listening`);
 });

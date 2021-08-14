@@ -1,8 +1,4 @@
-import {
-    $mongo,
-    MONGO_TOPIC_COLLECTION,
-    MONGO_EVENT_COLLECTION,
-} from "../../services/mongo";
+import { $mongo } from "../../services/mongo";
 import $error from "../../utils/error";
 import { $logger } from "../../utils/logger";
 import { MercuriosEvent } from "../../models/event";
@@ -14,7 +10,7 @@ export function mongoDriver(): StoreDriver {
         async setup() {
             let mongo = await $mongo.db;
 
-            await mongo.collection(MONGO_EVENT_COLLECTION).createIndexes([
+            await mongo.collection(COLLECTION.EVENTS).createIndexes([
                 {
                     key: { published_at: 1 },
                 },
@@ -23,7 +19,7 @@ export function mongoDriver(): StoreDriver {
                 },
             ]);
 
-            await mongo.collection(MONGO_EVENT_COLLECTION).createIndex(
+            await mongo.collection(COLLECTION.EVENTS).createIndex(
                 {
                     topic: 1,
                     seq: 1,
@@ -46,7 +42,7 @@ export function mongoDriver(): StoreDriver {
                     let {
                         value: { seq: nextSeq },
                     }: any = await $mongo.db
-                        .collection(MONGO_TOPIC_COLLECTION)
+                        .collection(COLLECTION.TOPICS)
                         .findOneAndUpdate(
                             { _id: event.topic },
                             { $inc: { seq: 1 } },

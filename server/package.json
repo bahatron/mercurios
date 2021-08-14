@@ -9,6 +9,7 @@
         "dev": "npm run build:watch & npm run start:pm2",
         "test": "MERCURIOS_DEBUG=0 mocha",
         "benchmark": "node dist/bin/benchmark.js",
+        "store:delete-topic": "node dist/bin/delete-topic.js",
         "build": "tsc",
         "build:watch": "npm run build -- --watch",
         "build:clean": "rm -rf dist/ && npm run build"
