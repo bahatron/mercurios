@@ -36,7 +36,7 @@ function runSetup() {
 }
 
 function build() {
-    exec(`docker-compose build --parallel`);
+    exec(`docker-compose build --parallel mercurios-server mercurios-client`);
 }
 
 function shutDown() {

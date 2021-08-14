@@ -166,10 +166,7 @@ async function createStream(topic: string) {
     try {
         await $mysql.table("mercurios_topics").insert({ topic, seq: 0 });
     } catch (err) {
-        if (
-            err.message.includes("duplicate key value") ||
-            err.code === "23505"
-        ) {
+        if (err.message.includes("Duplicate entry")) {
             return;
         }
 
@@ -211,33 +208,6 @@ async function appendTransaction({
 
         return nextSeq;
     });
-}
-
-async function appendProcedure({
-    data,
-    seq: expectedSeq,
-    key,
-    published_at,
-    topic,
-}: MercuriosEvent) {
-    let parsed: any = data ? $json.stringify(data) : null;
-
-    let result: number | undefined = await $mysql.transaction(async (trx) => {
-        await trx.raw(`SET @seq = ${expectedSeq || null};`);
-
-        await trx.raw(`call append_event(?, @seq, ?, ?, ?);`, [
-            topic,
-            published_at,
-            key,
-            parsed,
-        ]);
-
-        let result = await trx.raw(`SELECT @seq`);
-
-        return result.shift()?.shift()?.["@seq"];
-    });
-
-    return result;
 }
 
 async function retrySetup(): Promise<boolean> {
