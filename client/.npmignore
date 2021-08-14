@@ -1,6 +1,5 @@
 src/
 node_modules/
-nodemon.json
 tsconfig.json
 .mocharc.js
 *.test.*

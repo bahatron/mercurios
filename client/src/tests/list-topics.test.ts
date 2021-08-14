@@ -1,5 +1,5 @@
 import { connect } from "..";
-import { $http } from "../utils/http";
+import { $http } from "../utils/axios";
 import { expect } from "chai";
 
 const TEST_TOPICS = [

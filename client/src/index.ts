@@ -1,10 +1,10 @@
 import * as client from "./client/client";
-export * from "./client/client";
+import { ConnectOptions } from "./client/interfaces";
 
-import * as interfaces from "./client/interfaces";
+export * from "./client/client";
 export * from "./client/interfaces";
 
-export function connect(params: interfaces.ConnectOptions) {
+export function connect(params: ConnectOptions) {
     return client.MercuriosClient(params);
 }
 

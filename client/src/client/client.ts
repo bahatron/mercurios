@@ -1,9 +1,9 @@
 import { Connection } from "./connection";
-import { $http } from "../utils/http";
+import { $http } from "../utils/axios";
 import { $error } from "../utils/error";
 import { AxiosError } from "axios";
 import { v4 } from "uuid";
-import { $json, Logger } from "@bahatron/utils";
+import { Logger } from "@bahatron/utils";
 import {
     ConnectOptions,
     FilterOptions,
@@ -20,20 +20,19 @@ export function MercuriosClient({
     id: _id = v4(),
     debug: _debug = false,
 }: ConnectOptions) {
-    const _logger = Logger({
+    const _logger = Logger.Logger({
         debug: _debug,
         pretty: false,
         id: `mercurios:client:${_id}`,
-        formatter: $json.stringify,
     });
 
-    _logger.debug({ _url, _id }, "creating mercurios client...");
+    _logger.debug({ _url, _id }, "connecting to mercurios server...");
 
-    let _socket = Connection(_url, _id, _logger);
+    let _connection = Connection(_url, _id, _logger);
 
     return {
         async close() {
-            await _socket.close();
+            await _connection.close();
         },
 
         async ping(): Promise<boolean> {
@@ -137,9 +136,9 @@ export function MercuriosClient({
 
             let subscription = v4();
 
-            _socket.on(subscription, handler);
+            _connection.on(subscription, handler);
 
-            await _socket.send({
+            await _connection.send({
                 action: "subscribe",
                 topic,
                 subscription,
@@ -152,10 +151,12 @@ export function MercuriosClient({
         },
 
         async unsubscribe(subscription: string): Promise<void> {
-            await _socket.send({
+            await _connection.send({
                 action: "unsubscribe",
                 subscription,
             });
+
+            _connection.off(subscription);
 
             _logger.debug({ subscription }, "removed subscription");
         },

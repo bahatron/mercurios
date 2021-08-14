@@ -9,6 +9,7 @@
         "sourceMap": true,
         "outDir": "lib",
         "strict": true,
+        "skipLibCheck": true
     },
     "include": [
         "src",

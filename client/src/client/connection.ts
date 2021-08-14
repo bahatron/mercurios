@@ -1,9 +1,8 @@
-import $ws, { ClientOptions } from "ws";
+import ws, { ClientOptions } from "ws";
 import { $error } from "../utils/error";
-import { Logger } from "@bahatron/utils";
+import { Logger } from "@bahatron/utils/lib/logger";
 import {
     MercuriosMessage,
-    MercuriosEvent,
     MercuriosEventHandler,
     ServerMessage,
 } from "./interfaces";
@@ -22,10 +21,10 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
 
     function Socket() {
         try {
-            let socket = new $ws(_url, <ClientOptions>{});
+            let socket = new ws(_url, <ClientOptions>{});
 
             socket.on("open", async function onSocketOpen() {
-                _logger.info("ws connection open");
+                _logger.debug("ws connection open");
 
                 _pingInterval = setInterval(async () => {
                     if (socket.readyState !== socket.OPEN) {
@@ -138,6 +137,12 @@ export function Connection(_url: string, _id: string, _logger: Logger) {
             }
 
             _listeners[event].add(handler);
+        },
+
+        off(event: string): void {
+            if (_listeners[event]) {
+                delete _listeners[event];
+            }
         },
 
         close() {
