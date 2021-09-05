@@ -1,21 +1,17 @@
 {
     "compilerOptions": {
-        "target": "es6",
-        "module": "CommonJS",
-        "moduleResolution": "node",
-        "esModuleInterop": true,
+        "strict": true,
+        "outDir": "lib",
+        "target": "es2019",
+        "sourceMap": true,
         "declaration": true,
         "incremental": true,
-        "sourceMap": true,
-        "outDir": "lib",
-        "strict": true,
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "module": "commonjs",
+        "noImplicitAny": false,
+        "esModuleInterop": true,
+        "moduleResolution": "node"
     },
-    "include": [
-        "src",
-    ],
-    "exclude": [
-        "node_modules",
-        "lib"
-    ]
+    "include": ["src"],
+    "exclude": ["node_modules", "lib"]
 }

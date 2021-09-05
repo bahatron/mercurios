@@ -1,4 +1,12 @@
 src/
+run.js
+docker-compose.*
+Dockerfile.*
+Tiltfile
+Tiltfile.*
+.gitlab-ci.yml
+.tiltignore
+.dockerignore
 node_modules/
 tsconfig.json
 .mocharc.js

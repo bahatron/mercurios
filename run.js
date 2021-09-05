@@ -1,7 +1,7 @@
 #!/usr/bin/node
 const { execSync } = require("child_process");
 const argv = process.argv.slice(2);
-const exec = (command) => execSync(command, { stdio: [0, 1, 2] });
+const exec = (command, env) => execSync(command, { stdio: [0, 1, 2], env });
 const exit = (code) => process.exit(code);
 const argsContains = (flag) => {
     return Array.isArray(flag)
@@ -9,13 +9,75 @@ const argsContains = (flag) => {
         : argv.includes(flag);
 };
 
+/**
+ * constants
+ */
 const DEV_COMPOSE = "docker-compose.dev.yml";
-const TEST_COMPOSE = "docker-compose.test.yml";
 
-if (argsContains("build")) {
-    build();
+/**
+ * flags
+ */
+const hasCleanFlags = () => argsContains(["-c", "--clean"]);
+
+/**
+ * command handlers
+ */
+if (argsContains("setup")) {
+    if (hasCleanFlags()) {
+        exec(`find . -name "node_modules" -type d -prune -exec rm -rf '{}' +`);
+        exec("npx lerna clean -y");
+    }
+
+    exec("npm install");
     exit(0);
-} else if (argsContains("setup")) {
+}
+
+function shutDown() {
+    // exec(`test $(command -v tilt) && tilt down`);
+    exec(`docker-compose -f ${DEV_COMPOSE} down --remove-orphans --volumes`);
+}
+
+function runDev() {
+    if (hasCleanFlags()) {
+        shutDown();
+    }
+
+    let services = [`mercurios-client`, `mercurios-playground`];
+
+    if (argsContains(["--pg"])) {
+        services = [...services, "mercurios-postgres"];
+        exec(` tilt up --hud=true ${services.join(" ")}`, {
+            MERCURIOS_STORE: "pg",
+        });
+    } else if (argsContains(["--mongo"])) {
+        services = [...services, "mercurios-mongo"];
+        exec(`tilt up --hud=true ${services.join(" ")}`, {
+            MERCURIOS_STORE: "mongo",
+        });
+    } else {
+        services = [...services, "mercurios-mysql"];
+        exec(`tilt up --hud=true ${services.join(" ")}`, {
+            MERCURIOS_STORE: "mysql",
+        });
+    }
+
+    shutDown();
+    exit(0);
+}
+
+function runTest() {
+    if (hasCleanFlags()) {
+        shutDown();
+    }
+
+    exec(`./scripts/test.sh`);
+    exit(0);
+}
+
+/**
+ * main
+ */
+if (argsContains("setup")) {
     runSetup();
     exit(0);
 } else if (argsContains("down")) {
@@ -28,64 +90,5 @@ if (argsContains("build")) {
     runTest();
     exit(0);
 } else {
-    exit(0);
-}
-
-function runSetup() {
-    exec(`npm install && npm run bootstrap`);
-}
-
-function build() {
-    exec(`docker-compose build --parallel mercurios-server mercurios-client`);
-}
-
-function shutDown() {
-    // exec(`test $(command -v tilt) && tilt down`);
-    exec(`docker-compose -f ${DEV_COMPOSE} down --remove-orphans --volumes`);
-    exec(`docker-compose -f ${TEST_COMPOSE} down --remove-orphans --volumes`);
-}
-
-function shouldCleanUp() {
-    if (argsContains(["-c", "--clean"])) {
-        shutDown();
-    }
-}
-
-function shouldBuild() {
-    if (argsContains(["-b", "--build"])) {
-        build();
-    }
-}
-
-function runDev() {
-    shouldBuild();
-    shouldCleanUp();
-
-    let services = [
-        `mercurios-server`,
-        `mercurios-nats`,
-        `mercurios-client`,
-        `mercurios-playground`,
-    ];
-
-    if (argsContains(["--pg"])) {
-        services = [...services, "mercurios-postgres"];
-        exec(`MERCURIOS_STORE=pg tilt up --hud=true ${services.join(" ")}`);
-    } else if (argsContains(["--mongo"])) {
-        services = [...services, "mercurios-mongo"];
-        exec(`MERCURIOS_STORE=mongo tilt up --hud=true ${services.join(" ")}`);
-    } else {
-        services = [...services, "mercurios-mysql"];
-        exec(`MERCURIOS_STORE=mysql tilt up --hud=true ${services.join(" ")}`);
-    }
-
-    shutDown();
-    exit(0);
-}
-
-function runTest() {
-    shouldCleanUp();
-    shouldBuild();
-    exec(`./scripts/test.sh`);
     exit(0);
 }

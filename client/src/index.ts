@@ -1,13 +1,3 @@
-import * as client from "./client/client";
-import { ConnectOptions } from "./client/interfaces";
+import { createLogger } from "./utils/logger";
 
-export * from "./client/client";
-export * from "./client/interfaces";
-
-export function connect(params: ConnectOptions) {
-    return client.MercuriosClient(params);
-}
-
-export default {
-    connect,
-};
+let logger = createLogger({ id: () => "" });

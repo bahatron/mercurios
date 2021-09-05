@@ -1,12 +1,6 @@
 version: "3.5"
 
 services:
-    mercurios-server:
-        build:
-            context: .
-            dockerfile: Dockerfile.server
-        image: mercurios-server
-
     mercurios-client:
         build:
             context: .

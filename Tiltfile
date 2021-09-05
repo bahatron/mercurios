@@ -1,17 +1,6 @@
 docker_compose(['./docker-compose.dev.yml'])
 # update_settings(max_parallel_updates=2)
 
-docker_build('mercurios-server', '.', dockerfile = 'Dockerfile.server',
-    live_update=[
-        sync('./server', '/app/server'),
-        sync("./scripts", '/app/scripts')
-    ],
-    only=[
-        './server',
-        './scripts'
-    ]
-)
-
 docker_build('mercurios-client', '.', dockerfile = 'Dockerfile.client',
     live_update=[
         sync('./client', '/app/client'),
@@ -28,6 +17,7 @@ docker_build('mercurios-playground', '.', dockerfile = 'Dockerfile.playground',
         sync('./client', '/app/client'),
     ],
     only=[
+        './scripts/wait-for-it.sh',
         './playground',
         './client'
     ],

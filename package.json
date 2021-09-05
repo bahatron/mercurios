@@ -1,23 +1,37 @@
 {
     "name": "mercurios",
     "version": "1.0.1",
-    "description": "HTTP based event sourcing and message broker",
+    "description": "Event Sourcing with configurable database engine",
+    "private": true,
     "main": "run.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
         "bootstrap": "lerna bootstrap"
     },
     "repository": {
         "type": "git",
         "url": "git+https://gitlab.com/bahatron/mercurios.git"
     },
-    "author": "",
+    "author": "simonpiscitelli@gmail.com",
     "license": "ISC",
     "bugs": {
         "url": "https://gitlab.com/bahatron/mercurios/issues"
     },
     "homepage": "https://gitlab.com/bahatron/mercurios#readme",
     "dependencies": {
-        "lerna": "^4.0.0"
+        "lerna": "^4.0.0",
+        "husky": "^4.3.0",
+        "lint-staged": "^10.4.0",
+        "prettier": "^2.1.2"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "echo 'PRECOMMIT HOOK TRIGGERED' && lint-staged"
+        }
+    },
+    "lint-staged": {
+        "**/*.(ts|json|vue|scss)": [
+            "prettier --write",
+            "git add"
+        ]
     }
 }

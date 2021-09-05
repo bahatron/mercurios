@@ -1,8 +1,7 @@
 version: "3.5"
 
-x-mercurios-config: &mercurios-config
+x-mercurios-config: &client-config
     NATS_URL: nats://mercurios-nats:4222
-    MERCURIOS_TEST_URL: http://mercurios-server:4254
     MERCURIOS_STORE: ${MERCURIOS_STORE:-mysql}
     MERCURIOS_WORKERS: ${MERCURIOS_WORKERS:-2}
     MERCURIOS_DEBUG: 1
@@ -12,6 +11,7 @@ x-mercurios-config: &mercurios-config
 x-mongo-config: &mongo-config
     MONGO_URL: mongodb://mercurios-mongo:27017/mercurios?replicaSet=rs0
 
+## TODO: CONVERT TO SINGLE LINE URL
 x-postgres-config: &postgres-config
     POSTGRES_PASSWORD: secret
     POSTGRES_DB: mercurios
@@ -19,6 +19,7 @@ x-postgres-config: &postgres-config
     POSTGRES_PORT: 5432
     POSTGRES_HOST: mercurios-postgres
 
+## TODO: CONVERT TO SINGLE LINE URL
 x-mysql-config: &mysql-config
     MYSQL_USER: admin
     MYSQL_DATABASE: mercurios
@@ -29,53 +30,28 @@ x-mysql-config: &mysql-config
     # rds ssl cert will be present at /etc/ssl/rds-combined-ca-bundle.pem
     MYSQL_RDS_SSL: 0
 
-# # todo: create store driver
-# x-yugabyte-config: &yugabyte-config
-#     YUGABYTE_USER: postgres
-#     YUGABYTE_DB: postgres
-#     YUGABYTE_HOST: mercurios-yb-tserver
-#     YUGABYTE_PORT: 5433
-
 services:
-    mercurios-server:
-        image: mercurios-server
-        container_name: mercurios-server
-        ports:
-            - 4254:4254
-            - 9230:9230
-        command: sh -c "npm run dev"
-        environment:
-            <<: *mercurios-config
-            <<: *mysql-config
-            <<: *postgres-config
-            # <<: *yugabyte-config
-            <<: *mongo-config
-
     mercurios-client:
         image: mercurios-client
         container_name: mercurios-client
-        command: sh -c "npm run dev"
+        command: sh -c "npm run build:watch"
         volumes:
-            - ./client/lib:/app/client/lib
+            - ./src/lib:/app/client/lib
         environment:
-            MERCURIOS_URL: ws://mercurios-server:4254
-            MERCURIOS_DEV: 1
+            <<: *client-config
+            <<: *mysql-config
+            <<: *postgres-config
 
     mercurios-playground:
         image: mercurios-playground
         container_name: mercurios-playground
-        command: npm run dev
-        ports:
-            - 3000:3000
+        command: sh -c "npm run dev"
         environment:
-            MERCURIOS_URL: ${MERCURIOS_URL:-http://mercurios-server:4254}
-
-    mercurios-nats:
-        image: nats
-        container_name: mercurios-nats
-        command: ["-V"]
+            <<: *client-config
+            <<: *mysql-config
+            <<: *postgres-config
         ports:
-            - 4222:4222
+            - 4254:4254
 
     mercurios-mysql:
         image: mysql:5.7
@@ -97,9 +73,13 @@ services:
     mercurios-mongo:
         image: mongo
         container_name: mercurios-mongo
-        command: ["--bind_ip_all", "--replSet", "rs0"]
-        healthcheck:
-            test: test $$(echo "rs.initiate().ok || rs.status().ok" | mongo --port 27017 --quiet) -eq 1
-            interval: 10s
+        command: /scripts/mongo-init.sh
+        working_dir: /scripts
+        volumes:
+            - ./scripts:/scripts
         ports:
             - 27017:27017
+        environment:
+            MONGO_DB_REPLICA_SET_NAME: rs0
+            MONGO_DB_HOST_NAME: io-mongo
+            MONGO_DB_HOST_PORT: 27017
