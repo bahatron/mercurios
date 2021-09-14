@@ -19,48 +19,7 @@ x-postgres-config: &postgres-config
     POSTGRES_PORT: 5432
     POSTGRES_HOST: mercurios-postgres
 
-## TODO: CONVERT TO SINGLE LINE URL
-x-mysql-config: &mysql-config
-    MYSQL_USER: admin
-    MYSQL_DATABASE: mercurios
-    MYSQL_PASSWORD: secret
-    MYSQL_ROOT_PASSWORD: secret
-    MYSQL_HOST: mercurios-mysql
-    MYSQL_PORT: 3306
-    # rds ssl cert will be present at /etc/ssl/rds-combined-ca-bundle.pem
-    MYSQL_RDS_SSL: 0
-
 services:
-    mercurios-client:
-        image: mercurios-client
-        container_name: mercurios-client
-        command: sh -c "npm run build:watch"
-        volumes:
-            - ./src/lib:/app/client/lib
-        environment:
-            <<: *client-config
-            <<: *mysql-config
-            <<: *postgres-config
-
-    mercurios-playground:
-        image: mercurios-playground
-        container_name: mercurios-playground
-        command: sh -c "npm run dev"
-        environment:
-            <<: *client-config
-            <<: *mysql-config
-            <<: *postgres-config
-        ports:
-            - 4254:4254
-
-    mercurios-mysql:
-        image: mysql:5.7
-        container_name: mercurios-mysql
-        ports:
-            - 3306:3306
-        environment:
-            <<: *mysql-config
-
     mercurios-postgres:
         image: postgres
         container_name: mercurios-postgres
@@ -83,3 +42,26 @@ services:
             MONGO_DB_REPLICA_SET_NAME: rs0
             MONGO_DB_HOST_NAME: io-mongo
             MONGO_DB_HOST_PORT: 27017
+
+    mercurios-client:
+        image: mercurios-client
+        container_name: mercurios-client
+        command: sh -c "npm run build:watch"
+        volumes:
+            - ./src/lib:/app/client/lib
+        environment:
+            <<: *client-config
+            <<: *postgres-config
+
+    mercurios-playground:
+        image: mercurios-playground
+        container_name: mercurios-playground
+        command: sh -c "npm run dev"
+        environment:
+            <<: *client-config
+            <<: *postgres-config
+        ports:
+            - 4254:4254
+        depends_on:
+            - mercurios-postgres
+            - mercurios-mongo

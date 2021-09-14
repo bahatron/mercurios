@@ -16,21 +16,19 @@
     "author": "simonpiscitelli@gmail.com",
     "license": "Apache-2.0",
     "dependencies": {
-        "@bahatron/utils": "^2.3.1",
-        "axios": "^0.21.1",
-        "uuid": "^8.3.2",
-        "ws": "^7.5.3"
+        "@bahatron/utils": "^2.4.0",
+        "axios": "^0.21.4",
+        "knex": "^0.21.19",
+        "uuid": "^8.3.2"
     },
     "devDependencies": {
-        "@types/chai": "^4.2.21",
+        "@types/jest": "^27.0.1",
         "@types/luxon": "^1.27.1",
         "@types/mocha": "^8.2.3",
-        "@types/node": "^14.17.9",
+        "@types/node": "^14.17.15",
         "@types/uuid": "^8.3.1",
-        "@types/ws": "^7.4.7",
-        "chai": "^4.3.3",
+        "jest": "^27.2.0",
         "luxon": "^1.28.0",
-        "mocha": "^8.4.0",
         "ts-node": "^9.1.1",
         "tslib": "^2.3.1",
         "typescript": "^3.9.10"

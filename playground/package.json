@@ -7,7 +7,7 @@
     },
     "dependencies": {
         "@bahatron/mercurios": "file:../client",
-        "@bahatron/utils": "^2.3.1",
+        "@bahatron/utils": "^2.4.0",
         "@types/node": "^16.3.1",
         "fastify": "^3.19.0",
         "nodemon": "^2.0.12",

@@ -7,10 +7,16 @@
         "declaration": true,
         "incremental": true,
         "skipLibCheck": true,
+        "skipDefaultLibCheck": true,
         "module": "commonjs",
         "esModuleInterop": true,
         "moduleResolution": "node"
     },
-    "include": ["src"],
-    "exclude": ["node_modules", "lib"]
+    "include": [
+        "src"
+    ],
+    "exclude": [
+        "node_modules",
+        "lib"
+    ]
 }
