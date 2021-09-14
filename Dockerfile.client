@@ -1,7 +1,0 @@
-FROM node:lts-slim as src
-
-WORKDIR /app/client
-COPY ./client/package.json ./package.json
-RUN npm install
-COPY ./client .
-RUN npm run build:clean

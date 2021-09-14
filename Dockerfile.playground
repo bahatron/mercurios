@@ -1,6 +1,7 @@
 FROM node:lts-slim as src
 COPY scripts/wait-for-it.sh /usr/bin/wait-for-it
 RUN chmod 777 /usr/bin/wait-for-it
+RUN npm i -g pm2
 EXPOSE 4254
 
 WORKDIR /app/client
@@ -17,4 +18,5 @@ RUN npm run prepare
 
 WORKDIR /app/playground
 COPY ./playground .
+RUN npm run build:clean
 CMD [ "npm", "run", "dev" ]

@@ -43,16 +43,6 @@ services:
             MONGO_DB_HOST_NAME: io-mongo
             MONGO_DB_HOST_PORT: 27017
 
-    mercurios-client:
-        image: mercurios-client
-        container_name: mercurios-client
-        command: sh -c "npm run build:watch"
-        volumes:
-            - ./src/lib:/app/client/lib
-        environment:
-            <<: *client-config
-            <<: *postgres-config
-
     mercurios-playground:
         image: mercurios-playground
         container_name: mercurios-playground

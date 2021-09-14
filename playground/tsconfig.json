@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "strict": true,
-        "outDir": "lib",
+        "outDir": "dist",
         "target": "es2019",
         "sourceMap": true,
         "declaration": true,
@@ -12,11 +12,6 @@
         "esModuleInterop": true,
         "moduleResolution": "node"
     },
-    "include": [
-        "src"
-    ],
-    "exclude": [
-        "node_modules",
-        "lib"
-    ]
+    "include": ["src"],
+    "exclude": ["node_modules", "lib"]
 }

@@ -29,6 +29,7 @@ if (argsContains("setup")) {
     }
 
     exec("npm install");
+    exec(`npm run bootstrap`);
 }
 
 function shutDown() {
@@ -55,10 +56,7 @@ function runTest() {
 /**
  * main
  */
-if (argsContains("setup")) {
-    runSetup();
-    exit(0);
-} else if (argsContains("down")) {
+if (argsContains("down")) {
     shutDown();
     exit(0);
 } else if (argsContains("dev")) {
