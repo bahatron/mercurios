@@ -2,9 +2,9 @@ import { MercuriosEvent } from "../models/event";
 
 export interface StoreDriver {
     // event management
-    append(event: MercuriosEvent): Promise<MercuriosEvent>;
+    append(event: AppendOptions): Promise<MercuriosEvent>;
     read(topic: string, seq: number): Promise<MercuriosEvent | undefined>;
-    filter(topic: string, query: EventFilters): Promise<MercuriosEvent[]>;
+    filter(topic: string, filters: EventFilters): Promise<MercuriosEvent[]>;
     latest(topic: string): Promise<MercuriosEvent | undefined>;
     // topic management
     deleteTopic(topic: string): Promise<void>;

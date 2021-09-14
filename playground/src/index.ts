@@ -1,4 +1,4 @@
-import fastify from "fastify";
+import fastify, { FastifySchema } from "fastify";
 import fastifySwagger from "fastify-swagger";
 
 let server = fastify();
@@ -15,14 +15,11 @@ server.register(fastifySwagger, {
             url: "https://swagger.io",
             description: "Find more info here",
         },
-        host: "localhost",
+        host: "localhost:4254",
         schemes: ["http"],
         consumes: ["application/json"],
         produces: ["application/json"],
-        tags: [
-            { name: "user", description: "User related end-points" },
-            { name: "code", description: "Code related end-points" },
-        ],
+        tags: [{ name: "user", description: "User related end-points" }],
         definitions: {
             User: {
                 type: "object",
@@ -57,6 +54,9 @@ server.route({
     url: "/ping",
     handler: async (req, res) => {
         return res.send("pong");
+    },
+    schema: {
+        tags: ["APM"],
     },
 });
 

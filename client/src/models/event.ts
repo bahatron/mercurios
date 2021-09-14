@@ -1,4 +1,5 @@
 import { pickBy } from "lodash";
+import { $json } from "../utils/json";
 import { $validator } from "../utils/validator";
 import { MercuriosEventSchema } from "./event.schema";
 
@@ -23,7 +24,7 @@ export function MercuriosEvent({
             topic,
             timestamp,
             seq,
-            data: JSON.parse(data),
+            data: $json.parse(data),
             key,
         },
         Boolean
