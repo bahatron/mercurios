@@ -27,6 +27,6 @@ export interface EventFilters {
     after?: string;
 }
 
-export type AppendOptions = Omit<MercuriosEvent, "seq"> & {
+export type AppendOptions = Omit<MercuriosEvent, "seq" | "timestamp"> & {
     expectedSeq?: number;
 };

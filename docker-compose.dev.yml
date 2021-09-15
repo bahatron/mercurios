@@ -1,8 +1,8 @@
 version: "3.5"
 
-x-mercurios-config: &client-config
+x-client-config: &client-config
     NATS_URL: nats://mercurios-nats:4222
-    MERCURIOS_STORE: ${MERCURIOS_STORE:-mysql}
+    MERCURIOS_STORE: ${MERCURIOS_STORE:-pg}
     MERCURIOS_WORKERS: ${MERCURIOS_WORKERS:-2}
     MERCURIOS_DEBUG: 1
     MERCURIOS_DEV: 1
@@ -50,8 +50,20 @@ services:
         environment:
             <<: *client-config
             <<: *postgres-config
+            <<: *mongo-config
         ports:
             - 4254:4254
         depends_on:
             - mercurios-postgres
             - mercurios-mongo
+
+    mercurios-client:
+        image: mercurios-client
+        container_name: mercurios-client
+        command: sh -c "npm run build:watch"
+        environment:
+            <<: *client-config
+            <<: *postgres-config
+            <<: *mongo-config
+        depends_on:
+            - mercurios-playground

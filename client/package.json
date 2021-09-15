@@ -11,7 +11,8 @@
         "build": "tsc",
         "build:watch": "tsc --watch",
         "build:clean": "rm -rf dist && tsc",
-        "test": "jest --forceExit --config=jest.unit.config.js",
+        "test": "jest --forceExit",
+        "test:ts": "jest --forceExit --config=jest.unit.config.js",
         "test:ci": "jest --silent --forceExit --reporters=default --reporters=jest-stare"
     },
     "author": "simonpiscitelli@gmail.com",

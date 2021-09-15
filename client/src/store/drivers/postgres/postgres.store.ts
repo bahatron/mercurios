@@ -2,6 +2,7 @@ import { Json } from "@bahatron/utils";
 import * as Knex from "knex";
 import { MercuriosEvent } from "../../../models/event";
 import { $error } from "../../../utils/error";
+import { $logger } from "../../../utils/logger";
 import { knexEventFilter, natsQueryToSql } from "../../store.helpers";
 import { AppendOptions, StoreDriver } from "../../store.interfaces";
 import { STORE_COLLECTION } from "../../store.values";
@@ -9,45 +10,33 @@ import { PostgresClient } from "./postgres.client";
 
 const STORED_PROCEDURE = "append_event";
 
+/**
+ * @todo: leverage postgres date type
+ */
 export async function PostgresStore({ url }): Promise<StoreDriver> {
     const $postgres = PostgresClient({ url });
     await setup($postgres);
 
     let store: StoreDriver = {
-        async append({ topic, expectedSeq, timestamp, key, data }) {
+        async append(params) {
             try {
-                let result = await $postgres.raw(
-                    `call ${STORED_PROCEDURE}(?, ?, ?, ?)`,
-                    [
-                        topic,
-                        expectedSeq ?? null,
-                        timestamp,
-                        key ?? null,
-                        Json.stringify(data) ?? null,
-                    ]
-                );
-
-                return MercuriosEvent(result.rows.shift());
+                return await appendProcedure(MercuriosEvent(params), $postgres);
             } catch (err: any) {
-                if ((err.message as string).includes("ERR_NO_STREAM")) {
-                    await createTopic(topic, $postgres);
+                if (err.message.includes("ERR_NO_STREAM")) {
+                    $logger.debug(`creating new topic..`);
+                    await createTopic(params.topic, $postgres);
 
-                    return store.append({
-                        topic,
-                        timestamp,
-                        data,
-                        expectedSeq,
-                        key,
-                    });
-                } else if ((err.message as string).includes("ERR_CONFLICT")) {
+                    return store.append(params);
+                } else if (err.message.includes("ERR_CONFLICT")) {
                     throw $error.ExpectationFailed(
                         "Conflict with expected sequence",
                         {
                             code: "ERR_CONFLICT",
-                            expectedSeq,
+                            expectedSeq: params.expectedSeq,
                         }
                     );
                 } else {
+                    $logger.error(err);
                     throw $error.InternalError("PostgresError", err);
                 }
             }
@@ -150,6 +139,35 @@ export async function PostgresStore({ url }): Promise<StoreDriver> {
     return store;
 }
 
+/**
+ * @todo: clean up interface
+ */
+async function appendProcedure(
+    {
+        topic,
+        expectedSeq,
+        timestamp,
+        key,
+        data,
+    }: MercuriosEvent & { expectedSeq?: number },
+    $postgres: Knex
+) {
+    let result = await $postgres.raw(
+        `call ${STORED_PROCEDURE}(?, ?, ?, ?, ?)`,
+        [
+            topic,
+            expectedSeq ?? null,
+            timestamp,
+            key ?? null,
+            Json.stringify(data) ?? null,
+        ]
+    );
+
+    let seq = result.rows.shift().v_seq;
+
+    return MercuriosEvent({ topic, seq, timestamp, key, data });
+}
+
 async function createTopic(topic: string, $postgres: Knex) {
     try {
         await $postgres.table("mercurios_topics").insert({ topic, seq: 0 });
@@ -169,29 +187,33 @@ async function createTopic(topic: string, $postgres: Knex) {
  * @todo: refactor not to use knex
  */
 async function setup($postgres: Knex) {
-    await $postgres.schema.createTableIfNotExists(
-        STORE_COLLECTION.TOPICS,
-        (table) => {
-            table.string("topic").primary();
-            table.integer("seq");
-        }
-    );
+    if (!(await $postgres.schema.hasTable(STORE_COLLECTION.TOPICS))) {
+        await $postgres.schema.createTableIfNotExists(
+            STORE_COLLECTION.TOPICS,
+            (table) => {
+                table.string("topic").primary();
+                table.integer("seq");
+            }
+        );
+    }
 
-    await $postgres.schema.createTableIfNotExists(
-        STORE_COLLECTION.EVENTS,
-        (table) => {
-            table.string("topic");
-            table.integer("seq");
-            table.string("timestamp");
-            table.string("key");
-            table.text("data");
+    if (!(await $postgres.schema.hasTable(STORE_COLLECTION.EVENTS))) {
+        await $postgres.schema.createTableIfNotExists(
+            STORE_COLLECTION.EVENTS,
+            (table) => {
+                table.string("topic");
+                table.integer("seq");
+                table.string("timestamp");
+                table.string("key");
+                table.text("data");
 
-            table.primary(["topic", "seq"]);
+                table.primary(["topic", "seq"]);
 
-            table.index(["key"]);
-            table.index(["timestamp"]);
-        }
-    );
+                table.index(["key"]);
+                table.index(["timestamp"]);
+            }
+        );
+    }
 
     await $postgres.raw(`
         CREATE OR REPLACE PROCEDURE ${STORED_PROCEDURE} (
@@ -226,4 +248,6 @@ async function setup($postgres: Knex) {
         END;
         $$;
     `);
+
+    $logger.debug(`postgres driver setup complete`);
 }

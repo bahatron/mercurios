@@ -6,3 +6,9 @@ services:
             context: .
             dockerfile: Dockerfile.playground
         image: mercurios-playground
+
+    mercurios-client:
+        build:
+            context: .
+            dockerfile: Dockerfile.client
+        image: mercurios-client
