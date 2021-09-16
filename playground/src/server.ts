@@ -1,5 +1,7 @@
 import fastify, { FastifySchema } from "fastify";
 import fastifySwagger from "fastify-swagger";
+import { $logger } from "./logger";
+import { $mercurios } from "./mercurios";
 
 let server = fastify();
 
@@ -8,14 +10,14 @@ server.register(fastifySwagger, {
     swagger: {
         info: {
             title: "Test swagger",
-            description: "Testing the Fastify swagger API",
+            description: "Mercurios API",
             version: "0.1.0",
         },
         externalDocs: {
             url: "https://swagger.io",
             description: "Find more info here",
         },
-        host: "localhost:4254",
+        // host: "localhost:4254",
         schemes: ["http"],
         consumes: ["application/json"],
         produces: ["application/json"],
@@ -57,6 +59,30 @@ server.route({
     },
     schema: {
         tags: ["APM"],
+    },
+});
+
+server.route({
+    method: "POST",
+    url: "/publish",
+    handler: async (req, res) => {
+        $logger.info({
+            body: req.body,
+        });
+        let event = await $mercurios.publish("myTopic", { data: req.body });
+
+        return res.send(event);
+    },
+});
+
+server.route({
+    method: "GET",
+    url: "/topics",
+    handler: async (req, res) => {
+        $logger.info(`fetching topics....`);
+        let result = await $mercurios.topics();
+
+        return res.send(result);
     },
 });
 

@@ -6,17 +6,11 @@
         "sourceMap": true,
         "declaration": true,
         "incremental": true,
-        "skipLibCheck": true,
         "module": "commonjs",
         "noImplicitAny": false,
         "esModuleInterop": true,
         "moduleResolution": "node"
     },
-    "include": [
-        "src"
-    ],
-    "exclude": [
-        "node_modules",
-        "lib"
-    ]
+    "include": ["src"],
+    "exclude": ["node_modules", "lib"]
 }

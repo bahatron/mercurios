@@ -3,15 +3,15 @@ const logsCommon = {
     error_file: "/dev/null",
 };
 
-
 module.exports = {
     apps: [
         {
             ...logsCommon,
             name: "playground",
-            script: "dist/index.js",
+            script: "dist/server.js",
             autorestart: false,
-            watch: ["dist"],
+            watch: ["dist", "../client"],
+            // watch: true,
         },
     ],
 };

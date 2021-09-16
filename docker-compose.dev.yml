@@ -67,3 +67,5 @@ services:
             <<: *mongo-config
         depends_on:
             - mercurios-playground
+        volumes:
+            - ./client/lib:/app/client/lib

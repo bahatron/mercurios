@@ -18,5 +18,5 @@ RUN npm run prepare
 
 WORKDIR /app/playground
 COPY ./playground .
-RUN npm run build:clean
+RUN npm run build
 CMD [ "npm", "run", "dev" ]

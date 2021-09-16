@@ -1,10 +1,10 @@
 import { Json } from "@bahatron/utils";
 import * as Knex from "knex";
-import { MercuriosEvent } from "../../../models/event";
+import { AppendOptions } from "../..";
+import { MercuriosEvent } from "../../../event/event";
 import { $error } from "../../../utils/error";
-import { $logger } from "../../../utils/logger";
 import { knexEventFilter, natsQueryToSql } from "../../store.helpers";
-import { AppendOptions, StoreDriver } from "../../store.interfaces";
+import { StoreDriver } from "../../store.interfaces";
 import { STORE_COLLECTION } from "../../store.values";
 import { PostgresClient } from "./postgres.client";
 
@@ -13,17 +13,16 @@ const STORED_PROCEDURE = "append_event";
 /**
  * @todo: leverage postgres date type
  */
-export async function PostgresStore({ url }): Promise<StoreDriver> {
+export async function PostgresDriver({ url }): Promise<StoreDriver> {
     const $postgres = PostgresClient({ url });
     await setup($postgres);
 
     let store: StoreDriver = {
         async append(params) {
             try {
-                return await appendProcedure(MercuriosEvent(params), $postgres);
+                return await appendProcedure(params, $postgres);
             } catch (err: any) {
                 if (err.message.includes("ERR_NO_STREAM")) {
-                    $logger.debug(`creating new topic..`);
                     await createTopic(params.topic, $postgres);
 
                     return store.append(params);
@@ -36,8 +35,7 @@ export async function PostgresStore({ url }): Promise<StoreDriver> {
                         }
                     );
                 } else {
-                    $logger.error(err);
-                    throw $error.InternalError("PostgresError", err);
+                    throw err;
                 }
             }
         },
@@ -139,17 +137,8 @@ export async function PostgresStore({ url }): Promise<StoreDriver> {
     return store;
 }
 
-/**
- * @todo: clean up interface
- */
 async function appendProcedure(
-    {
-        topic,
-        expectedSeq,
-        timestamp,
-        key,
-        data,
-    }: MercuriosEvent & { expectedSeq?: number },
+    { topic, expectedSeq, timestamp, key, data }: AppendOptions,
     $postgres: Knex
 ) {
     let result = await $postgres.raw(
@@ -208,7 +197,6 @@ async function setup($postgres: Knex) {
                 table.text("data");
 
                 table.primary(["topic", "seq"]);
-
                 table.index(["key"]);
                 table.index(["timestamp"]);
             }
@@ -248,6 +236,4 @@ async function setup($postgres: Knex) {
         END;
         $$;
     `);
-
-    $logger.debug(`postgres driver setup complete`);
 }

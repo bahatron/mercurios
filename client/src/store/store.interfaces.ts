@@ -1,4 +1,4 @@
-import { MercuriosEvent } from "../models/event";
+import { MercuriosEvent } from "../event/event";
 
 export interface StoreDriver {
     // event management
@@ -27,6 +27,6 @@ export interface EventFilters {
     after?: string;
 }
 
-export type AppendOptions = Omit<MercuriosEvent, "seq" | "timestamp"> & {
+export type AppendOptions = Omit<MercuriosEvent, "seq"> & {
     expectedSeq?: number;
 };

@@ -4,13 +4,14 @@
         "outDir": "dist",
         "target": "es2019",
         "sourceMap": true,
-        "declaration": true,
         "incremental": true,
-        "skipLibCheck": true,
-        "skipDefaultLibCheck": true,
         "module": "commonjs",
         "esModuleInterop": true,
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "baseUrl": ".",
+        "paths": {
+            "@bahatron/mercurios": ["../client/lib"]
+        }
     },
     "include": ["src"],
     "exclude": ["node_modules", "lib"]
