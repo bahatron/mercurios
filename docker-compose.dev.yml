@@ -1,17 +1,8 @@
 version: "3.5"
 
 x-client-config: &client-config
-    NATS_URL: nats://mercurios-nats:4222
-    MERCURIOS_STORE: ${MERCURIOS_STORE:-pg}
-    MERCURIOS_WORKERS: ${MERCURIOS_WORKERS:-2}
-    MERCURIOS_DEBUG: 1
-    MERCURIOS_DEV: 1
-    MERCURIOS_SWAGGER: 1
+    MERCURIOS_TEST_URL: postgres://admin:secret@mercurios-postgres:5432/mercurios
 
-x-mongo-config: &mongo-config
-    MONGO_URL: mongodb://mercurios-mongo:27017/mercurios?replicaSet=rs0
-
-## TODO: CONVERT TO SINGLE LINE URL
 x-postgres-config: &postgres-config
     POSTGRES_PASSWORD: secret
     POSTGRES_DB: mercurios
@@ -29,19 +20,17 @@ services:
             <<: *postgres-config
         command: -c 'max_connections=500'
 
-    mercurios-mongo:
-        image: mongo
-        container_name: mercurios-mongo
-        command: /scripts/mongo-init.sh
-        working_dir: /scripts
-        volumes:
-            - ./scripts:/scripts
-        ports:
-            - 27017:27017
+    mercurios-client:
+        image: mercurios-client
+        container_name: mercurios-client
+        command: sh -c "npm run build:watch"
         environment:
-            MONGO_DB_REPLICA_SET_NAME: rs0
-            MONGO_DB_HOST_NAME: io-mongo
-            MONGO_DB_HOST_PORT: 27017
+            <<: *client-config
+            <<: *postgres-config
+        depends_on:
+            - mercurios-postgres
+        volumes:
+            - ./client/lib:/app/client/lib
 
     mercurios-playground:
         image: mercurios-playground
@@ -50,22 +39,7 @@ services:
         environment:
             <<: *client-config
             <<: *postgres-config
-            <<: *mongo-config
         ports:
             - 4254:4254
         depends_on:
-            - mercurios-postgres
-            - mercurios-mongo
-
-    mercurios-client:
-        image: mercurios-client
-        container_name: mercurios-client
-        command: sh -c "npm run build:watch"
-        environment:
-            <<: *client-config
-            <<: *postgres-config
-            <<: *mongo-config
-        depends_on:
-            - mercurios-playground
-        volumes:
-            - ./client/lib:/app/client/lib
+            - mercurios-client

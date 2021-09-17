@@ -1,37 +1,51 @@
 import { Json } from "@bahatron/utils";
 import * as Knex from "knex";
-import { AppendOptions } from "../..";
-import { MercuriosEvent } from "../../../event/event";
-import { $error } from "../../../utils/error";
-import { knexEventFilter, natsQueryToSql } from "../../store.helpers";
-import { StoreDriver } from "../../store.interfaces";
-import { STORE_COLLECTION } from "../../store.values";
-import { PostgresClient } from "./postgres.client";
+import { InsertOptions } from "..";
+import { MercuriosEvent } from "../../event/event";
+import { $error } from "../../utils/error";
+import { knexEventFilter, natsQueryToSql } from "../store.helpers";
+import { StoreDriver } from "../store.interface";
+import { STORE_COLLECTION } from "../store.values";
 
 const STORED_PROCEDURE = "append_event";
+const POSTGRES_CONFIG = {
+    client: "pg",
+    pool: {
+        min: 2,
+        max: 20,
+        propagateCreateError: false,
+    },
+};
+
+function PostgresClient({ url }) {
+    return Knex.default({
+        ...POSTGRES_CONFIG,
+        connection: url,
+    });
+}
 
 /**
- * @todo: leverage postgres date type
+ * @todo: leverage postgres date datatype
  */
 export async function PostgresDriver({ url }): Promise<StoreDriver> {
     const $postgres = PostgresClient({ url });
     await setup($postgres);
 
     let store: StoreDriver = {
-        async append(params) {
+        async insert(options) {
             try {
-                return await appendProcedure(params, $postgres);
+                return await appendProcedure($postgres, options);
             } catch (err: any) {
                 if (err.message.includes("ERR_NO_STREAM")) {
-                    await createTopic(params.topic, $postgres);
+                    await createTopic($postgres, options.topic);
 
-                    return store.append(params);
+                    return store.insert(options);
                 } else if (err.message.includes("ERR_CONFLICT")) {
                     throw $error.ExpectationFailed(
                         "Conflict with expected sequence",
                         {
                             code: "ERR_CONFLICT",
-                            expectedSeq: params.expectedSeq,
+                            expectedSeq: options.expectedSeq,
                         }
                     );
                 } else {
@@ -69,13 +83,13 @@ export async function PostgresDriver({ url }): Promise<StoreDriver> {
         },
 
         async filter(topic, filters) {
-            let query = $postgres
+            let baseQuery = $postgres
                 .table(STORE_COLLECTION.EVENTS)
                 .where({ topic });
 
-            let result = await knexEventFilter(query, filters);
+            let query = knexEventFilter(baseQuery, filters);
 
-            return result.map(MercuriosEvent);
+            return (await query).map(MercuriosEvent);
         },
 
         async topics({ like, withEvents, limit, offset }) {
@@ -138,8 +152,8 @@ export async function PostgresDriver({ url }): Promise<StoreDriver> {
 }
 
 async function appendProcedure(
-    { topic, expectedSeq, timestamp, key, data }: AppendOptions,
-    $postgres: Knex
+    $postgres: Knex,
+    { topic, expectedSeq, timestamp, key, data }: InsertOptions
 ) {
     let result = await $postgres.raw(
         `call ${STORED_PROCEDURE}(?, ?, ?, ?, ?)`,
@@ -157,7 +171,7 @@ async function appendProcedure(
     return MercuriosEvent({ topic, seq, timestamp, key, data });
 }
 
-async function createTopic(topic: string, $postgres: Knex) {
+async function createTopic($postgres: Knex, topic: string) {
     try {
         await $postgres.table("mercurios_topics").insert({ topic, seq: 0 });
     } catch (err: any) {

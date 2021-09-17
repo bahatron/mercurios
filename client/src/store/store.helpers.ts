@@ -1,5 +1,5 @@
 import * as Knex from "knex";
-import { EventFilters } from "./store.interfaces";
+import { EventFilters } from "..";
 
 export function natsQueryToSql(filter: string): string {
     let split = filter.split(".");
@@ -33,7 +33,7 @@ export function knexEventFilter(
     }
 
     if (to) {
-        builder.where("seq", "<=", to);
+        builder.where("seq", "<", to);
     }
 
     if (key) {
@@ -41,11 +41,11 @@ export function knexEventFilter(
     }
 
     if (before) {
-        builder.where("published_at", "<", before);
+        builder.where("timestamp", "<", before);
     }
 
     if (after) {
-        builder.where("published_at", ">=", after);
+        builder.where("timestamp", ">=", after);
     }
 
     return builder;

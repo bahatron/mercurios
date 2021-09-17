@@ -1,6 +1,6 @@
 import { $error } from "../utils/error";
-import { PostgresDriver } from "./drivers/postgres/postgres.driver";
-import { StoreDriver } from "./store.interfaces";
+import { PostgresDriver } from "./drivers/postgres.driver";
+import { StoreDriver } from "./store.interface";
 
 const StoreFactoryMap: Record<
     string,
@@ -9,19 +9,6 @@ const StoreFactoryMap: Record<
     pg: PostgresDriver,
 };
 
-export function StoreFactory({ driver = "pg", url }): Promise<StoreDriver> {
-    let factory = StoreFactoryMap[driver];
-
-    if (!factory) {
-        throw $error.InternalError(
-            `Invalid mercurios driver, valid drivers: ${Object.values(
-                StoreFactoryMap
-            ).join("|")}`,
-            { driver }
-        );
-    }
-
-    let store = StoreFactoryMap[driver]({ url });
-
-    return store;
+export function StoreFactory({ url }): Promise<StoreDriver> {
+    return StoreFactoryMap["pg"]({ url });
 }

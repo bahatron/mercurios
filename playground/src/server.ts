@@ -69,7 +69,7 @@ server.route({
         $logger.info({
             body: req.body,
         });
-        let event = await $mercurios.publish("myTopic", { data: req.body });
+        let event = await $mercurios.append("myTopic", { data: req.body });
 
         return res.send(event);
     },

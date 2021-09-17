@@ -1,20 +1,23 @@
 import { MercuriosEvent } from "../event/event";
 import { StoreFactory } from "../store/store";
-import { EventFilters, ListTopicsOptions } from "../store/store.interfaces";
-import { PublishOptions } from "./client.interfaces";
+import { EventFilters, ListTopicsOptions } from "./client.interfaces";
+import { createLogger } from "../utils/logger";
+import { AppendOptions } from "./client.interfaces";
+import { ConnectOptions } from "./client.interfaces";
 
 export type MercuriosClient = ReturnType<typeof MercuriosClient>;
-export function MercuriosClient({ driver = "pg", url }) {
-    let store = StoreFactory({ driver, url });
+export function MercuriosClient({ url, debug = false }: ConnectOptions) {
+    let logger = createLogger({ debug });
+    let store = StoreFactory({ url });
 
     let client = {
-        async publish(
+        async append(
             topic: string,
-            options: PublishOptions = {}
+            options: AppendOptions = {}
         ): Promise<MercuriosEvent> {
             let _store = await store;
 
-            let event = await _store.append({
+            let event = await _store.insert({
                 topic,
                 ...options,
                 timestamp: new Date().toISOString(),
@@ -36,16 +39,29 @@ export function MercuriosClient({ driver = "pg", url }) {
             return event;
         },
 
-        async filter(topic: string, filters: EventFilters = {}) {
+        async filter(
+            topic: string,
+            filters: EventFilters = {}
+        ): Promise<MercuriosEvent[]> {
             let _store = await store;
 
-            return await _store.filter(topic, filters);
+            let result = await _store.filter(topic, filters);
+
+            return result;
         },
 
-        async topics(filters: ListTopicsOptions = {}) {
+        async topics(filters: ListTopicsOptions = {}): Promise<string[]> {
             let _store = await store;
 
             return await _store.topics(filters);
+        },
+
+        async deleteTopic(topic: string): Promise<void> {
+            await (await store).deleteTopic(topic);
+        },
+
+        async topicExists(topic: string): Promise<boolean> {
+            return await (await store).topicExists(topic);
         },
     };
 
