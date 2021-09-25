@@ -23,6 +23,8 @@ export function MercuriosClient({ url, debug = false }: ConnectOptions) {
                 timestamp: new Date().toISOString(),
             });
 
+            logger.debug(event, "mercurios event created");
+
             return event;
         },
 
@@ -58,12 +60,16 @@ export function MercuriosClient({ url, debug = false }: ConnectOptions) {
 
         async deleteTopic(topic: string): Promise<void> {
             await (await store).deleteTopic(topic);
+
+            logger.debug({ topic }, `topic deleted`);
         },
 
         async topicExists(topic: string): Promise<boolean> {
             return await (await store).topicExists(topic);
         },
     };
+
+    logger.debug(`mercurios client initialized in debug mode`);
 
     return client;
 }
