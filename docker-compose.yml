@@ -1,14 +1,55 @@
 version: "3.5"
 
+x-client-config: &client-config
+    MERCURIOS_TEST_URL: postgres://admin:secret@mercurios-postgres:5432/mercurios
+
+x-postgres-config: &postgres-config
+    POSTGRES_PASSWORD: secret
+    POSTGRES_DB: mercurios
+    POSTGRES_USER: admin
+    POSTGRES_PORT: 5432
+    POSTGRES_HOST: mercurios-postgres
+
 services:
-    mercurios-playground:
-        build:
-            context: .
-            dockerfile: Dockerfile.playground
-        image: mercurios-playground
+    mercurios-postgres:
+        image: postgres
+        container_name: mercurios-postgres
+        ports:
+            - 5432:5432
+        environment:
+            <<: *postgres-config
+        command: -c 'max_connections=500'
 
     mercurios-client:
         build:
             context: .
             dockerfile: Dockerfile.client
         image: mercurios-client
+        container_name: mercurios-client
+        command: sh -c "npm run build:watch"
+        environment:
+            <<: *client-config
+            <<: *postgres-config
+        depends_on:
+            - mercurios-postgres
+        volumes:
+            - /app/client/lib
+            - ./client:/app/client
+
+    mercurios-playground:
+        build:
+            context: .
+            dockerfile: Dockerfile.playground
+        image: mercurios-playground
+        container_name: mercurios-playground
+        command: sh -c "npm run dev"
+        environment:
+            <<: *client-config
+            <<: *postgres-config
+        ports:
+            - 4254:4254
+        depends_on:
+            - mercurios-client
+        volumes:
+            - ./playground:/app/playground
+            - ./playground/dist:/app/playground/dist

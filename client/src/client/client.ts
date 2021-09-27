@@ -4,6 +4,7 @@ import { EventFilters, ListTopicsOptions } from "./client.interfaces";
 import { createLogger } from "../utils/logger";
 import { AppendOptions } from "./client.interfaces";
 import { ConnectOptions } from "./client.interfaces";
+import { MercuriosServer } from "../server/app";
 
 export type MercuriosClient = ReturnType<typeof MercuriosClient>;
 export function MercuriosClient({ url, debug = false }: ConnectOptions) {
@@ -11,6 +12,8 @@ export function MercuriosClient({ url, debug = false }: ConnectOptions) {
     let store = StoreFactory({ url });
 
     let client = {
+        Server: MercuriosServer({ logger, store }),
+
         async append(
             topic: string,
             options: AppendOptions = {}

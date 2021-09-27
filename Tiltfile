@@ -1,4 +1,4 @@
-docker_compose(['./docker-compose.dev.yml'])
+docker_compose(['./docker-compose.tilt.yml'])
 
 docker_build('mercurios-playground', '.', dockerfile = 'Dockerfile.playground',
     target='src',

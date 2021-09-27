@@ -14,9 +14,8 @@ RUN npm install
 
 WORKDIR /app/client
 COPY ./client .
-RUN npm run prepare
+RUN npm run build
 
 WORKDIR /app/playground
 COPY ./playground .
 RUN npm run build
-CMD [ "npm", "run", "dev" ]

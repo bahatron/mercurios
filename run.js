@@ -12,7 +12,7 @@ const argsContains = (flag) => {
 /**
  * constants
  */
-const DEV_COMPOSE = "docker-compose.dev.yml";
+const TILT_COMPOSE = "docker-compose.tilt.yml";
 
 /**
  * flags
@@ -33,16 +33,24 @@ if (argsContains("setup")) {
 }
 
 function shutDown() {
-    exec(`docker-compose -f ${DEV_COMPOSE} down --remove-orphans --volumes`);
+    exec(`docker-compose -f ${TILT_COMPOSE} down --remove-orphans --volumes`);
 }
 
-function runDev() {
+function runTilt() {
     if (hasCleanFlags()) {
         shutDown();
     }
 
-    exec(`tilt up --hud -f Tiltfile.dev`);
+    exec(`tilt up --hud -f Tiltfile`);
     shutDown();
+}
+
+function runCompose() {
+    if (hasCleanFlags()) {
+        shutDown();
+    }
+
+    exec(`docker-compose up --build --abort-on-container-exit`);
 }
 
 function runTest() {
@@ -59,8 +67,11 @@ function runTest() {
 if (argsContains("down")) {
     shutDown();
     exit(0);
+} else if (argsContains("tilt")) {
+    runTilt();
+    exit(0);
 } else if (argsContains("dev")) {
-    runDev();
+    runCompose();
     exit(0);
 } else if (argsContains("test")) {
     runTest();

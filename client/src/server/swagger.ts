@@ -275,28 +275,7 @@ export const swaggerDocs = {
                     200: {
                         "application/json": {
                             schema: {
-                                type: "object",
-                                properties: {
-                                    store: {
-                                        type: "object",
-                                        properties: {
-                                            driver: {
-                                                type: "string",
-                                            },
-                                            result: {
-                                                type: "boolean",
-                                            },
-                                        },
-                                    },
-                                    nats: {
-                                        type: "object",
-                                        properties: {
-                                            result: {
-                                                type: "boolean",
-                                            },
-                                        },
-                                    },
-                                },
+                                type: "string",
                             },
                         },
                     },
@@ -307,7 +286,7 @@ export const swaggerDocs = {
 
     components: {
         schemas: {
-            MercuriosEventSchema,
+            MercuriosEvent: MercuriosEventSchema,
         },
     },
 };

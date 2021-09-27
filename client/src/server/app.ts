@@ -4,25 +4,32 @@ import { requestLogger } from "./middleware/request-logger";
 import { swaggerDocs } from "./swagger";
 import cors from "cors";
 import { setRequestContext } from "./middleware/request-context";
-import { router } from "./router";
 import { Logger } from "@bahatron/utils/lib/logger";
-const swagger = require("swagger-ui-express");
+import { StoreDriver } from "../store";
+import { pingController } from "./routes/ping";
 
-export function MercuriosServer(logger: Logger) {
+export function MercuriosServer({
+    logger,
+    store,
+    swagger = false,
+}: {
+    swagger?: boolean;
+    logger: Logger;
+    store: Promise<StoreDriver>;
+}) {
     const app = express();
 
     app.use(express.json() as any);
     app.use(cors());
-
     app.use(setRequestContext(logger));
-
-    app.use("/", swagger.serve, swagger.setup(swaggerDocs));
-
     app.use(requestLogger(logger));
+    if (swagger) {
+        const swagger = require("swagger-ui-express");
+        app.use("/docs", swagger.serve, swagger.setup(swaggerDocs));
+    }
 
-    app.use(router);
+    app.get("/ping", pingController);
 
     app.use(errorHandler(logger));
-
     return app;
 }
