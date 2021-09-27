@@ -1,5 +1,3 @@
-import { MercuriosEventSchema } from "../event/event.schema";
-
 const EventRequest = {
     type: "object",
     properties: {
@@ -31,9 +29,9 @@ export const swaggerDocs = {
     ],
 
     paths: {
-        "/publish/{topic}": {
+        "/append/{topic}": {
             post: {
-                description: "publishes an event",
+                description: "appends an event",
                 parameters: [
                     {
                         name: "topic",
@@ -56,7 +54,7 @@ export const swaggerDocs = {
                         description: "event published",
                         content: {
                             "application/json": {
-                                schema: MercuriosEventSchema,
+                                schema: {},
                             },
                         },
                     },
@@ -66,47 +64,6 @@ export const swaggerDocs = {
                     },
                     500: {
                         description: "internal server error",
-                    },
-                },
-            },
-        },
-
-        "/emit/{topic}": {
-            post: {
-                description: "emits an event",
-                parameters: [
-                    {
-                        name: "topic",
-                        in: "path",
-                        type: "string",
-                        required: true,
-                        example: "test_topic",
-                    },
-                ],
-                requestBody: {
-                    description: "publish payload",
-                    content: {
-                        "application/json": {
-                            schema: {
-                                type: "object",
-                                properties: {
-                                    data: {
-                                        required: false,
-                                        example: {},
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                responses: {
-                    200: {
-                        description: "mercurios event",
-                        content: {
-                            "application/json": {
-                                schema: MercuriosEventSchema,
-                            },
-                        },
                     },
                 },
             },
@@ -285,8 +242,6 @@ export const swaggerDocs = {
     },
 
     components: {
-        schemas: {
-            MercuriosEvent: MercuriosEventSchema,
-        },
+        schemas: {},
     },
 };

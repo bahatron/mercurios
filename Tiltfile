@@ -5,6 +5,9 @@ docker_build('mercurios-playground', '.', dockerfile = 'Dockerfile.playground',
     live_update=[
         sync('./playground', '/app/playground'),
     ],
+    ignore=[
+        "./client/lib",
+    ],
     only=[
         './scripts/wait-for-it.sh',
         './playground',
