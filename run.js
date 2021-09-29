@@ -13,13 +13,9 @@ const argsContains = (flag) => {
  * command handlers
  */
 if (argsContains("setup")) {
-    if (hasCleanFlags()) {
-        exec(`find . -name "node_modules" -type d -prune -exec rm -rf '{}' +`);
-        exec("npx lerna clean -y");
-    }
-
+    exec(`find . -name "node_modules" -type d -prune -exec rm -rf '{}' +`);
+    // exec("npx lerna clean -y");
     exec("npm install");
-    exec(`npm run bootstrap`);
 }
 
 function shutDown() {

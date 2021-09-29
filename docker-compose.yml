@@ -33,7 +33,7 @@ services:
             - mercurios-postgres
         volumes:
             - ./client:/app/client
-            - /app/client/lib
+            # - /app/client/lib
 
     mercurios-playground:
         build:
@@ -49,5 +49,6 @@ services:
         depends_on:
             - mercurios-client
         volumes:
-            - ./playground:/app/playground
             - /app/playground/dist
+            - /app/playground/node_modules
+            - ./playground:/app/playground
