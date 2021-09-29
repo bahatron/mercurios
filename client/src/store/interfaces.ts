@@ -13,7 +13,7 @@ export interface InsertOptions {
 export interface StoreDriver {
     // event management
     insert(options: InsertOptions): Promise<MercuriosEvent>;
-    read(topic: string, seq: number): Promise<MercuriosEvent | undefined>;
+    fetch(topic: string, seq: number): Promise<MercuriosEvent | undefined>;
     filter(topic: string, filters: EventFilters): Promise<MercuriosEvent[]>;
     latest(topic: string): Promise<MercuriosEvent | undefined>;
     // topic management

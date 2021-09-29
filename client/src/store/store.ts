@@ -25,10 +25,15 @@ export const StoreFactory: StoreDriverFactory = async function ({
         async insert(options) {
             try {
                 let seq = await appendProcedure($postgres, options);
-                return MercuriosEvent({ ...options, seq });
+                let event = MercuriosEvent({ ...options, seq });
+
+                logger.debug(event, "mercurios event appended");
+
+                return event;
             } catch (err: any) {
                 if (err.message.includes("ERR_NO_STREAM")) {
                     await createTopic($postgres, options.topic);
+                    logger.debug({ topic: options.topic }, "topic created");
 
                     return store.insert(options);
                 } else if (err.message.includes("ERR_CONFLICT")) {
@@ -45,7 +50,7 @@ export const StoreFactory: StoreDriverFactory = async function ({
             }
         },
 
-        async read(topic, seq) {
+        async fetch(topic, seq) {
             let event = await $postgres
                 .table(STORE_VALUES.EVENT_TABLE)
                 .where({ topic, seq })
@@ -143,6 +148,8 @@ export const StoreFactory: StoreDriverFactory = async function ({
                         .delete(),
                 ]);
             });
+
+            logger.debug({ topic }, `topic deleted`);
         },
     };
 

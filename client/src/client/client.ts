@@ -21,15 +21,11 @@ export function MercuriosClient({ url, debug = false }: ConnectOptions) {
         ): Promise<MercuriosEvent> {
             let _store = await store;
 
-            let event = await _store.insert({
+            return await _store.insert({
                 topic,
                 ...options,
                 timestamp: new Date().toISOString(),
             });
-
-            logger.debug(event, "mercurios event created");
-
-            return event;
         },
 
         async read(
@@ -37,10 +33,11 @@ export function MercuriosClient({ url, debug = false }: ConnectOptions) {
             seq: number | "latest"
         ): Promise<MercuriosEvent | undefined> {
             let _store = await store;
+
             let event =
                 seq === "latest"
                     ? await _store.latest(topic)
-                    : await _store.read(topic, seq);
+                    : await _store.fetch(topic, seq);
 
             return event;
         },
@@ -49,23 +46,15 @@ export function MercuriosClient({ url, debug = false }: ConnectOptions) {
             topic: string,
             filters: EventFilters = {}
         ): Promise<MercuriosEvent[]> {
-            let _store = await store;
-
-            let result = await _store.filter(topic, filters);
-
-            return result;
+            return await (await store).filter(topic, filters);
         },
 
         async topics(filters: ListTopicsOptions = {}): Promise<string[]> {
-            let _store = await store;
-
-            return await _store.topics(filters);
+            return await (await store).topics(filters);
         },
 
         async deleteTopic(topic: string): Promise<void> {
             await (await store).deleteTopic(topic);
-
-            logger.debug({ topic }, `topic deleted`);
         },
 
         async topicExists(topic: string): Promise<boolean> {
