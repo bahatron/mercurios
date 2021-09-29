@@ -1,9 +1,9 @@
 import { Logger } from "@bahatron/utils/lib/logger";
 import { MercuriosEvent } from "../event/event";
-import { StoreFactory } from "../store/store";
-import { EventFilters, ListTopicsOptions } from "./client.interfaces";
-import { AppendOptions } from "./client.interfaces";
-import { ConnectOptions } from "./client.interfaces";
+import { StoreFactory } from "../store";
+import { EventFilters, ListTopicsOptions } from "./interfaces";
+import { AppendOptions } from "./interfaces";
+import { ConnectOptions } from "./interfaces";
 
 export type MercuriosClient = ReturnType<typeof MercuriosClient>;
 export function MercuriosClient({ url, debug = false }: ConnectOptions) {

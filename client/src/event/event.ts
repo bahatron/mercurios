@@ -14,11 +14,11 @@ export interface MercuriosEvent {
 
 export function MercuriosEvent({
     topic,
-    timestamp = new Date().toISOString(),
+    timestamp,
     seq,
     data,
     key,
-}: Partial<MercuriosEvent> = {}): MercuriosEvent {
+}: MercuriosEvent): MercuriosEvent {
     // this is because undefined is returned as null by mysql/postgres
     let event: any = pickBy(
         {
