@@ -19,7 +19,7 @@ export function MercuriosEvent({
     data,
     key,
 }: Partial<MercuriosEvent> = {}): MercuriosEvent {
-    // this is because undefine is returned as null by mysql/postgres
+    // this is because undefined is returned as null by mysql/postgres
     let event: any = pickBy(
         {
             topic,

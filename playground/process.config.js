@@ -10,8 +10,9 @@ module.exports = {
             name: "playground",
             script: "dist/server.js",
             autorestart: false,
-            watch: ["dist", "../client"],
-            // watch: true,
+            watch: ["dist", "../client/lib"],
+            exec_mode: "cluster",
+            instances: "max"
         },
     ],
 };

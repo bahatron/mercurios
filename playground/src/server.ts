@@ -2,10 +2,14 @@ import express from "express";
 import { $logger } from "./logger";
 import { $mercurios } from "./mercurios";
 import { swaggerDocs } from "./swagger";
+import morgan from "morgan";
+
 const swagger = require("swagger-ui-express");
 
 function expressServer() {
     const app = express();
+
+    app.use(morgan("tiny"));
 
     app.get("/", (req, res) => {
         res.redirect("/docs");

@@ -1,6 +1,4 @@
 FROM node:lts-slim as src
-COPY scripts/wait-for-it.sh /usr/bin/wait-for-it
-RUN chmod 777 /usr/bin/wait-for-it
 RUN npm i -g pm2
 EXPOSE 4254
 

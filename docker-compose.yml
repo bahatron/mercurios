@@ -1,11 +1,11 @@
 version: "3.5"
 
 x-client-config: &client-config
-    MERCURIOS_TEST_URL: postgres://admin:secret@mercurios-postgres:5432/mercurios
+    MERCURIOS_TEST_URL: postgres://admin:secret@mercurios-postgres:5432/postgres
 
 x-postgres-config: &postgres-config
     POSTGRES_PASSWORD: secret
-    POSTGRES_DB: mercurios
+    POSTGRES_DB: postgres
     POSTGRES_USER: admin
     POSTGRES_PORT: 5432
     POSTGRES_HOST: mercurios-postgres
@@ -29,7 +29,6 @@ services:
         command: sh -c "npm run build:watch"
         environment:
             <<: *client-config
-            <<: *postgres-config
         depends_on:
             - mercurios-postgres
         volumes:
@@ -45,7 +44,6 @@ services:
         command: sh -c "npm run dev"
         environment:
             <<: *client-config
-            <<: *postgres-config
         ports:
             - 4254:4254
         depends_on:

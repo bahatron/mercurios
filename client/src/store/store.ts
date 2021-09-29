@@ -9,6 +9,6 @@ const StoreFactoryMap: Record<
     pg: PostgresDriver,
 };
 
-export function StoreFactory({ url }): Promise<StoreDriver> {
-    return StoreFactoryMap["pg"]({ url });
+export function StoreFactory({ url, driver = "pg" }): Promise<StoreDriver> {
+    return StoreFactoryMap[driver]({ url });
 }

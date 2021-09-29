@@ -1,15 +1,12 @@
-docker_compose(['./docker-compose.tilt.yml'])
+docker_compose(['./docker-compose.yml'])
 
 docker_build('mercurios-playground', '.', dockerfile = 'Dockerfile.playground',
     target='src',
     live_update=[
         sync('./playground', '/app/playground'),
-    ],
-    ignore=[
-        "./client/lib",
+        sync('./client', '/app/client'),
     ],
     only=[
-        './scripts/wait-for-it.sh',
         './playground',
         './client'
     ],
