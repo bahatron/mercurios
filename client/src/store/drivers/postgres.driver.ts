@@ -1,11 +1,14 @@
 import { Json } from "@bahatron/utils";
 import * as Knex from "knex";
-import { InsertOptions } from "..";
 import { MercuriosEvent } from "../../event/event";
 import { $error } from "../../utils/error";
 import { knexEventFilter, natsQueryToSql } from "../store.helpers";
-import { StoreDriver } from "../store.interface";
 import { STORE_COLLECTION } from "../store.values";
+import {
+    StoreDriver,
+    StoreDriverFactory,
+    InsertOptions,
+} from "../store.interface";
 
 const STORED_PROCEDURE = "append_event";
 const POSTGRES_CONFIG = {
@@ -27,7 +30,10 @@ function PostgresClient({ url }) {
 /**
  * @todo: leverage postgres date datatype
  */
-export async function PostgresDriver({ url }): Promise<StoreDriver> {
+export const PostgresDriver: StoreDriverFactory = async function ({
+    url,
+    logger,
+}) {
     const $postgres = PostgresClient({ url });
     await setup($postgres);
 
@@ -89,6 +95,8 @@ export async function PostgresDriver({ url }): Promise<StoreDriver> {
 
             let query = knexEventFilter(baseQuery, filters);
 
+            logger.debug({ query: query.toString() }, "filter query");
+
             return (await query).map(MercuriosEvent);
         },
 
@@ -120,6 +128,11 @@ export async function PostgresDriver({ url }): Promise<StoreDriver> {
                 query.offset(offset);
             }
 
+            logger.debug(
+                { query: query.toString() },
+                "fetching mercurios topics..."
+            );
+
             return (await query).map((record) => record.topic);
         },
 
@@ -149,7 +162,7 @@ export async function PostgresDriver({ url }): Promise<StoreDriver> {
     };
 
     return store;
-}
+};
 
 async function appendProcedure(
     $postgres: Knex,
@@ -186,9 +199,6 @@ async function createTopic($postgres: Knex, topic: string) {
     }
 }
 
-/**
- * @todo: refactor not to use knex
- */
 async function setup(knex: Knex) {
     await knex.transaction(async (trx) => {
         if (!(await trx.schema.hasTable(STORE_COLLECTION.TOPICS))) {

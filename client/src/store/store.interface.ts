@@ -1,10 +1,11 @@
-import { EventFilters, ListTopicsOptions, AppendOptions } from "../client";
+import { Logger } from "@bahatron/utils";
+import { EventFilters, ListTopicsOptions } from "../client";
 import { MercuriosEvent } from "../event/event";
 
 export interface InsertOptions {
     topic: string;
-    expectedSeq?: number;
     timestamp: string;
+    expectedSeq?: number;
     key?: string;
     data?: any;
 }
@@ -19,4 +20,13 @@ export interface StoreDriver {
     deleteTopic(topic: string): Promise<void>;
     topicExists(topic: string): Promise<boolean>;
     topics(params: ListTopicsOptions): Promise<string[]>;
+}
+
+export interface CreateStoreDriverOptions {
+    url: string;
+    logger: Logger.Logger;
+}
+
+export interface StoreDriverFactory {
+    (params: CreateStoreDriverOptions): Promise<StoreDriver>;
 }

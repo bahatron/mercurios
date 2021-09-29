@@ -12,7 +12,7 @@ x-postgres-config: &postgres-config
 
 services:
     mercurios-postgres:
-        image: postgres
+        image: postgres:12
         container_name: mercurios-postgres
         ports:
             - 5432:5432
@@ -31,9 +31,8 @@ services:
             <<: *client-config
         depends_on:
             - mercurios-postgres
-        volumes:
-            - ./client:/app/client
-            # - /app/client/lib
+        # volumes:
+        #     - ./client:/app/client
 
     mercurios-playground:
         build:
@@ -44,6 +43,7 @@ services:
         command: sh -c "npm run dev"
         environment:
             <<: *client-config
+            MERCURIOS_DEV: 1
         ports:
             - 4254:4254
         depends_on:
@@ -51,4 +51,4 @@ services:
         volumes:
             - /app/playground/dist
             - /app/playground/node_modules
-            - ./playground:/app/playground
+            # - ./playground:/app/playground

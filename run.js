@@ -9,48 +9,26 @@ const argsContains = (flag) => {
         : argv.includes(flag);
 };
 
-/**
- * command handlers
- */
-if (argsContains("setup")) {
-    exec(`find . -name "node_modules" -type d -prune -exec rm -rf '{}' +`);
-    // exec("npx lerna clean -y");
-    exec("npm install");
-}
-
 function shutDown() {
     exec(`docker-compose down --remove-orphans --volumes`);
-}
-
-function runTilt() {
-    shutDown();
-
-    exec(`tilt up --hud -f Tiltfile`);
-    shutDown();
-}
-
-function runCompose() {
-    shutDown();
-
-    exec(`docker-compose up --build --abort-on-container-exit`);
-    shutDown();
 }
 
 /**
  * main
  */
-if (argsContains("down")) {
+if (argsContains("setup")) {
+    exec(`find . -name "node_modules" -type d -prune -exec rm -rf '{}' +`);
+    exec("npm install");
+} else if (argsContains("down")) {
     shutDown();
-    exit(0);
-} else if (argsContains("tilt")) {
-    runTilt();
-    exit(0);
-} else if (argsContains("dev")) {
-    runCompose();
-    exit(0);
-} else if (argsContains("test")) {
-    runTest();
-    exit(0);
-} else {
-    exit(0);
+} else if (argsContains(["tilt"])) {
+    shutDown();
+    exec(`tilt up --hud -f Tiltfile`);
+    shutDown();
+} else if (argsContains("dc")) {
+    shutDown();
+    exec(`docker-compose up --build --abort-on-container-exit`);
+    shutDown();
 }
+
+exit(0);

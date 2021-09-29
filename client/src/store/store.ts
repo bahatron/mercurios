@@ -1,14 +1,18 @@
-import { $error } from "../utils/error";
+import {
+    StoreDriver,
+    CreateStoreDriverOptions,
+    StoreDriverFactory,
+} from "./store.interface";
 import { PostgresDriver } from "./drivers/postgres.driver";
-import { StoreDriver } from "./store.interface";
 
-const StoreFactoryMap: Record<
-    string,
-    (...params: any[]) => Promise<StoreDriver>
-> = {
+const StoreFactoryMap: Record<string, StoreDriverFactory> = {
     pg: PostgresDriver,
 };
 
-export function StoreFactory({ url, driver = "pg" }): Promise<StoreDriver> {
-    return StoreFactoryMap[driver]({ url });
+export function StoreFactory({
+    driver = "pg",
+    url,
+    logger,
+}: { driver?: string } & CreateStoreDriverOptions): Promise<StoreDriver> {
+    return StoreFactoryMap[driver]({ url, logger });
 }
