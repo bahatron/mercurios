@@ -40,7 +40,7 @@ export const StoreFactory: StoreDriverFactory = async function ({
                     throw $error.ExpectationFailed(
                         "Conflict with expected sequence",
                         {
-                            code: "ERR_CONFLICT",
+                            reason: "ERR_CONFLICT",
                             expectedSeq: options.expectedSeq,
                         }
                     );
@@ -81,7 +81,8 @@ export const StoreFactory: StoreDriverFactory = async function ({
         async filter(topic, filters) {
             let baseQuery = $postgres
                 .table(STORE_VALUES.EVENT_TABLE)
-                .where({ topic });
+                .where({ topic })
+                .orderBy("seq", "asc");
 
             let query = knexEventFilter(baseQuery, filters);
 

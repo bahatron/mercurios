@@ -4,12 +4,12 @@ import { $json } from "../utils/json";
 import { $validator } from "../utils/validator";
 import { MercuriosEventSchema } from "./event.schema";
 
-export interface MercuriosEvent {
+export interface MercuriosEvent<T = any> {
     timestamp: string;
     topic: string;
     seq: number;
     key?: string;
-    data?: any;
+    data?: T;
 }
 
 export function MercuriosEvent({
