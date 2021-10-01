@@ -62,6 +62,12 @@ export async function setupStore(knex: Knex) {
                 COMMIT;
             END;
             $$;
-        `);
+        `).catch(err => {
+            if(err.message.includes("tuple concurrently updated")) {
+                return;
+            }
+
+            throw err;
+        })
     });
 }
