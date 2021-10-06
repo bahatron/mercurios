@@ -1,7 +1,6 @@
 import { Logger } from "@bahatron/utils/lib/logger";
-import { MercuriosEvent } from "../event/event";
 import { StoreFactory } from "../store";
-import { EventFilters, ListTopicsOptions } from "./interfaces";
+import { EventFilters, ListTopicsOptions, MercuriosEvent } from "./interfaces";
 import { AppendOptions } from "./interfaces";
 import { ConnectOptions } from "./interfaces";
 
@@ -15,10 +14,10 @@ export function MercuriosClient({ url, debug = false }: ConnectOptions) {
     let store = StoreFactory({ url, logger });
 
     let client = {
-        async append(
+        async append<T = any>(
             topic: string,
             options: AppendOptions = {}
-        ): Promise<MercuriosEvent> {
+        ): Promise<MercuriosEvent<T>> {
             let _store = await store;
 
             return await _store.insert({
@@ -28,10 +27,10 @@ export function MercuriosClient({ url, debug = false }: ConnectOptions) {
             });
         },
 
-        async read(
+        async read<T = any>(
             topic: string,
             seq: number | "latest"
-        ): Promise<MercuriosEvent | undefined> {
+        ): Promise<MercuriosEvent<T> | undefined> {
             let _store = await store;
 
             let event =
@@ -42,10 +41,10 @@ export function MercuriosClient({ url, debug = false }: ConnectOptions) {
             return event;
         },
 
-        async filter(
+        async filter<T = any>(
             topic: string,
             filters: EventFilters = {}
-        ): Promise<MercuriosEvent[]> {
+        ): Promise<MercuriosEvent<T>[]> {
             return await (await store).filter(topic, filters);
         },
 

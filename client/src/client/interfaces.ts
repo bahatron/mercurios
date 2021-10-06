@@ -28,3 +28,11 @@ export interface ConnectOptions {
     url: string;
     debug?: boolean;
 }
+
+export interface MercuriosEvent<T = any> {
+    timestamp: string;
+    topic: string;
+    seq: number;
+    key?: string;
+    data?: T;
+}

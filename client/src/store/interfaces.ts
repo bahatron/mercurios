@@ -1,6 +1,5 @@
 import { Logger } from "@bahatron/utils";
-import { EventFilters, ListTopicsOptions } from "../client";
-import { MercuriosEvent } from "../event/event";
+import { EventFilters, ListTopicsOptions, MercuriosEvent } from "../client";
 
 export interface InsertOptions {
     topic: string;

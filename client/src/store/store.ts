@@ -1,5 +1,5 @@
 import * as Knex from "knex";
-import { MercuriosEvent } from "../event/event";
+import { EventFactory } from "./event";
 import { $error } from "../utils/error";
 import {
     appendProcedure,
@@ -8,7 +8,7 @@ import {
     PostgresClient,
 } from "./helpers";
 import { STORE_VALUES } from "./values";
-import { StoreDriver, StoreDriverFactory } from "./interfaces";
+import { StoreDriverFactory } from "./interfaces";
 import { setupStore } from "./setup";
 
 /**
@@ -21,14 +21,14 @@ export const StoreFactory: StoreDriverFactory = async function ({
     const $postgres = PostgresClient({ url });
     await setupStore($postgres);
 
-    let store: StoreDriver = {
+    let store = {
         async insert(options) {
             try {
                 let seq = await appendProcedure($postgres, options);
-                let event = MercuriosEvent({ ...options, seq });
+
+                let event = EventFactory({ ...options, seq });
 
                 logger.debug(event, "mercurios event appended");
-
                 return event;
             } catch (err: any) {
                 if (err.message.includes("ERR_NO_STREAM")) {
@@ -60,7 +60,7 @@ export const StoreFactory: StoreDriverFactory = async function ({
                 return undefined;
             }
 
-            return MercuriosEvent(event);
+            return EventFactory(event);
         },
 
         async latest(topic) {
@@ -75,7 +75,7 @@ export const StoreFactory: StoreDriverFactory = async function ({
                 return undefined;
             }
 
-            return MercuriosEvent(result);
+            return EventFactory(result);
         },
 
         async filter(topic, filters) {
@@ -88,7 +88,7 @@ export const StoreFactory: StoreDriverFactory = async function ({
 
             logger.debug({ query: query.toString() }, "filter query");
 
-            return (await query).map(MercuriosEvent);
+            return (await query).map(EventFactory);
         },
 
         async topics({ like, withEvents, limit, offset }) {

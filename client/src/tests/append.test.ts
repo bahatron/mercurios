@@ -1,5 +1,5 @@
 import MercuriosClient from "..";
-import { MercuriosEventSchema } from "../event/event.schema";
+import { MercuriosEventSchema } from "../store/event";
 import { $validator } from "../utils/validator";
 
 describe(`Append Event`, () => {
