@@ -10,7 +10,7 @@
         "build:clean": "rm -rf dist && tsc"
     },
     "dependencies": {
-        "@bahatron/mercurios": "file:../client",
+        "@bahatron/mercurios": "file:..",
         "@bahatron/utils": "^2.4.0",
         "@types/express": "^4.17.13",
         "@types/morgan": "^1.9.3",

@@ -31,24 +31,6 @@ services:
             <<: *client-config
         depends_on:
             - mercurios-postgres
-        # volumes:
-        #     - ./client:/app/client
-
-    mercurios-playground:
-        build:
-            context: .
-            dockerfile: Dockerfile.playground
-        image: mercurios-playground
-        container_name: mercurios-playground
-        command: sh -c "npm run dev"
-        environment:
-            <<: *client-config
-            MERCURIOS_DEV: 1
-        ports:
-            - 4254:4254
-        depends_on:
-            - mercurios-client
         volumes:
-            - /app/playground/dist
-            - /app/playground/node_modules
-            # - ./playground:/app/playground
+            - ./src:/app/src
+            - /app/node_modules

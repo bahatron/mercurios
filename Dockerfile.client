@@ -1,7 +1,11 @@
 FROM node:lts-slim as src
+RUN npm i -g pm2
+RUN pm2 install typescript
+EXPOSE 4254
 
-WORKDIR /app/client
-COPY ./client/package.json ./package.json
+WORKDIR /app
+COPY ./package*.json ./
+# COPY ./tsconfig.* ./
 RUN npm install
-COPY ./client .
-RUN npm run build:clean
+COPY . .
+RUN npm run build

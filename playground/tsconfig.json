@@ -9,10 +9,19 @@
         "esModuleInterop": true,
         "moduleResolution": "node",
         "baseUrl": ".",
+        // "composite": true,
         "paths": {
-            "@bahatron/mercurios": ["../client/lib"]
+            "@bahatron/mercurios": [
+                "../src"
+            ]
         }
     },
-    "include": ["src"],
-    "exclude": ["node_modules", "lib"]
+    "include": [
+        "src",
+        ".."
+    ],
+    "exclude": [
+        "node_modules",
+        "lib"
+    ]
 }

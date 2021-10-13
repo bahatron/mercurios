@@ -1,5 +1,5 @@
 import { STORE_VALUES } from "./values";
-import Knex from "knex";
+import { Knex } from "knex";
 
 export async function setupStore(knex: Knex) {
     await knex.transaction(async (trx) => {
@@ -30,7 +30,9 @@ export async function setupStore(knex: Knex) {
             );
         }
 
-        await trx.raw(`
+        await trx
+            .raw(
+                `
             CREATE OR REPLACE PROCEDURE ${STORE_VALUES.APPEND_PROCEDURE} (
                 inout v_topic varchar(255),
                 inout v_seq integer,
@@ -62,12 +64,14 @@ export async function setupStore(knex: Knex) {
                 COMMIT;
             END;
             $$;
-        `).catch(err => {
-            if(err.message.includes("tuple concurrently updated")) {
-                return;
-            }
+        `
+            )
+            .catch((err) => {
+                if (err.message.includes("tuple concurrently updated")) {
+                    return;
+                }
 
-            throw err;
-        })
+                throw err;
+            });
     });
 }

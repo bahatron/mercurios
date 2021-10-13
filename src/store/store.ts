@@ -1,4 +1,4 @@
-import * as Knex from "knex";
+import { Knex } from "knex";
 import { EventFactory } from "./event";
 import { $error } from "../utils/error";
 import {
@@ -8,7 +8,7 @@ import {
     PostgresClient,
 } from "./helpers";
 import { STORE_VALUES } from "./values";
-import { StoreDriverFactory } from "./interfaces";
+import { StoreDriver, StoreDriverFactory } from "./interfaces";
 import { setupStore } from "./setup";
 
 /**
@@ -21,7 +21,7 @@ export const StoreFactory: StoreDriverFactory = async function ({
     const $postgres = PostgresClient({ url });
     await setupStore($postgres);
 
-    let store = {
+    let store: StoreDriver = {
         async insert(options) {
             try {
                 let seq = await appendProcedure($postgres, options);
@@ -124,7 +124,7 @@ export const StoreFactory: StoreDriverFactory = async function ({
                 "fetching mercurios topics..."
             );
 
-            return (await query).map((record) => record.topic);
+            return (await query).map((record: any) => record.topic);
         },
 
         async topicExists(topic) {
