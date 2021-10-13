@@ -1,6 +1,6 @@
 import MercuriosClient from "..";
-import { $logger } from "../../playground/src/logger";
 import { $config } from "../utils/config";
+import { $logger } from "../utils/logger";
 
 describe("subscribe to topic", () => {
     let mercurios: MercuriosClient;

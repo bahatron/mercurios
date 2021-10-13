@@ -26,11 +26,12 @@ services:
             dockerfile: Dockerfile.client
         image: mercurios-client
         container_name: mercurios-client
-        command: sh -c "npm run build:watch"
+        command: sh -c "npm run playground"
         environment:
             <<: *client-config
         depends_on:
             - mercurios-postgres
         volumes:
             - ./src:/app/src
+            - ./playground:/app/playground
             - /app/node_modules

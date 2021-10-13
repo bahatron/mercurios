@@ -1,5 +1,4 @@
 src/
-run.js
 docker-compose.*
 Dockerfile.*
 Tiltfile
@@ -11,3 +10,5 @@ node_modules/
 tsconfig.json
 .mocharc.js
 *.test.*
+playground/
+.github/
