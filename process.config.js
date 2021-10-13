@@ -8,11 +8,9 @@ module.exports = {
         {
             ...logsCommon,
             name: "playground",
-            // script: "dist/playground/server.js",
-            // script: "playground/src/server.ts",
-            script: "src/server.ts",
+            script: "playground/server.ts",
+            watch: ["src", "playground"],
             autorestart: false,
-            watch: true,
             exec_mode: "cluster",
             instances: "3",
         },

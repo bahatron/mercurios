@@ -8,7 +8,9 @@ export type MercuriosClient = ReturnType<typeof MercuriosClient>;
 export function MercuriosClient({ url, debug = false }: ConnectOptions) {
     let logger = Logger({
         debug,
-        pretty: process.env.MERCURIOS_DEV === "1",
+        // pretty: process.env.MERCURIOS_DEV === "1"
+        pretty: debug,
+        id: `mercurios:${process.pid}`,
     });
 
     let store = StoreFactory({ url, logger });

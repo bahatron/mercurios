@@ -1,5 +1,6 @@
 import { STORE_VALUES } from "./values";
 import { Knex } from "knex";
+import { Logger } from "@bahatron/utils/lib/logger";
 
 export async function setupStore(knex: Knex) {
     await knex.transaction(async (trx) => {
@@ -68,6 +69,38 @@ export async function setupStore(knex: Knex) {
             )
             .catch((err) => {
                 if (err.message.includes("tuple concurrently updated")) {
+                    return;
+                }
+
+                throw err;
+            });
+
+        await trx.raw(
+            `
+            CREATE OR REPLACE FUNCTION notify_${STORE_VALUES.NOTIFICATION_CHANNEL}()
+              RETURNS trigger AS
+            $BODY$
+                BEGIN
+                    PERFORM pg_notify('${STORE_VALUES.NOTIFICATION_CHANNEL}', row_to_json(NEW)::text);
+                    RETURN NULL;
+                END; 
+            $BODY$
+              LANGUAGE plpgsql VOLATILE
+              COST 100;`
+        );
+
+        await trx
+            .raw(
+                `
+                CREATE TRIGGER notify_${STORE_VALUES.NOTIFICATION_CHANNEL}
+                AFTER INSERT
+                ON "${STORE_VALUES.EVENT_TABLE}"
+                FOR EACH ROW
+                EXECUTE PROCEDURE notify_${STORE_VALUES.NOTIFICATION_CHANNEL}();
+            `
+            )
+            .catch((err) => {
+                if (err.code === "42710") {
                     return;
                 }
 

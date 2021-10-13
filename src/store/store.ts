@@ -1,15 +1,12 @@
-import { Knex } from "knex";
+import { Knex, knex } from "knex";
 import { EventFactory } from "./event";
 import { $error } from "../utils/error";
-import {
-    appendProcedure,
-    createTopic,
-    knexEventFilter,
-    PostgresClient,
-} from "./helpers";
+import { appendProcedure, createTopic, knexEventFilter } from "./helpers";
 import { STORE_VALUES } from "./values";
 import { StoreDriver, StoreDriverFactory } from "./interfaces";
 import { setupStore } from "./setup";
+import { Logger } from "@bahatron/utils/lib/logger";
+import { $logger } from "../utils/logger";
 
 /**
  * @todo: leverage postgres date datatype
@@ -18,8 +15,9 @@ export const StoreFactory: StoreDriverFactory = async function ({
     url,
     logger,
 }) {
-    const $postgres = PostgresClient({ url });
+    const $postgres = PostgresClient({ url, logger });
     await setupStore($postgres);
+    // await setupDispatcher($postgres);
 
     let store: StoreDriver = {
         async insert(options) {
@@ -156,3 +154,47 @@ export const StoreFactory: StoreDriverFactory = async function ({
 
     return store;
 };
+
+function PostgresClient({ url, logger }: { url: string; logger: Logger }) {
+    let listening: boolean;
+
+    return knex({
+        client: "pg",
+        connection: url,
+        pool: {
+            min: 2,
+            max: 20,
+            propagateCreateError: false,
+            afterCreate: (connection, done) => {
+                if (listening) {
+                    done(null, connection);
+                    return;
+                }
+                listening = true;
+                connection.query(
+                    `LISTEN ${STORE_VALUES.NOTIFICATION_CHANNEL}`,
+                    function (err) {
+                        if (err) {
+                            listening = false;
+                        } else {
+                            connection.on("notification", (msg) => {
+                                $logger.debug(msg, "got notification");
+                            });
+                            connection.on("end", () => {
+                                listening = false;
+                            });
+
+                            connection.on("error", (err) => {
+                                logger.warning(
+                                    err,
+                                    "error on mercurios notification"
+                                );
+                            });
+                        }
+                        done(err, connection);
+                    }
+                );
+            },
+        },
+    });
+}

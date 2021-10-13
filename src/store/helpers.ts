@@ -1,20 +1,8 @@
 import { Json } from "@bahatron/utils";
-import { Knex, knex } from "knex";
+import { Knex } from "knex";
 import { InsertOptions } from "./interfaces";
 import { EventFilters } from "../client/interfaces";
 import { STORE_VALUES } from "./values";
-
-export function PostgresClient({ url }: { url: string }) {
-    return knex({
-        client: "pg",
-        connection: url,
-        pool: {
-            min: 2,
-            max: 20,
-            propagateCreateError: false,
-        },
-    });
-}
 
 export async function createTopic($postgres: Knex, topic: string) {
     try {

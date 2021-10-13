@@ -9,10 +9,12 @@ import { Logger } from "@bahatron/utils/lib/logger";
 import { swaggerDocs } from "./swagger";
 import morgan from "morgan";
 import { Json } from "@bahatron/utils";
-import mercurios, { EventFilters } from "@bahatron/mercurios";
+import { mercurios, EventFilters } from "../src";
 
 const $mercurios = mercurios({
-    url: process.env.MERCURIOS_TEST_URL!,
+    url:
+        process.env.MERCURIOS_TEST_URL ||
+        "postgres://admin:secret@localhost:5432/postgres",
     debug: true,
 });
 

@@ -2,6 +2,7 @@ version: "3.5"
 
 x-client-config: &client-config
     MERCURIOS_TEST_URL: postgres://admin:secret@mercurios-postgres:5432/postgres
+    NODE_ENV: dev
 
 x-postgres-config: &postgres-config
     POSTGRES_PASSWORD: secret
@@ -25,13 +26,16 @@ services:
             context: .
             dockerfile: Dockerfile.client
         image: mercurios-client
+        ports:
+            - 4254:4254
         container_name: mercurios-client
-        command: sh -c "npm run playground"
+        command: sh -c "npm run pm2"
         environment:
             <<: *client-config
         depends_on:
             - mercurios-postgres
         volumes:
-            - ./src:/app/src
-            - ./playground:/app/playground
-            - /app/node_modules
+            - ./:/app
+            # - /app/node_modules
+            # - ./src:/app/src
+            # - ./playground:/app/playground
