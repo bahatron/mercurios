@@ -1,8 +1,7 @@
 import { Json } from "@bahatron/utils";
 import { Knex } from "knex";
-import { InsertOptions } from "./interfaces";
+import { InsertOptions, STORE_VALUES } from "./static";
 import { EventFilters } from "../client/interfaces";
-import { STORE_VALUES } from "./values";
 
 export async function createTopic($postgres: Knex, topic: string) {
     try {

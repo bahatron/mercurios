@@ -1,16 +1,13 @@
-import { Logger } from "@bahatron/utils/lib/logger";
 import { StoreFactory } from "../store";
+import { createLogger } from "../utils/logger";
 import { EventFilters, ListTopicsOptions, MercuriosEvent } from "./interfaces";
 import { AppendOptions } from "./interfaces";
 import { ConnectOptions } from "./interfaces";
 
 export type MercuriosClient = ReturnType<typeof MercuriosClient>;
 export function MercuriosClient({ url, debug = false }: ConnectOptions) {
-    let logger = Logger({
+    let logger = createLogger({
         debug,
-        // pretty: process.env.MERCURIOS_DEV === "1"
-        pretty: debug,
-        id: `mercurios:${process.pid}`,
     });
 
     let store = StoreFactory({ url, logger });

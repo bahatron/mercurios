@@ -2,11 +2,9 @@ import { Knex, knex } from "knex";
 import { EventFactory } from "./event";
 import { $error } from "../utils/error";
 import { appendProcedure, createTopic, knexEventFilter } from "./helpers";
-import { STORE_VALUES } from "./values";
-import { StoreDriver, StoreDriverFactory } from "./interfaces";
+import { StoreDriver, StoreDriverFactory, STORE_VALUES } from "./static";
 import { setupStore } from "./setup";
-import { Logger } from "@bahatron/utils/lib/logger";
-import { $logger } from "../utils/logger";
+import { PostgresClient } from "./driver";
 
 /**
  * @todo: leverage postgres date datatype
@@ -15,14 +13,14 @@ export const StoreFactory: StoreDriverFactory = async function ({
     url,
     logger,
 }) {
-    const $postgres = PostgresClient({ url, logger });
-    await setupStore($postgres);
-    // await setupDispatcher($postgres);
+    const _pg = PostgresClient({ url, logger });
+    await setupStore(_pg);
+    // await setupDispatcher(_pg);
 
     let store: StoreDriver = {
         async insert(options) {
             try {
-                let seq = await appendProcedure($postgres, options);
+                let seq = await appendProcedure(_pg, options);
 
                 let event = EventFactory({ ...options, seq });
 
@@ -30,7 +28,7 @@ export const StoreFactory: StoreDriverFactory = async function ({
                 return event;
             } catch (err: any) {
                 if (err.message.includes("ERR_NO_STREAM")) {
-                    await createTopic($postgres, options.topic);
+                    await createTopic(_pg, options.topic);
                     logger.debug({ topic: options.topic }, "topic created");
 
                     return store.insert(options);
@@ -49,7 +47,7 @@ export const StoreFactory: StoreDriverFactory = async function ({
         },
 
         async fetch(topic, seq) {
-            let event = await $postgres
+            let event = await _pg
                 .table(STORE_VALUES.EVENT_TABLE)
                 .where({ topic, seq })
                 .first();
@@ -62,7 +60,7 @@ export const StoreFactory: StoreDriverFactory = async function ({
         },
 
         async latest(topic) {
-            let query = $postgres.raw(
+            let query = _pg.raw(
                 `select * from ${STORE_VALUES.EVENT_TABLE} where topic = ? and seq = (select seq from ${STORE_VALUES.TOPIC_TABLE} where topic = ?)`,
                 [topic, topic]
             );
@@ -77,14 +75,17 @@ export const StoreFactory: StoreDriverFactory = async function ({
         },
 
         async filter(topic, filters) {
-            let baseQuery = $postgres
+            let baseQuery = _pg
                 .table(STORE_VALUES.EVENT_TABLE)
                 .where({ topic })
                 .orderBy("seq", "asc");
 
             let query = knexEventFilter(baseQuery, filters);
 
-            logger.debug({ query: query.toString() }, "filter query");
+            logger.debug(
+                { query: query.toString() },
+                "filtering mercurios topic..."
+            );
 
             return (await query).map(EventFactory);
         },
@@ -92,14 +93,14 @@ export const StoreFactory: StoreDriverFactory = async function ({
         async topics({ like, withEvents, limit, offset }) {
             let query: Knex.QueryBuilder;
             if (withEvents) {
-                query = $postgres
+                query = _pg
                     .table(STORE_VALUES.EVENT_TABLE)
                     .distinct("topic")
                     .orderBy("topic", "asc");
 
                 knexEventFilter(query, withEvents);
             } else {
-                query = $postgres
+                query = _pg
                     .table(STORE_VALUES.TOPIC_TABLE)
                     .select("topic")
                     .orderBy("topic", "asc");
@@ -126,7 +127,7 @@ export const StoreFactory: StoreDriverFactory = async function ({
         },
 
         async topicExists(topic) {
-            let result = await $postgres
+            let result = await _pg
                 .table(STORE_VALUES.TOPIC_TABLE)
                 .where({ topic })
                 .first();
@@ -135,7 +136,7 @@ export const StoreFactory: StoreDriverFactory = async function ({
         },
 
         async deleteTopic(topic) {
-            await $postgres.transaction(async (trx) => {
+            await _pg.transaction(async (trx) => {
                 await Promise.all([
                     trx
                         .table(STORE_VALUES.EVENT_TABLE)
@@ -154,47 +155,3 @@ export const StoreFactory: StoreDriverFactory = async function ({
 
     return store;
 };
-
-function PostgresClient({ url, logger }: { url: string; logger: Logger }) {
-    let listening: boolean;
-
-    return knex({
-        client: "pg",
-        connection: url,
-        pool: {
-            min: 2,
-            max: 20,
-            propagateCreateError: false,
-            afterCreate: (connection, done) => {
-                if (listening) {
-                    done(null, connection);
-                    return;
-                }
-                listening = true;
-                connection.query(
-                    `LISTEN ${STORE_VALUES.NOTIFICATION_CHANNEL}`,
-                    function (err) {
-                        if (err) {
-                            listening = false;
-                        } else {
-                            connection.on("notification", (msg) => {
-                                $logger.debug(msg, "got notification");
-                            });
-                            connection.on("end", () => {
-                                listening = false;
-                            });
-
-                            connection.on("error", (err) => {
-                                logger.warning(
-                                    err,
-                                    "error on mercurios notification"
-                                );
-                            });
-                        }
-                        done(err, connection);
-                    }
-                );
-            },
-        },
-    });
-}
