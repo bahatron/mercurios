@@ -2,7 +2,7 @@ version: "3.5"
 
 x-client-config: &client-config
     MERCURIOS_TEST_URL: postgres://admin:secret@mercurios-postgres:5432/postgres
-    NODE_ENV: dev
+    MERCURIOS_DEV: 1
 
 x-postgres-config: &postgres-config
     POSTGRES_PASSWORD: secret
@@ -36,6 +36,3 @@ services:
             - mercurios-postgres
         volumes:
             - ./:/app
-            # - /app/node_modules
-            # - ./src:/app/src
-            # - ./playground:/app/playground
