@@ -3,21 +3,23 @@ import { EventFactory } from "./event";
 import { $error } from "../utils/error";
 import { appendProcedure, createTopic, knexEventFilter } from "./helpers";
 import { StoreDriver, StoreDriverFactory, STORE_VALUES } from "./static";
-import { setupStore } from "./setup";
-import { PostgresClient } from "./driver";
+import { connect } from "./client";
+import { Observable } from "@bahatron/utils/lib/observable";
 
 /**
- * @todo: leverage postgres date datatype
+ * @todo: leverage postgres date datatype?
  */
 export const StoreFactory: StoreDriverFactory = async function ({
     url,
     logger,
 }) {
-    const _pg = PostgresClient({ url, logger });
-    await setupStore(_pg);
-    // await setupDispatcher(_pg);
+    const _observer = Observable();
+
+    const _pg = await connect({ url, observer: _observer, logger });
 
     let store: StoreDriver = {
+        on: _observer.on,
+
         async insert(options) {
             try {
                 let seq = await appendProcedure(_pg, options);

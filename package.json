@@ -17,7 +17,7 @@
         "test:ci": "npm run test -- --silent --reporters=default --reporters=jest-stare",
         "nodemon": "nodemon",
         "pm2": "pm2-runtime start process.config.js",
-        "dev": "docker-compose up --abort-on-container-exit"
+        "dev": "docker-compose up --force-recreate  --renew-anon-volumes --abort-on-container-exit"
     },
     "dependencies": {
         "@bahatron/utils": "^2.5.1",

@@ -1,6 +1,5 @@
 import MercuriosClient from "..";
 import { $config } from "../utils/config";
-import { $logger } from "../utils/logger";
 
 describe("subscribe to topic", () => {
     let mercurios: MercuriosClient;
@@ -12,7 +11,6 @@ describe("subscribe to topic", () => {
     });
 
     it.skip("can listen to topics", async () => {
-        // todo
-        $logger.debug("TODO");
+        /** @todo */
     });
 });

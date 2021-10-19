@@ -16,6 +16,8 @@ export interface InsertOptions {
     data?: any;
 }
 
+export type StoreEvent = "event";
+
 export interface StoreDriver {
     // event management
     insert(options: InsertOptions): Promise<MercuriosEvent>;
@@ -26,6 +28,8 @@ export interface StoreDriver {
     deleteTopic(topic: string): Promise<void>;
     topicExists(topic: string): Promise<boolean>;
     topics(params: ListTopicsOptions): Promise<string[]>;
+    // listening
+    on(event: StoreEvent, handler: (event: MercuriosEvent) => void): void;
 }
 
 export interface CreateStoreDriverOptions {
