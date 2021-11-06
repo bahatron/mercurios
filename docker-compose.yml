@@ -36,3 +36,5 @@ services:
             - mercurios-postgres
         volumes:
             - ./:/app
+            # - ./src:/app/src
+            # - ./playground:/app/playground

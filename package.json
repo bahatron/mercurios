@@ -7,7 +7,6 @@
     "author": "simonpiscitelli@gmail.com",
     "license": "Apache-2.0",
     "scripts": {
-        "prepare": "lerna bootstrap",
         "preversion": "npm run prepublishOnly",
         "prepublishOnly": "npm run build:clean && npm run test",
         "build": "tsc -p tsconfig.build.json",
