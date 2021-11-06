@@ -2,6 +2,7 @@ import { Logger, Observable } from "@bahatron/utils";
 import { parse } from "@bahatron/utils/lib/json";
 import { STORE_VALUES } from "./static";
 import knex, { Knex } from "knex";
+import { EventFactory } from "./event";
 
 export async function connect({
     url,
@@ -37,8 +38,11 @@ export async function connect({
                                 _listening = false;
                             } else {
                                 connection.on("notification", (msg) => {
-                                    logger.debug(msg, "got notification");
-                                    observer.emit("event", parse(msg.payload));
+                                    let payload = parse(msg.payload);
+                                    observer.emit(
+                                        "event",
+                                        EventFactory(payload)
+                                    );
                                 });
 
                                 connection.on("end", () => {
@@ -155,7 +159,7 @@ async function setupStore(client: Knex) {
             );
         });
     } catch (err: any) {
-        if (["42P16", "23505", "25P02", "XX000", "42710"].includes(err.code)) {
+        if (["42P16", "23505", "25P02", "XX000", "42710", "42P07"].includes(err.code)) {
             return;
         }
         throw err;

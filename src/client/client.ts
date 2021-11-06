@@ -1,4 +1,5 @@
 import { StoreFactory } from "../store";
+import { StoreEventListener } from "../store/static";
 import { createLogger } from "../utils/logger";
 import { EventFilters, ListTopicsOptions, MercuriosEvent } from "./interfaces";
 import { AppendOptions } from "./interfaces";
@@ -22,7 +23,6 @@ export function MercuriosClient({ url, debug = false }: ConnectOptions) {
             return await _store.insert({
                 topic,
                 ...options,
-                timestamp: new Date().toISOString(),
             });
         },
 
@@ -58,6 +58,13 @@ export function MercuriosClient({ url, debug = false }: ConnectOptions) {
         async topicExists(topic: string): Promise<boolean> {
             return await (await store).topicExists(topic);
         },
+
+        on: ((event, handler) => {
+            store.then((store) => {
+                store.on(event, handler);
+                logger.debug({ handler }, `subscription created`);
+            });
+        }) as StoreEventListener,
     };
 
     logger.debug(`mercurios client initialized in debug mode`);

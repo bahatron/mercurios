@@ -1,10 +1,11 @@
 import { Knex, knex } from "knex";
 import { EventFactory } from "./event";
 import { $error } from "../utils/error";
-import { appendProcedure, createTopic, knexEventFilter } from "./helpers";
+import { knexEventFilter } from "./helpers";
 import { StoreDriver, StoreDriverFactory, STORE_VALUES } from "./static";
-import { connect } from "./client";
+import { connect } from "./driver";
 import { Observable } from "@bahatron/utils/lib/observable";
+import { stringify } from "@bahatron/utils/lib/json";
 
 /**
  * @todo: leverage postgres date datatype?
@@ -17,29 +18,58 @@ export const StoreFactory: StoreDriverFactory = async function ({
 
     const _pg = await connect({ url, observer: _observer, logger });
 
+    async function createTopic(topic: string) {
+        try {
+            await _pg.table(STORE_VALUES.TOPIC_TABLE).insert({ topic, seq: 0 });
+
+            logger.debug({ topic }, "topic created");
+        } catch (err: any) {
+            if (
+                err.message.includes("duplicate key value") ||
+                err.code === "23505"
+            ) {
+                return;
+            }
+
+            throw err;
+        }
+    }
+
     let store: StoreDriver = {
         on: _observer.on,
 
-        async insert(options) {
+        async insert(payload) {
             try {
-                let seq = await appendProcedure(_pg, options);
+                let timestamp = new Date().toISOString();
 
-                let event = EventFactory({ ...options, seq });
+                let result = await _pg.raw(
+                    `call ${STORE_VALUES.APPEND_PROCEDURE}(?, ?, ?, ?, ?)`,
+                    [
+                        payload.topic,
+                        payload.expectedSeq ?? null,
+                        timestamp,
+                        payload.key ?? null,
+                        stringify(payload.data) ?? null,
+                    ]
+                );
+
+                let seq = result.rows.shift().v_seq;
+
+                let event = EventFactory({ ...payload, timestamp, seq });
 
                 logger.debug(event, "mercurios event appended");
                 return event;
             } catch (err: any) {
                 if (err.message.includes("ERR_NO_STREAM")) {
-                    await createTopic(_pg, options.topic);
-                    logger.debug({ topic: options.topic }, "topic created");
+                    await createTopic(payload.topic);
 
-                    return store.insert(options);
+                    return store.insert(payload);
                 } else if (err.message.includes("ERR_CONFLICT")) {
                     throw $error.ExpectationFailed(
                         "Conflict with expected sequence",
                         {
                             reason: "ERR_CONFLICT",
-                            expectedSeq: options.expectedSeq,
+                            expectedSeq: payload.expectedSeq,
                         }
                     );
                 } else {

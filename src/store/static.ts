@@ -10,13 +10,15 @@ export const STORE_VALUES = {
 
 export interface InsertOptions {
     topic: string;
-    timestamp: string;
     expectedSeq?: number;
     key?: string;
     data?: any;
 }
 
 export type StoreEvent = "event";
+export interface StoreEventListener {
+    (event: StoreEvent, handler: (event: MercuriosEvent) => void): void;
+}
 
 export interface StoreDriver {
     // event management
@@ -29,7 +31,7 @@ export interface StoreDriver {
     topicExists(topic: string): Promise<boolean>;
     topics(params: ListTopicsOptions): Promise<string[]>;
     // listening
-    on(event: StoreEvent, handler: (event: MercuriosEvent) => void): void;
+    on: StoreEventListener;
 }
 
 export interface CreateStoreDriverOptions {

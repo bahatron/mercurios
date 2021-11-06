@@ -33,6 +33,6 @@ export interface MercuriosEvent<T = any> {
     timestamp: string;
     topic: string;
     seq: number;
-    key?: string;
+    key: string | null;
     data?: T;
 }

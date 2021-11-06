@@ -1,5 +1,6 @@
 import { MercuriosEvent } from "../client";
 import { $json } from "../utils/json";
+import { $validator } from "../utils/validator";
 
 export function EventFactory({
     topic,
@@ -7,13 +8,13 @@ export function EventFactory({
     seq,
     data,
     key,
-}: MercuriosEvent): MercuriosEvent {
+}: any): MercuriosEvent {
     return {
         topic,
         timestamp,
         seq,
         data: $json.parse(data) ?? data,
-        key,
+        key: $validator.nullableString(key),
     };
 }
 
