@@ -1,5 +1,0 @@
-{
-    "watch": ["src", "playground"],
-    "ext": "ts",
-    "exec": "ts-node ./playground/server.ts"
-}

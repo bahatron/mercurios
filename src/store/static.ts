@@ -1,11 +1,11 @@
 import { Logger } from "@bahatron/utils";
 import { EventFilters, ListTopicsOptions, MercuriosEvent } from "../client";
 
-export const STORE_VALUES = {
-    EVENT_TABLE: `mercurios_events`,
-    TOPIC_TABLE: `mercurios_topics`,
-    APPEND_PROCEDURE: `append_event`,
-    NOTIFICATION_CHANNEL: `mercurios_event_created`,
+export const EVENT_TABLE = (slug = "mercurios") => `${slug}_events`;
+export const TOPIC_TABLE = (slug = "mercurios") => `${slug}_topics`;
+export const APPEND_PROCEDURE = (slug = "mercurios") => `${slug}_append_event`;
+export const NOTIFICATION_CHANNEL = (slug = "mercurios") => {
+    `${slug}_event_created`;
 };
 
 export interface InsertOptions {
@@ -34,11 +34,12 @@ export interface StoreDriver {
     on: StoreEventListener;
 }
 
-export interface CreateStoreDriverOptions {
+export interface CreateStoreOptions {
     url: string;
     logger: Logger.Logger;
+    tablePrefix?: string;
 }
 
-export interface StoreDriverFactory {
-    (params: CreateStoreDriverOptions): Promise<StoreDriver>;
+export interface StoreFactory {
+    (params: CreateStoreOptions): Promise<StoreDriver>;
 }

@@ -1,4 +1,4 @@
-import { StoreFactory } from "../store";
+import { Store } from "../store";
 import { StoreEventListener } from "../store/static";
 import { createLogger } from "../utils/logger";
 import { EventFilters, ListTopicsOptions, MercuriosEvent } from "./interfaces";
@@ -6,12 +6,16 @@ import { AppendOptions } from "./interfaces";
 import { ConnectOptions } from "./interfaces";
 
 export type MercuriosClient = ReturnType<typeof MercuriosClient>;
-export function MercuriosClient({ url, debug = false }: ConnectOptions) {
+export function MercuriosClient({
+    url,
+    debug = false,
+    tablePrefix,
+}: ConnectOptions) {
     let logger = createLogger({
         debug,
     });
 
-    let store = StoreFactory({ url, logger });
+    let store = Store({ url, logger, tablePrefix });
 
     let client = {
         async append<T = any>(

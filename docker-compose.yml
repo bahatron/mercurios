@@ -13,7 +13,7 @@ x-postgres-config: &postgres-config
 
 services:
     mercurios-postgres:
-        image: postgres:12
+        image: postgres
         container_name: mercurios-postgres
         ports:
             - 5432:5432
@@ -21,20 +21,18 @@ services:
             <<: *postgres-config
         command: -c 'max_connections=500'
 
-    mercurios-client:
+    mercurios-playground:
         build:
             context: .
-            dockerfile: Dockerfile.client
-        image: mercurios-client
+            dockerfile: Dockerfile.playground
+        image: mercurios-playground
         ports:
             - 4254:4254
-        container_name: mercurios-client
-        command: sh -c "npm run pm2"
+        container_name: mercurios-playground
+        command: npm run pm2
         environment:
             <<: *client-config
         depends_on:
             - mercurios-postgres
         volumes:
             - ./:/app
-            # - ./src:/app/src
-            # - ./playground:/app/playground

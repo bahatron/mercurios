@@ -7,6 +7,7 @@ export interface AppendOptions {
 export interface ConnectOptions {
     url: string;
     debug?: boolean;
+    tablePrefix?: string;
 }
 
 export interface ListTopicsOptions {

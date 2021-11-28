@@ -1,5 +1,4 @@
-import { sleep } from "@bahatron/utils/lib/helpers";
-import MercuriosClient, { MercuriosEvent } from "..";
+import MercuriosClient from "..";
 import { $config } from "../utils/config";
 
 describe("subscribe to topic", () => {

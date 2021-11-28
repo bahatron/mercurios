@@ -2,25 +2,34 @@ import { Knex, knex } from "knex";
 import { EventFactory } from "./event";
 import { $error } from "../utils/error";
 import { knexEventFilter } from "./helpers";
-import { StoreDriver, StoreDriverFactory, STORE_VALUES } from "./static";
-import { connect } from "./driver";
+import {
+    StoreDriver,
+    StoreFactory,
+    TOPIC_TABLE,
+    EVENT_TABLE,
+    APPEND_PROCEDURE,
+} from "./static";
+import { postgresDriver } from "./driver";
 import { Observable } from "@bahatron/utils/lib/observable";
 import { stringify } from "@bahatron/utils/lib/json";
 
-/**
- * @todo: leverage postgres date datatype?
- */
-export const StoreFactory: StoreDriverFactory = async function ({
+export const Store: StoreFactory = async function ({
     url,
     logger,
+    tablePrefix,
 }) {
     const _observer = Observable();
 
-    const _pg = await connect({ url, observer: _observer, logger });
+    const _pg = await postgresDriver({
+        url,
+        observer: _observer,
+        logger,
+        tablePrefix,
+    });
 
     async function createTopic(topic: string) {
         try {
-            await _pg.table(STORE_VALUES.TOPIC_TABLE).insert({ topic, seq: 0 });
+            await _pg.table(TOPIC_TABLE(tablePrefix)).insert({ topic, seq: 0 });
 
             logger.debug({ topic }, "topic created");
         } catch (err: any) {
@@ -43,7 +52,7 @@ export const StoreFactory: StoreDriverFactory = async function ({
                 let timestamp = new Date().toISOString();
 
                 let result = await _pg.raw(
-                    `call ${STORE_VALUES.APPEND_PROCEDURE}(?, ?, ?, ?, ?)`,
+                    `call ${APPEND_PROCEDURE(tablePrefix)}(?, ?, ?, ?, ?)`,
                     [
                         payload.topic,
                         payload.expectedSeq ?? null,
@@ -80,7 +89,7 @@ export const StoreFactory: StoreDriverFactory = async function ({
 
         async fetch(topic, seq) {
             let event = await _pg
-                .table(STORE_VALUES.EVENT_TABLE)
+                .table(EVENT_TABLE(tablePrefix))
                 .where({ topic, seq })
                 .first();
 
@@ -93,7 +102,11 @@ export const StoreFactory: StoreDriverFactory = async function ({
 
         async latest(topic) {
             let query = _pg.raw(
-                `select * from ${STORE_VALUES.EVENT_TABLE} where topic = ? and seq = (select seq from ${STORE_VALUES.TOPIC_TABLE} where topic = ?)`,
+                `select * from ${EVENT_TABLE(
+                    tablePrefix
+                )} where topic = ? and seq = (select seq from ${TOPIC_TABLE(
+                    tablePrefix
+                )} where topic = ?)`,
                 [topic, topic]
             );
 
@@ -108,7 +121,7 @@ export const StoreFactory: StoreDriverFactory = async function ({
 
         async filter(topic, filters) {
             let baseQuery = _pg
-                .table(STORE_VALUES.EVENT_TABLE)
+                .table(EVENT_TABLE(tablePrefix))
                 .where({ topic })
                 .orderBy("seq", "asc");
 
@@ -126,14 +139,14 @@ export const StoreFactory: StoreDriverFactory = async function ({
             let query: Knex.QueryBuilder;
             if (withEvents) {
                 query = _pg
-                    .table(STORE_VALUES.EVENT_TABLE)
+                    .table(EVENT_TABLE(tablePrefix))
                     .distinct("topic")
                     .orderBy("topic", "asc");
 
                 knexEventFilter(query, withEvents);
             } else {
                 query = _pg
-                    .table(STORE_VALUES.TOPIC_TABLE)
+                    .table(TOPIC_TABLE(tablePrefix))
                     .select("topic")
                     .orderBy("topic", "asc");
             }
@@ -160,7 +173,7 @@ export const StoreFactory: StoreDriverFactory = async function ({
 
         async topicExists(topic) {
             let result = await _pg
-                .table(STORE_VALUES.TOPIC_TABLE)
+                .table(TOPIC_TABLE(tablePrefix))
                 .where({ topic })
                 .first();
 
@@ -171,11 +184,11 @@ export const StoreFactory: StoreDriverFactory = async function ({
             await _pg.transaction(async (trx) => {
                 await Promise.all([
                     trx
-                        .table(STORE_VALUES.EVENT_TABLE)
+                        .table(EVENT_TABLE(tablePrefix))
                         .where({ topic })
                         .delete(),
                     trx
-                        .table(STORE_VALUES.TOPIC_TABLE)
+                        .table(TOPIC_TABLE(tablePrefix))
                         .where({ topic })
                         .delete(),
                 ]);

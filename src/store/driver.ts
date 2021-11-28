@@ -1,17 +1,27 @@
 import { Logger, Observable } from "@bahatron/utils";
 import { parse } from "@bahatron/utils/lib/json";
-import { STORE_VALUES } from "./static";
+import {
+    NOTIFICATION_CHANNEL,
+    EVENT_TABLE,
+    TOPIC_TABLE,
+    APPEND_PROCEDURE,
+} from "./static";
 import knex, { Knex } from "knex";
 import { EventFactory } from "./event";
 
-export async function connect({
+/**
+ * @todo: leverage postgres date datatype?
+ */
+export async function postgresDriver({
     url,
     observer,
     logger,
+    tablePrefix,
 }: {
     url: string;
     logger: Logger.Logger;
     observer: Observable.Observable;
+    tablePrefix?: string;
 }) {
     try {
         let _listening: boolean = false;
@@ -32,7 +42,7 @@ export async function connect({
                     _listening = true;
 
                     connection.query(
-                        `LISTEN ${STORE_VALUES.NOTIFICATION_CHANNEL}`,
+                        `LISTEN ${NOTIFICATION_CHANNEL(tablePrefix)}`,
                         (err) => {
                             if (err) {
                                 _listening = false;
@@ -58,7 +68,7 @@ export async function connect({
             },
         });
 
-        await setupStore(client);
+        await setupStore(client, tablePrefix);
 
         return client;
     } catch (err: any) {
@@ -67,12 +77,12 @@ export async function connect({
     }
 }
 
-async function setupStore(client: Knex) {
+async function setupStore(client: Knex, tablePrefix: string) {
     try {
         await client.transaction(async (trx) => {
-            if (!(await trx.schema.hasTable(STORE_VALUES.TOPIC_TABLE))) {
+            if (!(await trx.schema.hasTable(TOPIC_TABLE(tablePrefix)))) {
                 await trx.schema.createTable(
-                    STORE_VALUES.TOPIC_TABLE,
+                    TOPIC_TABLE(tablePrefix),
                     (table) => {
                         table.string("topic").primary();
                         table.integer("seq");
@@ -82,11 +92,15 @@ async function setupStore(client: Knex) {
 
             await trx.raw(
                 `
-                    CREATE OR REPLACE FUNCTION notify_${STORE_VALUES.NOTIFICATION_CHANNEL}()
+                    CREATE OR REPLACE FUNCTION notify_${NOTIFICATION_CHANNEL(
+                        tablePrefix
+                    )}()
                     RETURNS trigger AS
                     $BODY$
                         BEGIN
-                            PERFORM pg_notify('${STORE_VALUES.NOTIFICATION_CHANNEL}', row_to_json(NEW)::text);
+                            PERFORM pg_notify('${NOTIFICATION_CHANNEL(
+                                tablePrefix
+                            )}', row_to_json(NEW)::text);
                             RETURN NULL;
                         END; 
                     $BODY$
@@ -95,9 +109,9 @@ async function setupStore(client: Knex) {
                 `
             );
 
-            if (!(await trx.schema.hasTable(STORE_VALUES.EVENT_TABLE))) {
+            if (!(await trx.schema.hasTable(EVENT_TABLE(tablePrefix)))) {
                 await trx.schema.createTable(
-                    STORE_VALUES.EVENT_TABLE,
+                    EVENT_TABLE(tablePrefix),
                     (table) => {
                         table.string("topic");
                         table.integer("seq");
@@ -114,17 +128,21 @@ async function setupStore(client: Knex) {
 
             await trx.raw(
                 `
-                    CREATE TRIGGER notify_${STORE_VALUES.NOTIFICATION_CHANNEL}
+                    CREATE TRIGGER notify_${NOTIFICATION_CHANNEL(tablePrefix)}
                     AFTER INSERT
-                    ON "${STORE_VALUES.EVENT_TABLE}"
+                    ON "${EVENT_TABLE(tablePrefix)}"
                     FOR EACH ROW
-                    EXECUTE PROCEDURE notify_${STORE_VALUES.NOTIFICATION_CHANNEL}();
+                    EXECUTE PROCEDURE notify_${NOTIFICATION_CHANNEL(
+                        tablePrefix
+                    )}();
                 `
             );
 
             await trx.raw(
                 `
-                    CREATE OR REPLACE PROCEDURE ${STORE_VALUES.APPEND_PROCEDURE} (
+                    CREATE OR REPLACE PROCEDURE ${APPEND_PROCEDURE(
+                        tablePrefix
+                    )} (
                         inout v_topic varchar(255),
                         inout v_seq integer,
                         inout v_timestamp varchar(255),
@@ -137,7 +155,9 @@ async function setupStore(client: Knex) {
                         next_seq integer;
                     BEGIN
                         next_seq := (
-                                SELECT seq FROM ${STORE_VALUES.TOPIC_TABLE} WHERE topic = v_topic FOR UPDATE
+                                SELECT seq FROM ${TOPIC_TABLE(
+                                    tablePrefix
+                                )} WHERE topic = v_topic FOR UPDATE
                             ) + 1;
             
                         IF (next_seq IS NULL) THEN
@@ -146,10 +166,12 @@ async function setupStore(client: Knex) {
                             RAISE 'ERR_CONFLICT';
                         END IF;
             
-                        UPDATE ${STORE_VALUES.TOPIC_TABLE} SET seq = next_seq
+                        UPDATE ${TOPIC_TABLE(tablePrefix)} SET seq = next_seq
                             WHERE topic = v_topic;
             
-                        INSERT INTO ${STORE_VALUES.EVENT_TABLE} (topic, seq, timestamp, key, data)
+                        INSERT INTO ${EVENT_TABLE(
+                            tablePrefix
+                        )} (topic, seq, timestamp, key, data)
                             VALUES (v_topic, next_seq, v_timestamp, v_key, v_data)
                             returning seq into v_seq;
                         COMMIT;
@@ -159,7 +181,11 @@ async function setupStore(client: Knex) {
             );
         });
     } catch (err: any) {
-        if (["42P16", "23505", "25P02", "XX000", "42710", "42P07"].includes(err.code)) {
+        if (
+            ["42P16", "23505", "25P02", "XX000", "42710", "42P07"].includes(
+                err.code
+            )
+        ) {
             return;
         }
         throw err;
