@@ -1,8 +1,9 @@
 import MercuriosClient from "..";
+import { $config } from "../utils/config";
 
 describe(`Filter Topic`, () => {
     let mercurios = MercuriosClient({
-        url: process.env.MERCURIOS_TEST_URL!,
+        url: $config.test_url,
         debug: true,
     });
 

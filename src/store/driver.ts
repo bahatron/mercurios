@@ -1,13 +1,12 @@
 import { Logger, Observable } from "@bahatron/utils";
 import { parse } from "@bahatron/utils/lib/json";
-import {
-    NOTIFICATION_CHANNEL,
-    EVENT_TABLE,
-    TOPIC_TABLE,
-    APPEND_PROCEDURE,
-} from "./static";
 import knex, { Knex } from "knex";
 import { EventFactory } from "./event";
+
+export const EVENT_TABLE = (prefix) => `${prefix}_events`;
+export const TOPIC_TABLE = (prefix) => `${prefix}_topics`;
+export const APPEND_PROCEDURE = (prefix) => `${prefix}_append_event`;
+export const NOTIFICATION_CHANNEL = (prefix) => `${prefix}_event_created`;
 
 /**
  * @todo: leverage postgres date datatype?
@@ -21,7 +20,7 @@ export async function postgresDriver({
     url: string;
     logger: Logger.Logger;
     observer: Observable.Observable;
-    tablePrefix?: string;
+    tablePrefix: string;
 }) {
     try {
         let _listening: boolean = false;

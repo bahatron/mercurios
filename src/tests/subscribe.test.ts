@@ -1,5 +1,7 @@
 import MercuriosClient from "..";
+import { MercuriosEventSchema } from "../store/event";
 import { $config } from "../utils/config";
+import { $validator } from "../utils/validator";
 
 describe("subscribe to topic", () => {
     let mercurios: MercuriosClient;
@@ -25,6 +27,10 @@ describe("subscribe to topic", () => {
             },
         });
 
+        expect(
+            $validator.json(await subscriptionResult, MercuriosEventSchema)
+        ).toHaveLength(0);
+        
         expect(await subscriptionResult).toEqual(publishResult);
     });
 });

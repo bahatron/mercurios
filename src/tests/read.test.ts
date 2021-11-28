@@ -1,10 +1,11 @@
 import MercuriosClient from "..";
 import { MercuriosEventSchema } from "../store/event";
+import { $config } from "../utils/config";
 import { $validator } from "../utils/validator";
 
 describe("Read Event", () => {
     let mercurios = MercuriosClient({
-        url: process.env.MERCURIOS_TEST_URL!,
+        url: $config.test_url,
         debug: true,
     });
 

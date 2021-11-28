@@ -9,7 +9,7 @@ export type MercuriosClient = ReturnType<typeof MercuriosClient>;
 export function MercuriosClient({
     url,
     debug = false,
-    tablePrefix,
+    tablePrefix = "mercurios",
 }: ConnectOptions) {
     let logger = createLogger({
         debug,

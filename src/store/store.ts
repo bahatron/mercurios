@@ -2,13 +2,8 @@ import { Knex, knex } from "knex";
 import { EventFactory } from "./event";
 import { $error } from "../utils/error";
 import { knexEventFilter } from "./helpers";
-import {
-    StoreDriver,
-    StoreFactory,
-    TOPIC_TABLE,
-    EVENT_TABLE,
-    APPEND_PROCEDURE,
-} from "./static";
+import { StoreDriver, StoreFactory } from "./static";
+import { TOPIC_TABLE, EVENT_TABLE, APPEND_PROCEDURE } from "./driver";
 import { postgresDriver } from "./driver";
 import { Observable } from "@bahatron/utils/lib/observable";
 import { stringify } from "@bahatron/utils/lib/json";

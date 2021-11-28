@@ -29,7 +29,7 @@ services:
         ports:
             - 4254:4254
         container_name: mercurios-playground
-        command: npm run pm2
+        command: sh -c "npm run pm2"
         environment:
             <<: *client-config
         depends_on:
