@@ -52,11 +52,7 @@ let topics = await client.topics({
 -   docker-compose
 
 ```sh
-## IMPORTANT: it most be run before the first start of the application
-./run.js setup
-
-# start dev environment
-./run.js dev
+npm install && npm run dev
 ```
 
 ## Migration from v2 to v3
