@@ -9,7 +9,7 @@ import { Logger } from "@bahatron/utils/lib/logger";
 import { swaggerDocs } from "./swagger";
 import morgan from "morgan";
 import { Json } from "@bahatron/utils";
-import { mercurios, EventFilters } from "../src";
+import { mercurios, EventFilters } from "..";
 
 const $mercurios = mercurios({
     url:

@@ -1,4 +1,4 @@
-import { MercuriosEvent } from "../client";
+import { MercuriosEvent } from ".";
 import { $json } from "../utils/json";
 import { $validator } from "../utils/validator";
 

@@ -1,5 +1,5 @@
 import MercuriosClient from "..";
-import { MercuriosEventSchema } from "../store/event";
+import { MercuriosEventSchema } from "../client/event";
 import { $config } from "../utils/config";
 import { $validator } from "../utils/validator";
 

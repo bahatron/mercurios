@@ -7,14 +7,13 @@
     "author": "simonpiscitelli@gmail.com",
     "license": "Apache-2.0",
     "scripts": {
-        "preversion": "npm run prepublishOnly",
-        "prepublishOnly": "npm run build:clean && npm run test",
-        "build": "tsc -p tsconfig.build.json",
-        "build:watch": "npm run build -- --watch",
+        "prepublishOnly": "npm run build:dist && npm run test",
+        "build": "tsc",
         "build:clean": "rm -rf dist && npm run build",
+        "build:dist": "rm -rf dist && tsc -p tsconfig.build.json",
         "test": "jest --forceExit --runInBand",
         "test:ci": "npm run test -- --silent --reporters=default --reporters=jest-stare",
-        "pm2": "pm2-runtime start process.config.js",
+        "pm2": "tsc --watch & pm2-runtime start process.config.js",
         "dev": "docker-compose up --force-recreate  --renew-anon-volumes --abort-on-container-exit"
     },
     "dependencies": {

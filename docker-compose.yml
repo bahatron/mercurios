@@ -22,17 +22,12 @@ services:
         command: -c 'max_connections=500'
 
     mercurios-playground:
-        build:
-            context: .
-            dockerfile: Dockerfile.playground
         image: mercurios-playground
         ports:
             - 4254:4254
         container_name: mercurios-playground
-        command: sh -c "npm run pm2"
+        command: npm run pm2
         environment:
             <<: *client-config
         depends_on:
             - mercurios-postgres
-        volumes:
-            - ./:/app

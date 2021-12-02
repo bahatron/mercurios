@@ -1,7 +1,9 @@
 import { Logger, Observable } from "@bahatron/utils";
 import { parse } from "@bahatron/utils/lib/json";
+import e from "express";
 import knex, { Knex } from "knex";
-import { EventFactory } from "./event";
+import { EventFactory } from "../client/event";
+import { FEATURE_NOTIFY_ENABLED } from "../static";
 
 export const EVENT_TABLE = (prefix) => `${prefix}_events`;
 export const TOPIC_TABLE = (prefix) => `${prefix}_topics`;
@@ -89,25 +91,6 @@ async function setupStore(client: Knex, tablePrefix: string) {
                 );
             }
 
-            await trx.raw(
-                `
-                    CREATE OR REPLACE FUNCTION notify_${NOTIFICATION_CHANNEL(
-                        tablePrefix
-                    )}()
-                    RETURNS trigger AS
-                    $BODY$
-                        BEGIN
-                            PERFORM pg_notify('${NOTIFICATION_CHANNEL(
-                                tablePrefix
-                            )}', row_to_json(NEW)::text);
-                            RETURN NULL;
-                        END; 
-                    $BODY$
-                    LANGUAGE plpgsql VOLATILE
-                    COST 100
-                `
-            );
-
             if (!(await trx.schema.hasTable(EVENT_TABLE(tablePrefix)))) {
                 await trx.schema.createTable(
                     EVENT_TABLE(tablePrefix),
@@ -125,17 +108,46 @@ async function setupStore(client: Knex, tablePrefix: string) {
                 );
             }
 
-            await trx.raw(
-                `
-                    CREATE TRIGGER notify_${NOTIFICATION_CHANNEL(tablePrefix)}
-                    AFTER INSERT
-                    ON "${EVENT_TABLE(tablePrefix)}"
-                    FOR EACH ROW
-                    EXECUTE PROCEDURE notify_${NOTIFICATION_CHANNEL(
+            if (FEATURE_NOTIFY_ENABLED) {
+                await trx.raw(
+                    `
+                        CREATE OR REPLACE FUNCTION notify_${NOTIFICATION_CHANNEL(
+                            tablePrefix
+                        )}()
+                        RETURNS trigger AS
+                        $BODY$
+                            BEGIN
+                                PERFORM pg_notify('${NOTIFICATION_CHANNEL(
+                                    tablePrefix
+                                )}', row_to_json(NEW)::text);
+                                RETURN NULL;
+                            END;
+                        $BODY$
+                        LANGUAGE plpgsql VOLATILE
+                        COST 100
+                    `
+                );
+
+                await trx.raw(
+                    `
+                        CREATE TRIGGER notify_${NOTIFICATION_CHANNEL(
+                            tablePrefix
+                        )}
+                        AFTER INSERT
+                        ON "${EVENT_TABLE(tablePrefix)}"
+                        FOR EACH ROW
+                        EXECUTE PROCEDURE notify_${NOTIFICATION_CHANNEL(
+                            tablePrefix
+                        )}();
+                    `
+                );
+            } else {
+                await trx.raw(
+                    `DROP TRIGGER IF EXISTS notify_${NOTIFICATION_CHANNEL(
                         tablePrefix
-                    )}();
-                `
-            );
+                    )} on "${EVENT_TABLE(tablePrefix)}"`
+                );
+            }
 
             await trx.raw(
                 `

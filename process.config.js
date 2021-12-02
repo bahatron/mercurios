@@ -2,7 +2,7 @@ module.exports = {
     apps: [
         {
             name: "playground",
-            script: "playground/server.ts",
+            script: "lib/playground/server.js",
             watch: ["src", "playground"],
             autorestart: false,
             exec_mode: "cluster",

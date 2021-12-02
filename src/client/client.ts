@@ -1,9 +1,10 @@
 import { Store } from "../store";
-import { StoreEventListener } from "../store/static";
 import { createLogger } from "../utils/logger";
 import { EventFilters, ListTopicsOptions, MercuriosEvent } from "./interfaces";
 import { AppendOptions } from "./interfaces";
 import { ConnectOptions } from "./interfaces";
+import { FEATURE_NOTIFY_ENABLED } from "../static";
+import { StoreEventListener } from "../store/interfaces";
 
 export type MercuriosClient = ReturnType<typeof MercuriosClient>;
 export function MercuriosClient({
@@ -16,6 +17,13 @@ export function MercuriosClient({
     });
 
     let store = Store({ url, logger, tablePrefix });
+
+    let StoreEventListener: StoreEventListener = (event, handler) => {
+        store.then((store) => {
+            store.on(event, handler);
+            logger.debug({ handler }, `subscription created`);
+        });
+    };
 
     let client = {
         async append<T = any>(
@@ -62,14 +70,11 @@ export function MercuriosClient({
         async topicExists(topic: string): Promise<boolean> {
             return await (await store).topicExists(topic);
         },
-
-        on: ((event, handler) => {
-            store.then((store) => {
-                store.on(event, handler);
-                logger.debug({ handler }, `subscription created`);
-            });
-        }) as StoreEventListener,
     };
+
+    if (FEATURE_NOTIFY_ENABLED) {
+        (client as any).on = StoreEventListener;
+    }
 
     logger.debug(`mercurios client initialized in debug mode`);
 

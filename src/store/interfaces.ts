@@ -9,6 +9,7 @@ export interface InsertOptions {
 }
 
 export type StoreEvent = "event";
+
 export interface StoreEventListener {
     (event: StoreEvent, handler: (event: MercuriosEvent) => void): void;
 }
