@@ -1,6 +1,6 @@
 # Mercurios
 
-Event sourcing simplified
+Event Sourcing != Async Messaging
 
 ## Notes
 
