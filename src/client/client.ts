@@ -3,78 +3,67 @@ import { createLogger } from "../utils/logger";
 import { EventFilters, ListTopicsOptions, MercuriosEvent } from "./interfaces";
 import { AppendOptions } from "./interfaces";
 import { ConnectOptions } from "./interfaces";
-import { FEATURE_NOTIFY_ENABLED } from "../static";
-import { StoreEventListener } from "../store/interfaces";
 
 export type MercuriosClient = ReturnType<typeof MercuriosClient>;
 export function MercuriosClient({
     url,
     debug = false,
     tablePrefix = "mercurios",
+    onEvent,
 }: ConnectOptions) {
     let logger = createLogger({
         debug,
     });
 
-    let store = Store({ url, logger, tablePrefix });
-
-    let StoreEventListener: StoreEventListener = (event, handler) => {
-        store.then((store) => {
-            store.on(event, handler);
-            logger.debug({ handler }, `subscription created`);
-        });
-    };
+    let _store = Store({ url, logger, tablePrefix });
 
     let client = {
         async append<T = any>(
             topic: string,
             options: AppendOptions = {}
         ): Promise<MercuriosEvent<T>> {
-            let _store = await store;
+            let store = await _store;
 
-            return await _store.insert({
+            let event = await store.insert({
                 topic,
                 ...options,
             });
+
+            onEvent?.(event);
+
+            return event;
         },
 
         async read<T = any>(
             topic: string,
             seq: number | "latest"
         ): Promise<MercuriosEvent<T> | undefined> {
-            let _store = await store;
+            let store = await _store;
 
-            let event =
-                seq === "latest"
-                    ? await _store.latest(topic)
-                    : await _store.fetch(topic, seq);
-
-            return event;
+            return seq === "latest"
+                ? store.latest(topic)
+                : store.fetch(topic, seq);
         },
 
         async filter<T = any>(
             topic: string,
             filters: EventFilters = {}
         ): Promise<MercuriosEvent<T>[]> {
-            return await (await store).filter(topic, filters);
+            return (await _store).filter(topic, filters);
         },
 
         async topics(filters: ListTopicsOptions = {}): Promise<string[]> {
-            return await (await store).topics(filters);
+            return (await _store).topics(filters);
         },
 
         async deleteTopic(topic: string): Promise<void> {
-            await (await store).deleteTopic(topic);
+            await (await _store).deleteTopic(topic);
         },
 
         async topicExists(topic: string): Promise<boolean> {
-            return await (await store).topicExists(topic);
+            return (await _store).topicExists(topic);
         },
     };
-
-    if (FEATURE_NOTIFY_ENABLED) {
-        (client as any).on = StoreEventListener;
-    }
 
     logger.debug(`mercurios client initialized in debug mode`);
 

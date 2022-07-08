@@ -5,7 +5,7 @@ import { $validator } from "../utils/validator";
 
 describe("Read Event", () => {
     let mercurios = MercuriosClient({
-        url: $config.test_url,
+        url: $config.TEST_URL,
         debug: true,
     });
 

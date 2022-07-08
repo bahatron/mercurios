@@ -22,6 +22,9 @@ services:
         command: -c 'max_connections=500'
 
     mercurios-playground:
+        build:
+            context: .
+            dockerfile: Dockerfile.playground
         image: mercurios-playground
         ports:
             - 4254:4254

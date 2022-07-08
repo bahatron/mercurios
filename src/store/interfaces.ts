@@ -24,8 +24,6 @@ export interface StoreDriver {
     deleteTopic(topic: string): Promise<void>;
     topicExists(topic: string): Promise<boolean>;
     topics(params: ListTopicsOptions): Promise<string[]>;
-    // listening
-    on: StoreEventListener;
 }
 
 export interface CreateStoreOptions {

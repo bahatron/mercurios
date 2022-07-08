@@ -3,7 +3,7 @@ import { $config } from "../utils/config";
 
 describe("List Topics", () => {
     let mercurios = MercuriosClient({
-        url: $config.test_url,
+        url: $config.TEST_URL,
         debug: true,
     });
 

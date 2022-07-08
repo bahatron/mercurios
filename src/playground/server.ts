@@ -8,8 +8,8 @@ import express, {
 import { Logger } from "@bahatron/utils/lib/logger";
 import { swaggerDocs } from "./swagger";
 import morgan from "morgan";
-import { Json } from "@bahatron/utils";
 import { mercurios, EventFilters } from "..";
+import { parse } from "@bahatron/utils/lib/helpers";
 
 const $mercurios = mercurios({
     url:
@@ -82,7 +82,7 @@ function expressServer() {
         "/topics",
         asyncRoute(async (req, res) => {
             let { like } = req.query as any;
-            let withEvents = Json.parse(req.query.withEvents) as EventFilters;
+            let withEvents = parse(req.query.withEvents) as EventFilters;
 
             $logger.debug({ like, withEvents }, "fetching topics...");
 

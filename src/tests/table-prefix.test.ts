@@ -10,11 +10,11 @@ describe(`Table Prefix Selection`, () => {
     it(`will create tables with the selected prefix`, async () => {
         let pg = knex({
             client: "pg",
-            connection: $config.test_url,
+            connection: $config.TEST_URL,
         });
 
         let client = MercuriosClient({
-            url: $config.test_url,
+            url: $config.TEST_URL,
             tablePrefix: TEST_PREFIX,
         });
 

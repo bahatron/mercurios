@@ -1,5 +1,5 @@
+import { parse } from "@bahatron/utils/lib/helpers";
 import { MercuriosEvent } from ".";
-import { $json } from "../utils/json";
 import { $validator } from "../utils/validator";
 
 export function EventFactory({
@@ -13,7 +13,7 @@ export function EventFactory({
         topic,
         timestamp,
         seq,
-        data: $json.parse(data) ?? data,
+        data: parse(data) ?? data,
         key: $validator.nullableString(key),
     };
 }

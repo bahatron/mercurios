@@ -8,6 +8,7 @@ export interface ConnectOptions {
     url: string;
     debug?: boolean;
     tablePrefix?: string;
+    onEvent?: (event: MercuriosEvent) => void;
 }
 
 export interface ListTopicsOptions {

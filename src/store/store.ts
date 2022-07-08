@@ -4,20 +4,16 @@ import { $error } from "../utils/error";
 import { knexEventFilter } from "./helpers";
 import { StoreDriver, StoreFactory } from "./interfaces";
 import { TOPIC_TABLE, EVENT_TABLE, APPEND_PROCEDURE } from "./driver";
-import { postgresDriver } from "./driver";
-import { Observable } from "@bahatron/utils/lib/observable";
-import { stringify } from "@bahatron/utils/lib/json";
+import { driver } from "./driver";
+import { stringify } from "@bahatron/utils/lib/helpers";
 
 export const Store: StoreFactory = async function ({
     url,
     logger,
     tablePrefix,
 }) {
-    const _observer = Observable();
-
-    const _pg = await postgresDriver({
+    const _pg = await driver({
         url,
-        observer: _observer,
         logger,
         tablePrefix,
     });
@@ -40,8 +36,6 @@ export const Store: StoreFactory = async function ({
     }
 
     let store: StoreDriver = {
-        on: _observer.on,
-
         async insert(payload) {
             try {
                 let timestamp = new Date().toISOString();
@@ -70,11 +64,11 @@ export const Store: StoreFactory = async function ({
                     return store.insert(payload);
                 } else if (err.message.includes("ERR_CONFLICT")) {
                     throw $error.ExpectationFailed(
-                        "Conflict with expected sequence",
                         {
                             reason: "ERR_CONFLICT",
                             expectedSeq: payload.expectedSeq,
-                        }
+                        },
+                        "Conflict with expected sequence"
                     );
                 } else {
                     throw err;

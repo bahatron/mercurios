@@ -11,7 +11,7 @@ describe("subscribe to topic", () => {
 
         beforeAll(async () => {
             mercurios = MercuriosClient({
-                url: $config.test_url,
+                url: $config.TEST_URL,
                 debug: true,
             });
         });

@@ -1,9 +1,5 @@
 import { Logger, Observable } from "@bahatron/utils";
-import { parse } from "@bahatron/utils/lib/json";
-import e from "express";
 import knex, { Knex } from "knex";
-import { EventFactory } from "../client/event";
-import { FEATURE_NOTIFY_ENABLED } from "../static";
 
 export const EVENT_TABLE = (prefix) => `${prefix}_events`;
 export const TOPIC_TABLE = (prefix) => `${prefix}_topics`;
@@ -13,20 +9,16 @@ export const NOTIFICATION_CHANNEL = (prefix) => `${prefix}_event_created`;
 /**
  * @todo: leverage postgres date datatype?
  */
-export async function postgresDriver({
+export async function driver({
     url,
-    observer,
     logger,
     tablePrefix,
 }: {
     url: string;
     logger: Logger.Logger;
-    observer: Observable.Observable;
     tablePrefix: string;
 }) {
     try {
-        let _listening: boolean = false;
-
         let client = knex({
             client: "pg",
             connection: url,
@@ -34,38 +26,6 @@ export async function postgresDriver({
                 min: 2,
                 max: 20,
                 propagateCreateError: false,
-                afterCreate: (connection, done) => {
-                    if (_listening) {
-                        done(null, connection);
-                        return;
-                    }
-
-                    _listening = true;
-
-                    connection.query(
-                        `LISTEN ${NOTIFICATION_CHANNEL(tablePrefix)}`,
-                        (err) => {
-                            if (err) {
-                                _listening = false;
-                            } else {
-                                connection.on("notification", (msg) => {
-                                    let payload = parse(msg.payload);
-                                    observer.emit(
-                                        "event",
-                                        EventFactory(payload)
-                                    );
-                                });
-
-                                connection.on("end", () => {
-                                    _listening = false;
-                                });
-
-                                connection.on("error", logger.warning);
-                            }
-                            done(err, connection);
-                        }
-                    );
-                },
             },
         });
 
@@ -105,47 +65,6 @@ async function setupStore(client: Knex, tablePrefix: string) {
                         table.index(["key"]);
                         table.index(["timestamp"]);
                     }
-                );
-            }
-
-            if (FEATURE_NOTIFY_ENABLED) {
-                await trx.raw(
-                    `
-                        CREATE OR REPLACE FUNCTION notify_${NOTIFICATION_CHANNEL(
-                            tablePrefix
-                        )}()
-                        RETURNS trigger AS
-                        $BODY$
-                            BEGIN
-                                PERFORM pg_notify('${NOTIFICATION_CHANNEL(
-                                    tablePrefix
-                                )}', row_to_json(NEW)::text);
-                                RETURN NULL;
-                            END;
-                        $BODY$
-                        LANGUAGE plpgsql VOLATILE
-                        COST 100
-                    `
-                );
-
-                await trx.raw(
-                    `
-                        CREATE TRIGGER notify_${NOTIFICATION_CHANNEL(
-                            tablePrefix
-                        )}
-                        AFTER INSERT
-                        ON "${EVENT_TABLE(tablePrefix)}"
-                        FOR EACH ROW
-                        EXECUTE PROCEDURE notify_${NOTIFICATION_CHANNEL(
-                            tablePrefix
-                        )}();
-                    `
-                );
-            } else {
-                await trx.raw(
-                    `DROP TRIGGER IF EXISTS notify_${NOTIFICATION_CHANNEL(
-                        tablePrefix
-                    )} on "${EVENT_TABLE(tablePrefix)}"`
                 );
             }
 
