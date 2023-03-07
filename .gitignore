@@ -1,6 +1,7 @@
 dist/
 lib/
 node_modules/
+jest-stare/
 .env
 package-lock.json
 mercurios-test-logs

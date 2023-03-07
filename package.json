@@ -17,9 +17,9 @@
         "dev": "docker-compose up --force-recreate  --renew-anon-volumes --abort-on-container-exit"
     },
     "dependencies": {
-        "@bahatron/utils": "^3.4.0",
-        "knex": "^2.1.0",
-        "pg": "^8.7.3"
+        "@bahatron/utils": "^3.5.7",
+        "knex": "^2.4.2",
+        "pg": "^8.10.0"
     },
     "devDependencies": {
         "@types/express": "^4.17.13",
