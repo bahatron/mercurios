@@ -1,7 +1,7 @@
+import { JsonSchema } from "@bahatron/utils";
 import MercuriosClient from "..";
 import { MercuriosEventSchema } from "../client/event";
 import { $config } from "../utils/config";
-import { $validator } from "../utils/validator";
 
 describe(`Append Event`, () => {
     let mercurios = MercuriosClient({
@@ -28,9 +28,9 @@ describe(`Append Event`, () => {
             expect(event.seq).toBe(1);
             expect(event.key).toBe(key);
             expect(event.data).toEqual(data);
-            expect($validator.json(event, MercuriosEventSchema)).toHaveLength(
-                0
-            );
+            expect(() =>
+                JsonSchema.validate(event, MercuriosEventSchema)
+            ).not.toThrow();
 
             expect(await mercurios.topicExists(topic)).toBe(true);
         });

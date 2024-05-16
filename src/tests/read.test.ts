@@ -1,7 +1,7 @@
+import { JsonSchema } from "@bahatron/utils";
 import MercuriosClient from "..";
 import { MercuriosEventSchema } from "../client/event";
 import { $config } from "../utils/config";
-import { $validator } from "../utils/validator";
 
 describe("Read Event", () => {
     let mercurios = MercuriosClient({
@@ -50,9 +50,9 @@ describe("Read Event", () => {
         it(`responds with a mercurios event`, async () => {
             let event = await mercurios.read(topic, 1);
 
-            expect($validator.json(event, MercuriosEventSchema)).toHaveLength(
-                0
-            );
+            expect(() =>
+                JsonSchema.validate(event, MercuriosEventSchema)
+            ).not.toThrow();
         });
     });
 

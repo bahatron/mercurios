@@ -1,6 +1,6 @@
 import { parse } from "@bahatron/utils/lib/helpers";
 import { MercuriosEvent } from ".";
-import { $validator } from "../utils/validator";
+import { nullableString } from "../utils/nullable-string";
 
 export function EventFactory({
     topic,
@@ -14,7 +14,7 @@ export function EventFactory({
         timestamp,
         seq,
         data: parse(data) ?? data,
-        key: $validator.nullableString(key),
+        key: nullableString(key),
     };
 }
 

@@ -1,8 +1,8 @@
+import { JsonSchema } from "@bahatron/utils";
 import MercuriosClient from "..";
 import { MercuriosEventSchema } from "../client/event";
 import { FEATURE_NOTIFY_ENABLED } from "../static";
 import { $config } from "../utils/config";
-import { $validator } from "../utils/validator";
 
 describe("subscribe to topic", () => {
     if (FEATURE_NOTIFY_ENABLED) {
@@ -29,9 +29,11 @@ describe("subscribe to topic", () => {
                 },
             });
 
-            expect(
-                $validator.json(await subscriptionResult, MercuriosEventSchema)
-            ).toHaveLength(0);
+            let result = await subscriptionResult;
+            
+            expect(() =>
+                JsonSchema.validate(result, MercuriosEventSchema)
+            ).not.toThrow();
 
             expect(await subscriptionResult).toEqual(publishResult);
         });
